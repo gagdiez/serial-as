@@ -25,7 +25,7 @@ class Encoder extends ClassDecorator {
     //let rhs = `this.${name}.toString()`;
     //this.fields.push(`sb.push(\`${name}: \${${rhs}}\`)`);
     const _type = toString(node.type!);
-    this.fields.push(`encoder.encode_${_type}('${name}', this.${name})`);
+    this.fields.push(`pr.push(encoder.encode_${_type}('${name}', this.${name}))`);
   }
 
   visitClassDeclaration(node: ClassDeclaration): void {
@@ -37,20 +37,13 @@ class Encoder extends ClassDecorator {
     this.fields = [];
     this.visit(node.members);
 
-    let fields_plus_inbetween = []
-    for(let i=0; i < this.fields.length; i++){
-      fields_plus_inbetween.push(this.fields[i])
-      if(i!=this.fields.length-1){ fields_plus_inbetween.push(`encoder.between()`)}
-    }
-
     const method = `
       encode():string {
         let encoder = new ${this.used_encoder}()
-        encoder.start()
-        ${fields_plus_inbetween.join(";\n\t")};
-        encoder.end()
+        let pr:Array<string> = new Array<string>();
         
-        return encoder.encoded
+        ${this.fields.join(";\n\t")};
+        return encoder.merge_encoded(pr)
       }
     `
     let member = SimpleParser.parseClassMember(method, node);

@@ -17,53 +17,47 @@ export abstract class Encodeable{
 }
 
 export abstract class Encoder<T>{
-  constructor(public encoded:T){ }
+  constructor(){}
 
-  start():void{}
-  between():void{}
-  end():void{}
+  //abstract encode_u8(value:u8):T
+  //abstract encode_i8(value:i8):T
+  //abstract encode_u16(value:u16):T
+  //abstract encode_i16(value:i16):T
+  //abstract encode_u32(value:u32):T
+  abstract encode_i32(name:string, value:i32):T
+  //abstract encode_u64(value:u64):T
+  abstract encode_i64(name:string, value:i64):T
+  //abstract encode_u128(value:u128):T
+  abstract encode_string(name:string, value:String):T
+  //abstract encode_array(name:string, value:Array<T>):T
 
-  //abstract encode_u8(value:u8):void
-  //abstract encode_i8(value:i8):void
-  //abstract encode_u16(value:u16):void
-  //abstract encode_i16(value:i16):void
-  //abstract encode_u32(value:u32):void
-  abstract encode_i32(name:string, value:i32):void
-  //abstract encode_u64(value:u64):void
-  abstract encode_i64(name:string, value:i64):void
-  //abstract encode_u128(value:u128):void
-  abstract encode_string(name:string, value:String):void
-  //abstract encode_array(value:Array):void
+  abstract merge_encoded(array:Array<T>):T
 
   encode(object:Encodeable):T{
-    this.start()
-
     let properties:Array<Property> = object.getOwnProperties()
-    
+    let encoded:Array<T> = []
+
     for(let i=0; i<properties.length; i++){
 
       const prop:Property = properties[i]
 
       if(prop.type == 'i32'){ 
         let prop_value:i32 = object.get_i32(prop.name)
-        this.encode_i32(prop.name, prop_value)
+        encoded.push(this.encode_i32(prop.name, prop_value))
       }      
 
       if(prop.type == 'i64'){ 
         let prop_value:i64 = object.get_i64(prop.name)
-        this.encode_i64(prop.name, prop_value)
+        encoded.push(this.encode_i64(prop.name, prop_value))
       }
 
       if(prop.type == 'string'){ 
         let prop_value:string = object.get_string(prop.name)
-        this.encode_string(prop.name, prop_value)
+        encoded.push(this.encode_string(prop.name, prop_value))
       }
-
-      if(i != properties.length - 1){ this.between() }
     
     }
 
-    this.end()
-    return this.encoded
+    return this.merge_encoded(encoded)
   }
 }
