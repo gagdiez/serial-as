@@ -20,7 +20,14 @@ export class JSON extends Encoder<String>{
   }
 
   encode_string(value:string):string{ return '"' + value + '"' }
+
+  encode_i8(value:i8):string{ return value.toString() }
+  encode_i16(value:i16):string{ return value.toString() }
   encode_i32(value:i32):string{ return value.toString() }
   encode_i64(value:i64):string{ return value.toString() }
   
+  encode_u8(value:u8):string{ return value.toString() }
+  encode_u16(value:u16):string{ return value.toString() }
+  encode_u32(value:u32):string{ return value.toString() }
+  encode_u64(value:u64):string{ return value.toString() }
 }

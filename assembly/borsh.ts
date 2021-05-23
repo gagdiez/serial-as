@@ -43,17 +43,22 @@ export class Borsh extends Encoder<ArrayBuffer>{
     return encoded
   }
 
-  encode_i32(value:i32):ArrayBuffer{
-    let buffer:ArrayBuffer = new ArrayBuffer(sizeof<i32>())
-    store<i32>(changetype<usize>(buffer), value)
+  encode_number<T>(value:T):ArrayBuffer{
+    let buffer:ArrayBuffer = new ArrayBuffer(sizeof<T>())
+    store<T>(changetype<usize>(buffer), value)
     return buffer
   }
 
-  encode_i64(value:i64):ArrayBuffer{
-    let buffer:ArrayBuffer = new ArrayBuffer(sizeof<i64>())
-    store<i64>(changetype<usize>(buffer), value)
-    return buffer
-  }
+  encode_i8(value:i8):ArrayBuffer{ return this.encode_number<i8>(value) }
+  encode_i16(value:i16):ArrayBuffer{ return this.encode_number<i16>(value) }
+  encode_i32(value:i32):ArrayBuffer{ return this.encode_number<i32>(value) }
+  encode_i64(value:i64):ArrayBuffer{ return this.encode_number<i64>(value) }
+
+  encode_u8(value:u8):ArrayBuffer{ return this.encode_number<u8>(value) }
+  encode_u16(value:u16):ArrayBuffer{ return this.encode_number<u16>(value) }
+  encode_u32(value:u32):ArrayBuffer{ return this.encode_number<u32>(value) }
+  encode_u64(value:u64):ArrayBuffer{ return this.encode_number<u64>(value) }
+
 
   encode_field(name:string, value:ArrayBuffer):ArrayBuffer{
     return value
