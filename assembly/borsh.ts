@@ -1,4 +1,4 @@
-import {Property, Encodeable, Encoder} from ".";
+import {Encoder} from ".";
 
 export class Borsh extends Encoder<ArrayBuffer>{
   public offset:i32 = 0
@@ -7,7 +7,7 @@ export class Borsh extends Encoder<ArrayBuffer>{
     super()
   }
 
-  merge(properties:Array<Property>, encodes:Array<ArrayBuffer>):ArrayBuffer{
+  merge_encoded(obj_name:string, encodes:Array<ArrayBuffer>):ArrayBuffer{
     let size:i32 = 0
     for(let i:i32=0; i < encodes.length; i++){ size += encodes[i].byteLength }
     
@@ -26,7 +26,7 @@ export class Borsh extends Encoder<ArrayBuffer>{
   encode_string(value:string):ArrayBuffer{
     // encoded = utf8_encoding(x) as Vec<u8>
     // repr(encoded.len() as u32)
-    // repr(encoded as Vec<u8>) 
+    // repr(encoded as Vec<u8>)
 
     let utf8_enc:ArrayBuffer = String.UTF8.encode(value)
     let encoded:ArrayBuffer = new ArrayBuffer(utf8_enc.byteLength + 4)
@@ -53,6 +53,10 @@ export class Borsh extends Encoder<ArrayBuffer>{
     let buffer:ArrayBuffer = new ArrayBuffer(sizeof<i64>())
     store<i64>(changetype<usize>(buffer), value)
     return buffer
+  }
+
+  encode_field(name:string, value:ArrayBuffer):ArrayBuffer{
+    return value
   }
 
 }

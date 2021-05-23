@@ -1,9 +1,9 @@
-import {Property, Encoder} from ".";
+import {Encoder} from ".";
 
 export class JSON extends Encoder<String>{
 
-  merge_encoded(encodes:Array<String>):String{
-    let json:string = "{"
+  merge_encoded(obj_name:string, encodes:Array<string>):string{
+    let json:string = obj_name + " {"
     
     for(let i=0; i<encodes.length; i++){
       json += encodes[i]
@@ -19,8 +19,8 @@ export class JSON extends Encoder<String>{
     return '"' + name + '":' + value
   }
 
-  encode_string(name:string, value:string):string{ return this.encode_field(name, '"' + value + '"') }
-  encode_i32(name:string, value:i32):string{ return this.encode_field(name, value.toString()) }
-  encode_i64(name:string, value:i64):string{ return this.encode_field(name, value.toString()) }
+  encode_string(value:string):string{ return '"' + value + '"' }
+  encode_i32(value:i32):string{ return value.toString() }
+  encode_i64(value:i64):string{ return value.toString() }
   
 }

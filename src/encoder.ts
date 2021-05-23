@@ -1,19 +1,17 @@
-import { Parser,   ClassDeclaration,
-  FieldDeclaration,
-  MethodDeclaration, } from "../as";
+import { ClassDeclaration, FieldDeclaration, MethodDeclaration } from "../as";
 import { SimpleParser } from "visitor-as/dist/simpleParser";
 
-import { ClassDecorator, registerDecorator } from "visitor-as/dist/decorator";
+import { ClassDecorator } from "visitor-as/dist/decorator";
 
-import { not, isLibrary, className, toString, isMethodNamed } from 'visitor-as/dist/utils';
-import { ConstructorExpression } from "assemblyscript";
+import { toString, isMethodNamed } from 'visitor-as/dist/utils';
 
 
-class Encoder extends ClassDecorator {
+export abstract class Encoder extends ClassDecorator {
   currentClass?: ClassDeclaration;
   fields: string[];
 
-  constructor(public used_encoder:string="JSON"){
+  constructor(public encoder:string="JSON",
+              public res_type:string="string"){
     super()
   }
 
@@ -22,10 +20,24 @@ class Encoder extends ClassDecorator {
     if (!node.type) {
       throw new Error(`Field ${name} is missing a type declaration`);
     }
-    //let rhs = `this.${name}.toString()`;
-    //this.fields.push(`sb.push(\`${name}: \${${rhs}}\`)`);
+
+    //TODO:
+    // if type == Array<T>:
+    //   if T == basic_type: (i.e. int, string, float)
+    //     arr = [encoder.encode<T>('', v) for v in node.value]
+    //   else:
+    //     assert(v has method encode, "ERROR")
+    //     arr = [v.encode() for v in node.value]
+    //   pr.push encoder.encode_field(node.name, encoder.encode_array(arr))
+    // else:
     const _type = toString(node.type!);
-    this.fields.push(`pr.push(encoder.encode_${_type}('${name}', this.${name}))`);
+    this.fields.push(`
+      pr.push(
+        encoder.encode_field(
+          '${name}',
+          encoder.encode_${_type}(this.${name})
+        )
+      )`);
   }
 
   visitClassDeclaration(node: ClassDeclaration): void {
@@ -34,34 +46,24 @@ class Encoder extends ClassDecorator {
     }
     
     this.currentClass = node;
+    const class_name:string = toString(node.name!)
+
     this.fields = [];
     this.visit(node.members);
 
     const method = `
-      encode():string {
-        let encoder = new ${this.used_encoder}()
-        let pr:Array<string> = new Array<string>();
+      encode():${this.res_type}{
+        let encoder = new ${this.encoder}()
+        let pr:Array<${this.res_type}> = new Array<${this.res_type}>();
         
         ${this.fields.join(";\n\t")};
-        return encoder.merge_encoded(pr)
+        return encoder.merge_encoded('${class_name}', pr)
       }
     `
     let member = SimpleParser.parseClassMember(method, node);
 
     node.members.push(member);
   }
-
+ 
   visitMethodDeclaration(node: MethodDeclaration): void { }
 }
-
-class JSON_Encoder extends Encoder{
-  constructor(){super("JSON")}
-  get name(): string { return "jencoded"; }
-}
-
-class Borsh_Encoder extends Encoder{
-  constructor(){super("Borsh")}
-  get name(): string { return "bencoded"; }
-}
-
-export = function(){registerDecorator(new JSON_Encoder()) || registerDecorator(new Borsh_Encoder()) }
