@@ -1,4 +1,4 @@
-import { MemoryStream, compileString } from "../as";
+import { MemoryStream, compileString } from "visitor-as/as";
 import * as loader from "assemblyscript/lib/loader/umd";
 
 const CompileStringResult = (false as true) && compileString("");

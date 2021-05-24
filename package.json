@@ -30,6 +30,6 @@
   "dependencies": {
     "lodash.clonedeep": "^4.5.0",
     "ts-mixer": "^5.4.1",
-    "visitor-as": "git+https://github.com/willemneal/visitor-as.git"
+    "visitor-as": "^0.6.0"
   }
 }

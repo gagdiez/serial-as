@@ -1,6 +1,6 @@
 import {Encoder} from ".";
 
-export class Borsh extends Encoder<ArrayBuffer>{
+export class Borsh<T> extends Encoder<T, ArrayBuffer>{
   public offset:i32 = 0
 
   constructor(){
