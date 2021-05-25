@@ -21,17 +21,8 @@ export abstract class Encoder extends ClassDecorator {
       throw new Error(`Field ${name} is missing a type declaration`);
     }
 
-    //TODO:
-    // if type == Array<T>:
-    //   if T == basic_type: (i.e. int, string, float)
-    //     arr = [encoder.encode<T>('', v) for v in node.value]
-    //   else:
-    //     assert(v has method encode, "ERROR")
-    //     arr = [v.encode() for v in node.value]
-    //   pr.push encoder.encode_field(node.name, encoder.encode_array(arr))
-    // else:
     const _type = getName(node.type!);
-    this.fields.push(`encoder.encode_field<${getName(this.currentClass!)}, ${_type}>("${name}", this.${name})`);
+    this.fields.push(`encoder.encode<${_type}>("${name}", this.${name})`);
   }
 
   visitClassDeclaration(node: ClassDeclaration): void {
@@ -46,13 +37,13 @@ export abstract class Encoder extends ClassDecorator {
     this.visit(node.members);
 
     const method = `
-      encode<__T>(encoder: Encoder<__T>): __T {
-        let encoder = new ${this.encoder}()
-        let pr:Array<__T> = new Array<__T>();
+      encode<__I, __R>(encoder: Encoder<__I, __R>): __R {
         
+        encoder.start("${class_name}")
         ${this.fields.join(";\n\t")};
-        super.encode<__T>(encoder);
-        return encoder.merge_encoded('${class_name}', pr)
+        //TODO: -- DO NOT FORGET -- super.encode<__T>(encoder);
+        encoder.end()
+        return encoder.get_encoded_object()
       }
     `
     let member = SimpleParser.parseClassMember(method, node);

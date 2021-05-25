@@ -1,33 +1,43 @@
 import {Encoder} from ".";
 
-export class JSON extends Encoder<String>{
+export class JSON extends Encoder<string[], string>{
 
-  merge_encoded(obj_name:string, encodes:Array<string>):string{
-    let json:string[] = [obj_name , " {"]
-    
-    for(let i=0; i<encodes.length; i++){
-      json.push(encodes[i])
-      if(i!=encodes.length-1) json.push(', ')
-    }
+  public first:bool = true
+  public started:bool = false
+  public finished:bool = false
 
-    json.push("}")
+  constructor(){ super([]) }
 
-    return json.join()
+  start(class_name:string):void{
+    assert(!this.started, "Already started")
+    this.partial_encode = [`${class_name} {`]
+    this.started = true
   }
 
-  encode_field(name:string, value:string):string{
-    return `"${name}": ${value}`
+  end():void{
+    assert(this.started, "Please start the encoder")
+    assert(!this.finished, "The encoder has finished")
+    this.partial_encode.push("}")
+    this.finished = true
   }
 
-  encode_string(value:string):string{ return `"${value}"` }
+  get_encoded_object():string{
+    if(!this.finished){this.end()}
+    return this.partial_encode.join('')
+  }
 
-  encode_i8(value:i8):string{ return value.toString() }
-  encode_i16(value:i16):string{ return value.toString() }
-  encode_i32(value:i32):string{ return value.toString() }
-  encode_i64(value:i64):string{ return value.toString() }
-  
-  encode_u8(value:u8):string{ return value.toString() }
-  encode_u16(value:u16):string{ return value.toString() }
-  encode_u32(value:u32):string{ return value.toString() }
-  encode_u64(value:u64):string{ return value.toString() }
+  encode_field(name:string, value:string):void{
+    assert(this.started, "Please start the encoder")
+    if(!this.first){this.partial_encode.push(", ")}
+    this.partial_encode.push(`"${name}":${value}`)
+    this.first = false
+  }
+
+  encode_string(name:string, value:string):void{
+    this.encode_field(name, `"${value}"`)
+  }
+
+  encode_number<K extends number>(name:string, value:K):void{
+    this.encode_field(name, value.toString())
+  }
 }

@@ -16,8 +16,8 @@ module.exports = {
     /** A runtime must be provided here. */
     // "--runtime": ["none"], // Acceptable values are: full, half, stub (arena), and none
     "--transform": [
-    //  "./src/json.encoder.ts",
-      "./src/borsh.encoder.ts",
+      "./src/json.encoder.ts",
+    //  "./src/borsh.encoder.ts",
       ],
   },
   /**

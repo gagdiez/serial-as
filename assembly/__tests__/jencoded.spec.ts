@@ -1,4 +1,5 @@
 import {JSON} from '../json'
+import {Encoder} from '../index'
 
 @jencoded
 class Pair{
@@ -18,8 +19,12 @@ describe("JSON Encoder", () => {
     //let p1:Pair = {s1:0, s2:1}
     //let p2:Pair = {s1:2, s2:3}
     //let test:Test = {str:"testing", number:2, arr:[p1, p2]}
-
+    const encoder:JSON = new JSON()
     let test:Test = {str:"testing", number:2}
-    //expect(test.encode()).toBe("Test {\"number\":2, \"str\":\"testing\"}")
+    
+    let res:string = test.encode<string[], string>(encoder)
+
+    expect(res)
+    .toBe("Test {\"number\":2, \"str\":\"testing\"}")
   });
 });
