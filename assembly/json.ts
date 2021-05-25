@@ -3,23 +3,23 @@ import {Encoder} from ".";
 export class JSON extends Encoder<String>{
 
   merge_encoded(obj_name:string, encodes:Array<string>):string{
-    let json:string = obj_name + " {"
+    let json:string[] = [obj_name , " {"]
     
     for(let i=0; i<encodes.length; i++){
-      json += encodes[i]
-      if(i!=encodes.length-1) json += ', '
+      json.push(encodes[i])
+      if(i!=encodes.length-1) json.push(', ')
     }
 
-    json += "}"
+    json.push("}")
 
-    return json
+    return json.join()
   }
 
   encode_field(name:string, value:string):string{
-    return '"' + name + '":' + value
+    return `"${name}": ${value}`
   }
 
-  encode_string(value:string):string{ return '"' + value + '"' }
+  encode_string(value:string):string{ return `"${value}"` }
 
   encode_i8(value:i8):string{ return value.toString() }
   encode_i16(value:i16):string{ return value.toString() }

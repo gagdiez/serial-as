@@ -1,6 +1,6 @@
 import { Encoder } from "./encoder"
 
-import { registerDecorator } from "visitor-as/dist/decorator";
+import { registerDecorator } from "visitor-as";
 
 class JSONEncoder extends Encoder{
   constructor(){super("JSON", "string")}

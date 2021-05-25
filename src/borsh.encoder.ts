@@ -1,5 +1,5 @@
 import { Encoder } from "./encoder";
-import { registerDecorator } from "visitor-as/dist/decorator";
+import { registerDecorator } from "visitor-as";
 
 class BorshEncoder extends Encoder{
   constructor(){super("Borsh", "ArrayBuffer")}
