@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "lodash.clonedeep": "^4.5.0",
+    "near-sdk-as": "^3.2.0",
     "ts-mixer": "^5.4.1",
     "visitor-as": "^0.6.0"
   }

@@ -1,3 +1,5 @@
+import { u128 } from "near-sdk-as";
+
 function isNull<T>(t: T): bool {
   if (isNullable<T>() || isReference<T>()) {
     return changetype<usize>(t) == 0;
@@ -5,41 +7,30 @@ function isNull<T>(t: T): bool {
   return false;
 }
 
-
 export abstract class Encoder<R>{
-  // An Encoder has an internal state of type I, and returns
-  // encoded object of type R
+
   constructor(){}
 
-  //abstract encode_array(value:Array<T>): void
-
-  // Encodes the field `name` using its encoded value
-  //abstract encode_field<_Class, _Field>(name:string, value: _Field): void;
-
-  /* encode_object<_Class extends Object>(_class: _Class): void {
-    this.pushObject();
-    _class.encode(this);
-    this.popObject();
-  }
-
-  encode_arr(){
-    this.pushArray();
-    this.encode_array();
-    this.popArray();
-  }
-
-  abstract pushArray(): void;
-  abstract pushObject(): void;
-  abstract popObject(): void;
-  abstract popArray(): void; */
-
-  abstract start(class_name:string):void
-  abstract end():void
+  abstract encode_field<T>(name:string, value:T):void
   abstract get_encoded_object():R
-  abstract encode_field<V>(name:string, value:V):void
 
   // Boolean
-  //abstract encode_bool(value: bool): void
+  abstract encode_bool(value: bool): void
+
+  // Map --
+  abstract encode_map<K, V>(value:Map<K, V>): void
+
+  // Null --
+  abstract encode_null(): void
+
+  // Object --
+  abstract encode_object<C>(value:C): void
+
+  // String --
+  abstract encode_string(value:string): void
+
+  // Set --
+  abstract encode_set<S>(value:Set<S>): void
 
   // Number --
   abstract encode_u8(value:u8): void
@@ -50,10 +41,11 @@ export abstract class Encoder<R>{
   abstract encode_i32(value:i32): void
   abstract encode_u64(value:u64): void
   abstract encode_i64(value:i64): void
+  abstract encode_u128(value:u128): void
   abstract encode_f32(value:f32): void
   abstract encode_f64(value:f64): void
 
-  encode_number<V extends number>(value:V):void{
+  encode_number<N extends number>(value:N):void{
     // @ts-ignore
     if (value instanceof u8){ this.encode_u8(value); return }
     // @ts-ignore
@@ -76,20 +68,46 @@ export abstract class Encoder<R>{
     if (value instanceof f64){ this.encode_f64(value); return }
   }
 
-  // Null --
-  //abstract encode_null(): void
-
-  // String --
-  abstract encode_string(value:string): void
-
   // Array --
-  abstract encode_array<K>(value:Array<K>): void
+  abstract encode_array<A>(value:Array<A>): void
+  abstract encode_u8array(value:Uint8Array): void
+  abstract encode_i8array(value:Int8Array): void
+  abstract encode_u16array(value:Uint16Array): void
+  abstract encode_i16array(value:Int16Array): void
+  abstract encode_u32array(value:Uint32Array): void
+  abstract encode_i32array(value:Int32Array): void
+  abstract encode_u64array(value:Uint64Array): void
+  abstract encode_i64array(value:Int64Array): void
 
+  encode_array_like<T>(value:T): void{
+    // @ts-ignore
+    if (value instanceof Uint8Array){ this.encode_u8array(value); return }
+    // @ts-ignore
+    if (value instanceof Uint16Array){ this.encode_u16array(value); return }
+    // @ts-ignore
+    if (value instanceof Uint32Array){ this.encode_u32array(value); return }
+    // @ts-ignore
+    if (value instanceof Uint64Array){ this.encode_u64array(value); return }
+    // @ts-ignore
+    if (value instanceof Int8Array){ this.encode_i8array(value); return }
+    // @ts-ignore
+    if (value instanceof Int16Array){ this.encode_i16array(value); return }
+    // @ts-ignore
+    if (value instanceof Int32Array){ this.encode_i32array(value); return }
+    // @ts-ignore
+    if (value instanceof Int64Array){ this.encode_i64array(value); return }
+
+    // @ts-ignore
+    this.encode_array<valueof<T>>(value);
+  }
+
+
+  // Encode --
   encode<V>(value: V): void {
     // This function encodes a value:V into the encoder.encoded_object:R
 
     // @ts-ignore
-    if (isBoolean<V>()){ this.encode_boolean(value); return }
+    if (isBoolean<V>()){ this.encode_bool(value); return }
 
     // @ts-ignore
     if (isInteger<V>() || isFloat<V>()){ this.encode_number<V>(value); return }
@@ -97,59 +115,20 @@ export abstract class Encoder<R>{
     // @ts-ignore
     if (isString<V>()) { this.encode_string(value); return }
 
-    //if (isNull<V>(value)){ return encoder.encode_null() }
+    if (isNull<V>(value)){ this.encode_null(); return }
     
-    if (isReference<V>()) {
-      // @ts-ignore
-      //if (isDefined(value.encode)){ return this.encode_object(value) }
+    // @ts-ignore
+    if (isDefined(value.encode)){ this.encode_object(value); return }
 
-      if (isArrayLike<V>(value)){ this.encode_array<valueof<V>>(value); return }
-    }
-      //   if (f instanceof Uint8Array) {
-      //     // @ts-ignore
-      //     encoder.setString(name, base64.encode(<Uint8Array>f));
-      //   } else {
-      //     encoder.pushArray(name);
-      //     for (let i: i32 = 0; i < f.length; i++) {
-      //       // @ts-ignore
-      //       encode<valueof<T>, JSONEncoder>(f[i], null, encoder);
-      //     }
-      //     encoder.popArray();
-      //   }
-      // } else {
-      //   // Is an object
-      //   if (f instanceof u128) {
-      //     // @ts-ignore
-      //     encoder.setString(name, f.toString());
-      //   } else if (f instanceof Map) {
-      //     assert(
-      //       // @ts-ignore
-      //       nameof<indexof<T>>() == "String",
-      //       "Can only encode maps with string keys"
-      //     );
-      //     let keys = f.keys();
-      //     encoder.pushObject(name);
-      //     for (let i = 0; i < keys.length; i++) {
-      //       // @ts-ignore
-      //       encode<valueof<T>, JSONEncoder>(
-      //         f.get(keys[i]),
-      //         keys[i],
-      //         encoder
-      //       );
-      //     }
-      //     encoder.popObject();
-      //   } else if (f instanceof Set) {
-      //     // @ts-ignore
-      //     let values: Array<indexof<T>> = f.values();
-      //     encoder.pushArray(name);
-      //     for (let i = 0; i < values.length; i++) {
-      //       // @ts-ignore
-      //       encode<indexof<T>, JSONEncoder>(values[i], null, encoder);
-      //     }
-      //     encoder.popArray();
-      //   }
-      //}
-      // encoder.encode_object<T>(name, changetype<T>(f));
-    //}
+    if (isArrayLike<V>(value)){ this.encode_array_like<V>(value); return }
+
+    // @ts-ignore
+    if (value instanceof u128){ this.encode_u128(value); return }
+
+    // @ts-ignore
+    if(value instanceof Set){ this.encode_set<valueof<V>>(value); return }
+
+    // @ts-ignore
+    if(value instanceof Map){ this.encode_map<indexof<V>, valueof<V>>(value)}
   }
 }

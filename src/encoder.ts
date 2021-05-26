@@ -39,10 +39,9 @@ export abstract class Encoder extends ClassDecorator {
     const method = `
       encode<__T>(encoder: Encoder<__T>): __T {
         
-        encoder.start("${class_name}")
         ${this.fields.join(";\n\t")};
         //TODO: -- DO NOT FORGET -- super.encode<__T>(encoder);
-        encoder.end()
+
         return encoder.get_encoded_object()
       }
     `
