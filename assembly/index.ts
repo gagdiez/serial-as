@@ -36,74 +36,75 @@ export abstract class Encoder<R>{
   abstract start(class_name:string):void
   abstract end():void
   abstract get_encoded_object():R
+  abstract encode_field<V>(name:string, value:V):void
 
   // Boolean
-  //abstract encode_bool(name:string, value: bool): void
+  //abstract encode_bool(value: bool): void
 
   // Number --
-  encode_u8(name:string, value:u8): void{}
-  encode_i8(name:string, value:i8): void{}
-  encode_u16(name:string, value:u16): void{}
-  encode_i16(name:string, value:i16): void{}
-  encode_u32(name:string, value:u32): void{}
-  encode_i32(name:string, value:i32): void{}
-  encode_u64(name:string, value:u64): void{}
-  encode_i64(name:string, value:i64): void{}
-  encode_f32(name:string, value:f32): void{}
-  encode_f64(name:string, value:f64): void{}
+  abstract encode_u8(value:u8): void
+  abstract encode_i8(value:i8): void
+  abstract encode_u16(value:u16): void
+  abstract encode_i16(value:i16): void
+  abstract encode_u32(value:u32): void
+  abstract encode_i32(value:i32): void
+  abstract encode_u64(value:u64): void
+  abstract encode_i64(value:i64): void
+  abstract encode_f32(value:f32): void
+  abstract encode_f64(value:f64): void
 
-  encode_number<V extends number>(name:string, value:V):void{
+  encode_number<V extends number>(value:V):void{
     // @ts-ignore
-    if (value instanceof u8){ this.encode_u8(name, value); return }
+    if (value instanceof u8){ this.encode_u8(value); return }
     // @ts-ignore
-    if (value instanceof i8){ this.encode_i8(name, value); return }
+    if (value instanceof i8){ this.encode_i8(value); return }
     // @ts-ignore
-    if (value instanceof u16){ this.encode_u16(name, value); return }
+    if (value instanceof u16){ this.encode_u16(value); return }
     // @ts-ignore
-    if (value instanceof i16){ this.encode_i16(name, value); return }
+    if (value instanceof i16){ this.encode_i16(value); return }
     // @ts-ignore
-    if (value instanceof u32){ this.encode_u32(name, value); return }
+    if (value instanceof u32){ this.encode_u32(value); return }
     // @ts-ignore
-    if (value instanceof i32){ this.encode_i32(name, value); return }
+    if (value instanceof i32){ this.encode_i32(value); return }
     // @ts-ignore
-    if (value instanceof u64){ this.encode_u64(name, value); return }
+    if (value instanceof u64){ this.encode_u64(value); return }
     // @ts-ignore
-    if (value instanceof i64){ this.encode_i64(name, value); return }
+    if (value instanceof i64){ this.encode_i64(value); return }
     // @ts-ignore
-    if (value instanceof f32){ this.encode_f32(name, value); return }
+    if (value instanceof f32){ this.encode_f32(value); return }
     // @ts-ignore
-    if (value instanceof f64){ this.encode_f64(name, value); return }
+    if (value instanceof f64){ this.encode_f64(value); return }
   }
 
   // Null --
-  //abstract encode_null(name:string): void
+  //abstract encode_null(): void
 
   // String --
-  abstract encode_string(name:string, value:string): void
+  abstract encode_string(value:string): void
 
   // Array --
-  //abstract encode_array<K>(name:string, value:Array<K>): void;
+  abstract encode_array<K>(value:Array<K>): void
 
-  encode<V>(name: string, value: V): void {
-    // This function encodes < object.name:V = value > into the < encoder.encoded_object:R >
-
-    // @ts-ignore
-    if (isBoolean<V>()){ this.encode_boolean(name, value); return }
+  encode<V>(value: V): void {
+    // This function encodes a value:V into the encoder.encoded_object:R
 
     // @ts-ignore
-    if (isInteger<V>() || isFloat<V>()){ this.encode_number<V>(name, value); return }
+    if (isBoolean<V>()){ this.encode_boolean(value); return }
 
     // @ts-ignore
-    if (isString<V>()) { this.encode_string(name, value); return }
+    if (isInteger<V>() || isFloat<V>()){ this.encode_number<V>(value); return }
 
-    //if (isNull<V>(value)){ return encoder.encode_null(name) }
+    // @ts-ignore
+    if (isString<V>()) { this.encode_string(value); return }
+
+    //if (isNull<V>(value)){ return encoder.encode_null() }
     
-    //if (isReference<V>()) {
+    if (isReference<V>()) {
       // @ts-ignore
-      //if (isDefined(value.encode)){ return this.encode_object(name, value) }
+      //if (isDefined(value.encode)){ return this.encode_object(value) }
 
-      // @ts-ignore
-      //if (isArrayLike<V>(value)){ return this.encode_array<valueof<V>>(name, value)
+      if (isArrayLike<V>(value)){ this.encode_array<valueof<V>>(value); return }
+    }
       //   if (f instanceof Uint8Array) {
       //     // @ts-ignore
       //     encoder.setString(name, base64.encode(<Uint8Array>f));

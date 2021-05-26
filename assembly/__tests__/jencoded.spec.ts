@@ -11,6 +11,7 @@ class Pair{
 class Test{
   public number:i32;
   public str:string;
+  public arr:Array<i32>;
   //public arr:Array<Pair>;
 }
 
@@ -20,11 +21,11 @@ describe("JSON Encoder", () => {
     //let p2:Pair = {s1:2, s2:3}
     //let test:Test = {str:"testing", number:2, arr:[p1, p2]}
     const encoder:JSON = new JSON()
-    let test:Test = {str:"testing", number:2}
+    let test:Test = {str:"testing", number:2, arr:[0, 1]}
     
     let res:string = test.encode<string>(encoder)
 
     expect(res)
-    .toBe("Test {\"number\":2, \"str\":\"testing\"}")
+    .toBe("Test {\"number\":2, \"str\":\"testing\", \"arr\":[0,1]}")
   });
 });
