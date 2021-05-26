@@ -37,7 +37,7 @@ export abstract class Encoder extends ClassDecorator {
     this.visit(node.members);
 
     const method = `
-      encode<__I, __R>(encoder: Encoder<__I, __R>): __R {
+      encode<__T>(encoder: Encoder<__T>): __T {
         
         encoder.start("${class_name}")
         ${this.fields.join(";\n\t")};

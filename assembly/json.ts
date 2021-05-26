@@ -1,12 +1,13 @@
 import {Encoder} from ".";
 
-export class JSON extends Encoder<string[], string>{
+export class JSON extends Encoder<string>{
 
   public first:bool = true
   public started:bool = false
   public finished:bool = false
+  public partial_encode:string[] = []
 
-  constructor(){ super([]) }
+  constructor(){ super() }
 
   start(class_name:string):void{
     assert(!this.started, "Already started")

@@ -22,7 +22,7 @@ describe("JSON Encoder", () => {
     const encoder:JSON = new JSON()
     let test:Test = {str:"testing", number:2}
     
-    let res:string = test.encode<string[], string>(encoder)
+    let res:string = test.encode<string>(encoder)
 
     expect(res)
     .toBe("Test {\"number\":2, \"str\":\"testing\"}")

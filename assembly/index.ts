@@ -6,10 +6,10 @@ function isNull<T>(t: T): bool {
 }
 
 
-export abstract class Encoder<I, R>{
+export abstract class Encoder<R>{
   // An Encoder has an internal state of type I, and returns
   // encoded object of type R
-  constructor(public partial_encode:I){}
+  constructor(){}
 
   //abstract encode_array(value:Array<T>): void
 
