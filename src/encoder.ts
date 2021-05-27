@@ -22,6 +22,7 @@ export abstract class Encoder extends ClassDecorator {
     }
 
     const _type = getName(node.type!);
+    
     this.fields.push(`encoder.encode_field<${_type}>("${name}", this.${name})`);
   }
 
