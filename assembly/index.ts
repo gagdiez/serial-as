@@ -79,6 +79,7 @@ export abstract class Encoder<R>{
   abstract encode_u64array(value:Uint64Array): void
   abstract encode_i64array(value:Int64Array): void
 
+  // Q2: HOW CAN I ADD T as Array?
   encode_array_like<T>(value:T): void{
     // @ts-ignore
     if (value instanceof Uint8Array){ this.encode_u8array(value); return }
@@ -96,9 +97,6 @@ export abstract class Encoder<R>{
     if (value instanceof Int32Array){ this.encode_i32array(value); return }
     // @ts-ignore
     if (value instanceof Int64Array){ this.encode_i64array(value); return }
-
-    // @ts-ignore
-    this.encode_array<valueof<T>>(value);
   }
 
 
@@ -109,6 +107,7 @@ export abstract class Encoder<R>{
     // @ts-ignore
     if (isBoolean<V>()){ this.encode_bool(value); return }
 
+    // QUESTION 1: ADD 128 HERE?
     // @ts-ignore
     if (isInteger<V>() || isFloat<V>()){ this.encode_number<V>(value); return }
 
@@ -120,7 +119,10 @@ export abstract class Encoder<R>{
     // @ts-ignore
     if (isDefined(value.encode)){ this.encode_object(value); return }
 
-    if (isArrayLike<V>(value)){ this.encode_array_like<V>(value); return }
+    // @ts-ignore
+    if(isArray(value)){ this.encode_array<valueof<V>>(value); return }
+
+    if (isArrayLike<V>(value)){ this.encode_array_like(value); return }
 
     // @ts-ignore
     if (value instanceof u128){ this.encode_u128(value); return }
