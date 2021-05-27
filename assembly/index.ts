@@ -18,7 +18,7 @@ export abstract class Encoder<R>{
   abstract encode_bool(value: bool): void
 
   // Map --
-  abstract encode_map<K, V>(value:Map<K, V>): void
+  abstract encode_map<M extends Map<any, any> | null>(value:M): void
 
   // Null --
   abstract encode_null(): void
@@ -30,7 +30,7 @@ export abstract class Encoder<R>{
   abstract encode_string(value:string): void
 
   // Set --
-  abstract encode_set<S>(value:Set<S>): void
+  abstract encode_set<S extends Set<any> | null>(value:S): void
 
   // Number --
   abstract encode_u8(value:u8): void
@@ -73,8 +73,6 @@ export abstract class Encoder<R>{
 
   // Encode --
   encode<V>(value: V): void {
-    // This function encodes a value:V into the encoder.encoded_object:R
-
     // @ts-ignore
     if (isBoolean<V>()){ this.encode_bool(value); return }
 
@@ -84,9 +82,11 @@ export abstract class Encoder<R>{
     // @ts-ignore
     if (isString<V>()) { this.encode_string(value); return }
 
-    if (isNullable<V>(value)){
-      if (value == null) this.encode_null(); return
-    }
+    // @ts-ignore
+    if(value instanceof u128){ this.encode_u128(value); return }  // -> we need to get ride of this
+
+    // All the following types are nullable
+    if(value == null){this.encode_null(); return}
 
     // @ts-ignore
     if (isDefined(value.encode)){ this.encode_object(value); return }
@@ -95,12 +95,9 @@ export abstract class Encoder<R>{
     if(isArrayLike<V>(value)){ this.encode_array<V>(value); return }
 
     // @ts-ignore
-    if(value instanceof u128){ this.encode_u128(value); return }  // -> we need to get ride of this
+    if(value instanceof Set){ this.encode_set<V>(value); return }
 
     // @ts-ignore
-    if(value instanceof Set){ this.encode_set<valueof<V>>(value); return }
-
-    // @ts-ignore
-    if(value instanceof Map){ this.encode_map<indexof<V>, valueof<V>>(value)}
+    if(value instanceof Map){ this.encode_map<V>(value) }
   }
 }

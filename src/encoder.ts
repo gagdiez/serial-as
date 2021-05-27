@@ -21,10 +21,15 @@ class Encoder extends ClassDecorator {
     if (!node.type) {
       throw new Error(`Field ${name} is missing a type declaration`);
     }
-
     const _type = getName(node.type!);
     
-    this.fields.push(`encoder.encode_field<${_type}>("${name}", this.${name})`);
+    this.fields.push(`
+      if(isNullable(this.${name})){
+        encoder.encode_field<${_type} | null>("${name}", this.${name})
+      }else{
+        encoder.encode_field<${_type}>("${name}", this.${name})
+      }
+    `);
   }
 
   visitClassDeclaration(node: ClassDeclaration): void {

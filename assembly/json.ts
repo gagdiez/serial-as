@@ -17,8 +17,7 @@ export class JSON extends Encoder<string>{
   encode_field<K>(name:string, value:K):void{
     if(this.starting_object){
       this.inner_encode.push("{")
-    }
-    else{ 
+    }else{ 
       this.inner_encode[this.inner_encode.length-1] = ","
     }
     
@@ -40,14 +39,10 @@ export class JSON extends Encoder<string>{
 
   // Array --
   encode_array<K extends ArrayLike<any> | null>(value:K):void{
-    if(value == null){
-      this.encode_null()
-      return
-    }
+    if(value == null){ this.encode_null(); return }
 
     if(value instanceof Uint8Array){
-      this.inner_encode.push(`"${base64.encode(value)}"`)
-      return
+      this.inner_encode.push(`"${base64.encode(value)}"`); return
     }
 
     this.inner_encode.push(`[`)
@@ -64,26 +59,31 @@ export class JSON extends Encoder<string>{
   encode_null(): void{ this.inner_encode.push("null") }
 
   // Set --
-  encode_set<S>(set:Set<S>): void{
-    let values: Array<S> = set.values();
+  encode_set<S extends Set<any> | null>(set:S): void{
+    if(set == null){ this.encode_null(); return }
+
+    let values = set.values();
     this.inner_encode.push(`{`)
     for (let i = 0; i < values.length; i++) {
-      this.encode<S>(values[i])
+      this.encode<indexof<S>>(values[i])
       if(i != values.length-1){ this.inner_encode.push(`,`) }
     }
     this.inner_encode.push(`}`)
   }
 
   // Map --
-  encode_map<K, V>(value:Map<K, V>): void{
+  encode_map<M extends Map<any, any> | null>(map:M): void{
+    if(map == null){ this.encode_null(); return }
+
     this.inner_encode.push(`{`)
 
-    let keys = value.keys();
+    let keys = map.keys();
 
     for (let i = 0; i < keys.length; i++) {
-      this.encode<K>(keys[i])
+      this.encode<indexof<M>>(keys[i])
       this.inner_encode.push(':')
-      this.encode<V>(value.get(keys[i]))
+      this.encode<valueof<M>>(map.get(keys[i]))
+
       if(i != keys.length-1){ this.inner_encode.push(`,`) }
     }
 
