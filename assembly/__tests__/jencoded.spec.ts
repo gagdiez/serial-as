@@ -3,13 +3,13 @@ import {Encoder} from '../index'
 import { u128, base64 } from "near-sdk-as";
 
 
-@jencoded
+@encodable
 class Pair{
   public s1:i32;
   public s2:i32;
 }
 
-@jencoded
+@encodable
 class Test{
   public number:i32=2;
   public str:string="testing";
@@ -18,7 +18,7 @@ class Test{
   public f32_zero: f32;
 }
 
-@jencoded
+@encodable
 export class FooBar {
   foo: i32 = 0;
   bar: u32 = 1;

@@ -1,67 +1,128 @@
 import {Encoder} from ".";
+import { u128 } from "near-sdk-as";
 
-export class Borsh<T> extends Encoder<T, ArrayBuffer>{
+export class Borsh extends Encoder<ArrayBuffer>{
   public offset:i32 = 0
+  public inner_encode:ArrayBuffer = new ArrayBuffer(200)
 
   constructor(){
     super()
   }
-
-  merge_encoded(obj_name:string, encodes:Array<ArrayBuffer>):ArrayBuffer{
-    let size:i32 = 0
-    for(let i:i32=0; i < encodes.length; i++){ size += encodes[i].byteLength }
-    
-    let merged_buffer = new ArrayBuffer(size)
-    let offset:i32 = 0
-
-    for(let i:i32=0; i < encodes.length; i++){
-      let src = changetype<usize>(encodes[i])
-      let dst = changetype<usize>(merged_buffer) + <usize>offset
-      memory.copy(dst, src, encodes[i].byteLength)
-      offset += encodes[i].byteLength
-    }
-    return merged_buffer
+  
+  get_encoded_object():ArrayBuffer{
+    return this.inner_encode.slice(0, this.offset)
   }
-    
-  encode_string(value:string):ArrayBuffer{
-    // encoded = utf8_encoding(x) as Vec<u8>
-    // repr(encoded.len() as u32)
-    // repr(encoded as Vec<u8>)
 
-    let utf8_enc:ArrayBuffer = String.UTF8.encode(value)
-    let encoded:ArrayBuffer = new ArrayBuffer(utf8_enc.byteLength + 4)
+  encode_field<T>(name:string, value:T):void{
+    this.encode<T>(value)
+  }
+
+  // Bool --
+  encode_bool(value:bool): void{
+    // Q3 ??????? 
+  }
+
+  // String --
+  encode_string(value:string):void{
+    const utf8_enc:ArrayBuffer = String.UTF8.encode(value)
     
     // repr(encoded.len() as u32)
-    store<u32>(changetype<usize>(encoded), utf8_enc.byteLength)
-
+    store<u32>(changetype<usize>(this.inner_encode) + this.offset,
+               utf8_enc.byteLength)
+    this.offset += 4
+    
     // repr(encoded as Vec<u8>) 
-    const offset:i32 = 4
-    memory.copy(changetype<usize>(encoded) + offset,
+    memory.copy(changetype<usize>(this.inner_encode) + this.offset,
                 changetype<usize>(utf8_enc),
                 utf8_enc.byteLength)
-
-    return encoded
+    this.offset += utf8_enc.byteLength
   }
 
-  encode_number<T>(value:T):ArrayBuffer{
-    let buffer:ArrayBuffer = new ArrayBuffer(sizeof<T>())
-    store<T>(changetype<usize>(buffer), value)
-    return buffer
+  // Array --
+  encode_array<K>(value:Array<K>):void{
+    // repr(value.len() as u32) 
+    store<u32>(changetype<usize>(this.inner_encode) + this.offset,
+               value.length as u32)
+    this.offset += 4
+
+    //for el in x; repr(el as K)
+    for(let i=0; i<value.length; i++){
+      this.encode<K>(value[i])  // already updates this.offset
+    }
   }
 
-  encode_i8(value:i8):ArrayBuffer{ return this.encode_number<i8>(value) }
-  encode_i16(value:i16):ArrayBuffer{ return this.encode_number<i16>(value) }
-  encode_i32(value:i32):ArrayBuffer{ return this.encode_number<i32>(value) }
-  encode_i64(value:i64):ArrayBuffer{ return this.encode_number<i64>(value) }
+  // Null --
+  encode_null(): void{ /* ?????? */ }
 
-  encode_u8(value:u8):ArrayBuffer{ return this.encode_number<u8>(value) }
-  encode_u16(value:u16):ArrayBuffer{ return this.encode_number<u16>(value) }
-  encode_u32(value:u32):ArrayBuffer{ return this.encode_number<u32>(value) }
-  encode_u64(value:u64):ArrayBuffer{ return this.encode_number<u64>(value) }
-
-
-  encode_field(name:string, value:ArrayBuffer):ArrayBuffer{
-    return value
+  // Set --
+  encode_set<S>(set:Set<S>): void{
+    let values: Array<S> = set.values();
+    // repr(value.len() as u32) 
+    store<u32>(changetype<usize>(this.inner_encode) + this.offset,
+               values.length as u32)
+    this.offset += 4
+    
+    //for el in x.sorted(); repr(el as S)
+    for(let i=0; i<values.length; i++){
+      this.encode<S>(values[i])  // already updates this.offset
+    }
   }
+
+  // Map --
+  encode_map<K, V>(value:Map<K, V>): void{
+    let keys = value.keys();
+
+    // repr(encoded.len() as u32)
+    store<u32>(changetype<usize>(this.inner_encode) + this.offset,
+               keys.length)
+    this.offset += 4
+
+    // repr(k as K)
+    // repr(v as V)
+    for (let i = 0; i < keys.length; i++) {
+      this.encode<K>(keys[i])
+      this.encode<V>(value.get(keys[i]))
+    }
+  }
+
+  // Object --
+  encode_object<C>(object:C): void{   
+    // @ts-ignore
+    object.encode<string>(this)
+  }
+
+  encode_number<T>(value:T):void{
+    // little_endian(x)
+    store<T>(changetype<usize>(this.inner_encode) + this.offset, value)
+    this.offset += sizeof<T>()
+  }
+
+  encode_u128(value:u128):void{
+    // little_endian(x)
+    store<u128>(changetype<usize>(this.inner_encode) + this.offset, value)
+    this.offset += sizeof<u128>()
+  }
+
+  // We override encode_number, for which we don't need these
+  encode_u8(value:u8): void{}
+  encode_i8(value:i8): void{}
+  encode_u16(value:u16): void{}
+  encode_i16(value:i16): void{}
+  encode_u32(value:u32): void{}
+  encode_i32(value:i32): void{}
+  encode_u64(value:u64): void{}
+  encode_i64(value:i64): void{}
+  encode_f32(value:f32): void{}
+  encode_f64(value:f64): void{}
+
+  // We override encode_array_like, for which we don't need these
+  encode_u8array(value:Uint8Array): void{}
+  encode_i8array(value:Int8Array): void{}
+  encode_u16array(value:Uint16Array): void{}
+  encode_i16array(value:Int16Array): void{}
+  encode_u32array(value:Uint32Array): void{}
+  encode_i32array(value:Int32Array): void{}
+  encode_u64array(value:Uint64Array): void{}
+  encode_i64array(value:Int64Array): void{}
 
 }

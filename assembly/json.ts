@@ -70,13 +70,13 @@ export class JSON extends Encoder<string>{
 
   // Map --
   encode_map<K, V>(value:Map<K, V>): void{
-    assert(isString<K>(), "We can only encode maps with string keys")
     this.inner_encode.push(`{`)
 
     let keys = value.keys();
 
     for (let i = 0; i < keys.length; i++) {
-      this.inner_encode.push(`${keys[i]}:`)
+      this.encode<K>(keys[i])
+      this.inner_encode.push(':')
       this.encode<V>(value.get(keys[i]))
       if(i != keys.length-1){ this.inner_encode.push(`,`) }
     }
@@ -105,7 +105,7 @@ export class JSON extends Encoder<string>{
   encode_f64(value:f64): void{ this.inner_encode.push(value.toString()) }
 
   encode_u8array(value:Uint8Array): void{
-    this.inner_encode.push(base64.encode(value))
+    this.inner_encode.push(`"${base64.encode(value)}"`)
   }
 
   // TODO: RAISE ERROR

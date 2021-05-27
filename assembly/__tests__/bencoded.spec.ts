@@ -1,12 +1,14 @@
 import {Borsh} from '../borsh'
+import {Encoder} from '../index'
+import { u128, base64 } from "near-sdk-as";
 
-@bencoded
+@encodable
 class Pair{
   public s1:i32;
   public s2:i32;
 }
 
-@bencoded
+@encodable
 class Test{
   public number:i32;
   public str:string;
@@ -33,6 +35,8 @@ describe("Borsh Encoder", () => {
       store<u8>(changetype<usize>(expected_buffer) + i*sizeof<u8>(), expected[i])
     }
 
-    //expect(test.encode()).toStrictEqual(expected_buffer)
+    const encoder = new Borsh()
+    let res:ArrayBuffer = test.encode<ArrayBuffer>(encoder)
+    expect(res).toStrictEqual(expected_buffer)
   });
 });
