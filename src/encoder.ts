@@ -4,9 +4,10 @@ import { SimpleParser } from "visitor-as/dist/simpleParser";
 import { ClassDecorator } from "visitor-as/dist/decorator";
 
 import { toString, isMethodNamed, getName } from 'visitor-as/dist/utils';
+import { registerDecorator } from "visitor-as";
 
 
-export abstract class Encoder extends ClassDecorator {
+class Encoder extends ClassDecorator {
   currentClass?: ClassDeclaration;
   fields: string[];
 
@@ -50,6 +51,10 @@ export abstract class Encoder extends ClassDecorator {
 
     node.members.push(member);
   }
+
+  get name(): string { return "encodable" }
  
   visitMethodDeclaration(node: MethodDeclaration): void { }
 }
+
+export = registerDecorator(new Encoder())
