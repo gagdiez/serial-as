@@ -30,12 +30,13 @@ export class FooBar {
   uint8array: Uint8Array = new Uint8Array(0);
   arr: Array<Array<string>> = [];
   u32Arr: u32[] = [];
-  i32Arr: i32[] = [];
-  u128Val: u128 = u128.Zero;
+  i32Arr: i32[] | null;
+  u128Val: u128 = u128.from("128");
   uint8arrays: Array<Uint8Array> = [];
   // TODO: Fix u64 array
   u64Arr: u64[] = [];
 }  
+
 
 describe("JSON Encoder", () => {
   it("should encode json", () => {

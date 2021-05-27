@@ -69,36 +69,7 @@ export abstract class Encoder<R>{
   }
 
   // Array --
-  abstract encode_array<A>(value:Array<A>): void
-  abstract encode_u8array(value:Uint8Array): void
-  abstract encode_i8array(value:Int8Array): void
-  abstract encode_u16array(value:Uint16Array): void
-  abstract encode_i16array(value:Int16Array): void
-  abstract encode_u32array(value:Uint32Array): void
-  abstract encode_i32array(value:Int32Array): void
-  abstract encode_u64array(value:Uint64Array): void
-  abstract encode_i64array(value:Int64Array): void
-
-  // Q2: HOW CAN I ADD T as Array?
-  encode_array_like<T>(value:T): void{
-    // @ts-ignore
-    if (value instanceof Uint8Array){ this.encode_u8array(value); return }
-    // @ts-ignore
-    if (value instanceof Uint16Array){ this.encode_u16array(value); return }
-    // @ts-ignore
-    if (value instanceof Uint32Array){ this.encode_u32array(value); return }
-    // @ts-ignore
-    if (value instanceof Uint64Array){ this.encode_u64array(value); return }
-    // @ts-ignore
-    if (value instanceof Int8Array){ this.encode_i8array(value); return }
-    // @ts-ignore
-    if (value instanceof Int16Array){ this.encode_i16array(value); return }
-    // @ts-ignore
-    if (value instanceof Int32Array){ this.encode_i32array(value); return }
-    // @ts-ignore
-    if (value instanceof Int64Array){ this.encode_i64array(value); return }
-  }
-
+  abstract encode_array<A extends ArrayLike<any> | null>(value:A): void
 
   // Encode --
   encode<V>(value: V): void {
@@ -107,25 +78,24 @@ export abstract class Encoder<R>{
     // @ts-ignore
     if (isBoolean<V>()){ this.encode_bool(value); return }
 
-    // QUESTION 1: ADD 128 HERE?
     // @ts-ignore
     if (isInteger<V>() || isFloat<V>()){ this.encode_number<V>(value); return }
 
     // @ts-ignore
     if (isString<V>()) { this.encode_string(value); return }
 
-    if (isNull<V>(value)){ this.encode_null(); return }
-    
+    if (isNullable<V>(value)){
+      if (value == null) this.encode_null(); return
+    }
+
     // @ts-ignore
     if (isDefined(value.encode)){ this.encode_object(value); return }
 
     // @ts-ignore
-    if(isArray(value)){ this.encode_array<valueof<V>>(value); return }
-
-    if (isArrayLike<V>(value)){ this.encode_array_like(value); return }
+    if(isArrayLike<V>(value)){ this.encode_array<V>(value); return }
 
     // @ts-ignore
-    if (value instanceof u128){ this.encode_u128(value); return }
+    if(value instanceof u128){ this.encode_u128(value); return }  // -> we need to get ride of this
 
     // @ts-ignore
     if(value instanceof Set){ this.encode_set<valueof<V>>(value); return }

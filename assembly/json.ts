@@ -38,16 +38,22 @@ export class JSON extends Encoder<string>{
     this.inner_encode.push(`"${value}"`)
   }
 
-  encode_u128(value:u128):void{
-    this.inner_encode.push(value.toString())
-  }
-
   // Array --
-  encode_array<K>(value:Array<K>):void{
+  encode_array<K extends ArrayLike<any> | null>(value:K):void{
+    if(value == null){
+      this.encode_null()
+      return
+    }
+
+    if(value instanceof Uint8Array){
+      this.inner_encode.push(`"${base64.encode(value)}"`)
+      return
+    }
+
     this.inner_encode.push(`[`)
 
     for(let i=0; i<value.length; i++){
-      this.encode<K>(value[i])
+      this.encode<valueof<K>>(value[i])
       if(i != value.length-1){ this.inner_encode.push(`,`) }
     }
 
@@ -99,21 +105,9 @@ export class JSON extends Encoder<string>{
   encode_i16(value:i16): void{ this.inner_encode.push(value.toString()) }
   encode_u32(value:u32): void{ this.inner_encode.push(value.toString()) }
   encode_i32(value:i32): void{ this.inner_encode.push(value.toString()) }
-  encode_u64(value:u64): void{ this.inner_encode.push(value.toString()) }
-  encode_i64(value:i64): void{ this.inner_encode.push(value.toString()) }
+  encode_u64(value:u64): void{ this.inner_encode.push(`"${value.toString()}"`) }
+  encode_i64(value:i64): void{ this.inner_encode.push(`"${value.toString()}"`) }
+  encode_u128(value:u128): void{ this.inner_encode.push(`"${value.toString()}"`) }
   encode_f32(value:f32): void{ this.inner_encode.push(value.toString()) }
   encode_f64(value:f64): void{ this.inner_encode.push(value.toString()) }
-
-  encode_u8array(value:Uint8Array): void{
-    this.inner_encode.push(`"${base64.encode(value)}"`)
-  }
-
-  // TODO: RAISE ERROR
-  encode_i8array(value:Int8Array): void{}
-  encode_u16array(value:Uint16Array): void{}
-  encode_i16array(value:Int16Array): void{}
-  encode_u32array(value:Uint32Array): void{}
-  encode_i32array(value:Int32Array): void{}
-  encode_u64array(value:Uint64Array): void{}
-  encode_i64array(value:Int64Array): void{}
 }
