@@ -1,34 +1,40 @@
-import { ClassDeclaration, FieldDeclaration, MethodDeclaration } from "visitor-as/as";
-import { SimpleParser } from "visitor-as/dist/simpleParser";
+import { TypeNode, ClassDeclaration, FieldDeclaration, MethodDeclaration } from "visitor-as/as";
+import { SimpleParser, ClassDecorator, registerDecorator } from "visitor-as";
 
-import { ClassDecorator } from "visitor-as/dist/decorator";
+
 
 import { toString, isMethodNamed, getName } from 'visitor-as/dist/utils';
-import { registerDecorator } from "visitor-as";
+
+const OR_NULL = /\|.*null/;
+function getTypeName(type: TypeNode): string { 
+  let _type = getName(type);
+    if (type.isNullable && !OR_NULL.test(_type)) { 
+      _type = `${_type} | null`;
+    }
+  return _type
+}
 
 
 class Encoder extends ClassDecorator {
   currentClass?: ClassDeclaration;
-  fields: string[];
+  encodeStmts: string[];
+  decodeStmts: string[];
 
   constructor(public encoder:string="JSON",
               public res_type:string="string"){
-    super()
+    super();
   }
 
   visitFieldDeclaration(node: FieldDeclaration): void {
-    const name = getName(node);
+    const name = toString(node.name);
     if (!node.type) {
       throw new Error(`Field ${name} is missing a type declaration`);
     }
-    const _type = getName(node.type!);
     
-    this.fields.push(`
-      if(isNullable(this.${name}) && ${_type.indexOf('[]') == -1} ){
-        encoder.encode_field<${_type} | null>("${name}", this.${name})
-      }else{
+    const _type = getTypeName(node.type);
+    
+    this.encodeStmts.push(`
         encoder.encode_field<${_type}>("${name}", this.${name})
-      }
     `);
   }
 
@@ -40,24 +46,29 @@ class Encoder extends ClassDecorator {
     this.currentClass = node;
     const class_name:string = getName(node)
 
-    this.fields = [];
+    this.encodeStmts = [];
+    this.decodeStmts = [];
     this.visit(node.members);
 
-    const method = `
-      encode<__T>(encoder: Encoder<__T>): __T {
-        
-        ${this.fields.join(";\n\t")};
-        //TODO: -- DO NOT FORGET -- super.encode<__T>(encoder);
-
-        return encoder.get_encoded_object()
-      }
+    const encodeMethod = `
+    encode<__T>(encoder: Encoder<__T>): __T {
+      ${node.extendsType != null? "\n    super.encode<__T>(encoder);" : ""}
+      ${this.encodeStmts.join(";\n\t")};
+      return encoder.get_encoded_object()
+    }
     `
-    let member = SimpleParser.parseClassMember(method, node);
+    const decodeMethod = `
+    decode<__T>(decoder: Decoder<__T>): ${class_name} {
+      ${this.decodeStmts.join(";\n\t")};${node.extendsType != null? "\n    super.decode<__T>(decoder);" : ""}
+      return decoder.get_decoded_object()
+    }
+    `
+    let member = SimpleParser.parseClassMember(encodeMethod, node);
 
     node.members.push(member);
   }
 
-  get name(): string { return "encodable" }
+  get name(): string { return "serializable" }
  
   visitMethodDeclaration(node: MethodDeclaration): void { }
 }

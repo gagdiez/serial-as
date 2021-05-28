@@ -3,13 +3,13 @@ import {Encoder} from '../index'
 import { u128, base64 } from "near-sdk-as";
 
 
-@encodable
+@serializable
 class Pair{
   public s1:i32;
   public s2:i32;
 }
 
-@encodable
+@serializable
 class Test{
   public number:i32=2;
   public str:string="testing";
@@ -18,7 +18,7 @@ class Test{
   public f32_zero: f32;
 }
 
-@encodable
+@serializable
 export class FooBar {
   foo: i32 = 0;
   bar: u32 = 1;
@@ -37,12 +37,39 @@ export class FooBar {
   u64Arr: u64[] = [];
 }  
 
-@encodable
+@serializable
+export class Nested {
+  f: FooBar = new FooBar();
+}
+@serializable
 export class Nullables {
   u32Arr_null: u32[] | null;
-  arr_null: Array<string> | null;
+  arr_null: string[] | null;
+  u64_arr: Array<u64> | null;
   map_null: Map<string, string> | null;
   set_null: Set<string> | null;
+  obj_null: Nested | null;
+}
+
+@serializable
+export class Extends extends FooBar {
+  x: bool[] = [1];
+}
+
+function initFooBar(f: FooBar): void { 
+  f.u32Arr = [42, 11];
+  f.foo = 321;
+  f.bar = 123;
+  f.flag = true;
+  f.baz = "foo";
+  f.uint8array = base64.decode("aGVsbG8sIHdvcmxkIQ==");
+  f.u128Val = new u128(128);
+  f.arr = [["Hello"], ["World"]];
+  f.uint8arrays = new Array<Uint8Array>(2);
+  f.uint8arrays[0] = base64.decode("aGVsbG8sIHdvcmxkIQ==");
+  f.uint8arrays[1] = base64.decode("aGVsbG8sIHdvcmxkIQ==");
+  f.u64Arr = [10000000000, 100000000000];
+
 }
 
 
@@ -53,7 +80,7 @@ describe("JSON Encoder", () => {
     let res:string = test.encode<string>(encoder)
 
     expect(res)
-    .toBe('{\"u32Arr_null\":null,\"arr_null\":null,\"map_null\":null,\"set_null\":null}')
+    .toBe('{\"u32Arr_null\":null,\"arr_null\":null,\"u64_arr\":null,\"map_null\":null,\"set_null\":null,\"obj_null\":null}')
   });
 
   it("should encode simple json", () => {
@@ -68,22 +95,29 @@ describe("JSON Encoder", () => {
   it("should encode complex json", () => {
     const encoder:JSON = new JSON()
     const original = new FooBar();
-    original.u32Arr = [42, 11];
-    original.foo = 321;
-    original.bar = 123;
-    original.flag = true;
-    original.baz = "foo";
-    original.uint8array = base64.decode("aGVsbG8sIHdvcmxkIQ==");
-    original.u128Val = new u128(128);
-    original.arr = [["Hello"], ["World"]];
-    original.uint8arrays = new Array<Uint8Array>(2);
-    original.uint8arrays[0] = base64.decode("aGVsbG8sIHdvcmxkIQ==");
-    original.uint8arrays[1] = base64.decode("aGVsbG8sIHdvcmxkIQ==");
-    original.u64Arr = [10000000000, 100000000000];
+    initFooBar(original);
 
     let res:string = original.encode<string>(encoder)
 
     expect(res)
     .toBe('{"foo":321,"bar":123,"u64Val":"4294967297","u64_zero":"0","i64Val":"-64","flag":true,"baz":"foo","uint8array":"aGVsbG8sIHdvcmxkIQ==","arr":[["Hello"],["World"]],"u32Arr":[42,11],"i32Arr":[],"u128Val":"128","uint8arrays":["aGVsbG8sIHdvcmxkIQ==","aGVsbG8sIHdvcmxkIQ=="],"u64Arr":["10000000000","100000000000"]}')
+  });
+
+  it("should encode nested json", () => {
+    const encoder:JSON = new JSON()
+    const original = new Nested();
+    initFooBar(original.f);
+    let res:string = original.encode<string>(encoder)
+    expect(res)
+    .toBe('{"f":{"foo":321,"bar":123,"u64Val":"4294967297","u64_zero":"0","i64Val":"-64","flag":true,"baz":"foo","uint8array":"aGVsbG8sIHdvcmxkIQ==","arr":[["Hello"],["World"]],"u32Arr":[42,11],"i32Arr":[],"u128Val":"128","uint8arrays":["aGVsbG8sIHdvcmxkIQ==","aGVsbG8sIHdvcmxkIQ=="],"u64Arr":["10000000000","100000000000"]}}')
+  });
+
+  it("should encode json with inheritence", () => {
+    const encoder:JSON = new JSON()
+    const original = new Extends();
+    initFooBar(original);
+    let res:string = original.encode<string>(encoder)
+    expect(res)
+    .toBe('{"foo":321,"bar":123,"u64Val":"4294967297","u64_zero":"0","i64Val":"-64","flag":true,"baz":"foo","uint8array":"aGVsbG8sIHdvcmxkIQ==","arr":[["Hello"],["World"]],"u32Arr":[42,11],"i32Arr":[],"u128Val":"128","uint8arrays":["aGVsbG8sIHdvcmxkIQ==","aGVsbG8sIHdvcmxkIQ=="],"u64Arr":["10000000000","100000000000"],"x":[true]}')
   });
 });

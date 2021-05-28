@@ -85,8 +85,7 @@ export abstract class Encoder<R>{
     // @ts-ignore
     if(value instanceof u128){ this.encode_u128(value); return }  // -> we need to get ride of this
 
-    // All the following types are nullable
-    if(value == null){this.encode_null(); return}
+    if (isNullable<V>() && value == null) { this.encode_null(); return }
 
     // @ts-ignore
     if (isDefined(value.encode)){ this.encode_object(value); return }
@@ -98,6 +97,7 @@ export abstract class Encoder<R>{
     if(value instanceof Set){ this.encode_set<V>(value); return }
 
     // @ts-ignore
-    if(value instanceof Map){ this.encode_map<V>(value) }
+    if(value instanceof Map){ this.encode_map<V>(value); }
   }
+
 }
