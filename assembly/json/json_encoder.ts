@@ -1,7 +1,7 @@
-import {Encoder} from ".";
+import {Encoder} from "..";
 import { base64, u128 } from "near-sdk-as";
 
-export class JSON extends Encoder<string>{
+export class JSONEncoder extends Encoder<string>{
 
   public starting_object:bool = true
   public inner_encode:string[] = []

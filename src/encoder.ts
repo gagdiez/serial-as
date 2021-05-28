@@ -1,16 +1,14 @@
 import { TypeNode, ClassDeclaration, FieldDeclaration, MethodDeclaration } from "visitor-as/as";
 import { SimpleParser, ClassDecorator, registerDecorator } from "visitor-as";
-
-
-
 import { toString, isMethodNamed, getName } from 'visitor-as/dist/utils';
 
-const OR_NULL = /\|.*null/;
-function getTypeName(type: TypeNode): string { 
+
+function getTypeName(type: TypeNode): string {
   let _type = getName(type);
-    if (type.isNullable && !OR_NULL.test(_type)) { 
-      _type = `${_type} | null`;
-    }
+  const OR_NULL = /\|.*null/;
+  if (type.isNullable && !OR_NULL.test(_type)) {
+    _type = `${_type} | null`;
+  }
   return _type
 }
 
@@ -20,10 +18,10 @@ class Encoder extends ClassDecorator {
   encodeStmts: string[];
   decodeStmts: string[];
 
-  constructor(public encoder:string="JSON",
+/*   constructor(public encoder:string="JSON",
               public res_type:string="string"){
     super();
-  }
+  } */
 
   visitFieldDeclaration(node: FieldDeclaration): void {
     const name = toString(node.name);
@@ -52,14 +50,15 @@ class Encoder extends ClassDecorator {
 
     const encodeMethod = `
     encode<__T>(encoder: Encoder<__T>): __T {
-      ${node.extendsType != null? "\n    super.encode<__T>(encoder);" : ""}
+      ${node.extendsType != null? "super.encode<__T>(encoder);" : ""}
       ${this.encodeStmts.join(";\n\t")};
       return encoder.get_encoded_object()
     }
     `
     const decodeMethod = `
     decode<__T>(decoder: Decoder<__T>): ${class_name} {
-      ${this.decodeStmts.join(";\n\t")};${node.extendsType != null? "\n    super.decode<__T>(decoder);" : ""}
+      ${this.decodeStmts.join(";\n\t")};
+      ${node.extendsType != null? "super.decode<__T>(decoder);" : ""}
       return decoder.get_decoded_object()
     }
     `

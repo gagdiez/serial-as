@@ -9,8 +9,6 @@ function isNull<T>(t: T): bool {
 
 export abstract class Encoder<R>{
 
-  constructor(){}
-
   abstract encode_field<T>(name:string, value:T):void
   abstract get_encoded_object():R
 

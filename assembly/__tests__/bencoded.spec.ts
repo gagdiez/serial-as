@@ -1,4 +1,4 @@
-import {Borsh} from '../borsh'
+import {BorshEncoder} from '../borsh'
 import {Encoder} from '../index'
 import { u128, base64 } from "near-sdk-as";
 
@@ -35,7 +35,7 @@ describe("Borsh Encoder", () => {
       store<u8>(changetype<usize>(expected_buffer) + i*sizeof<u8>(), expected[i])
     }
 
-    const encoder = new Borsh()
+    const encoder = new BorshEncoder()
     let res:ArrayBuffer = test.encode<ArrayBuffer>(encoder)
     expect(res).toStrictEqual(expected_buffer)
   });

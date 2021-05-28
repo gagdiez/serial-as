@@ -1,4 +1,4 @@
-import {Encoder} from ".";
+import {Encoder} from "..";
 import { u128 } from "near-sdk-as";
 
 class Buffer {
@@ -31,7 +31,7 @@ class Buffer {
 }
 
 
-export class Borsh extends Encoder<ArrayBuffer>{
+export class BorshEncoder extends Encoder<ArrayBuffer>{
   public buffer:Buffer = new Buffer()
   
   get_encoded_object():ArrayBuffer{
