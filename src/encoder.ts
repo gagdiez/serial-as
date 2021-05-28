@@ -24,7 +24,7 @@ class Encoder extends ClassDecorator {
     const _type = getName(node.type!);
     
     this.fields.push(`
-      if(isNullable(this.${name})){
+      if(isNullable(this.${name}) && ${_type.indexOf('[]') == -1} ){
         encoder.encode_field<${_type} | null>("${name}", this.${name})
       }else{
         encoder.encode_field<${_type}>("${name}", this.${name})
