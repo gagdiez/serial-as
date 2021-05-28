@@ -55,10 +55,10 @@ export class JSON extends Encoder<string>{
   encode_null(): void{ this.inner_encode.push("null") }
 
   // Set --
-  encode_set<S extends Set<any> | null>(set:S): void{
-    if(set == null){ this.encode_null(); return }
+  encode_set<S extends Set<any> | null>(value:S): void{
+    if(value == null){ this.encode_null(); return }
 
-    let values = set.values();
+    let values = value.values();
     this.inner_encode.push(`{`)
     for (let i = 0; i < values.length; i++) {
       this.encode<indexof<S>>(values[i])
@@ -68,17 +68,17 @@ export class JSON extends Encoder<string>{
   }
 
   // Map --
-  encode_map<M extends Map<any, any> | null>(map:M): void{
-    if(map == null){ this.encode_null(); return }
+  encode_map<M extends Map<any, any> | null>(value:M): void{
+    if(value == null){ this.encode_null(); return }
 
     this.inner_encode.push(`{`)
 
-    let keys = map.keys();
+    let keys = value.keys();
 
     for (let i = 0; i < keys.length; i++) {
       this.encode<indexof<M>>(keys[i])
       this.inner_encode.push(':')
-      this.encode<valueof<M>>(map.get(keys[i]))
+      this.encode<valueof<M>>(value.get(keys[i]))
 
       if(i != keys.length-1){ this.inner_encode.push(`,`) }
     }
@@ -87,11 +87,15 @@ export class JSON extends Encoder<string>{
   }
 
   // Object --
-  encode_object<C>(object:C): void{
+  encode_object<C>(value:C): void{
     this.starting_object = true
-    
-    // @ts-ignore
-    object.encode<string>(this)
+    if (!isNullable<C>()){
+      // @ts-ignore
+      value.encode<string>(this);
+    } else if (value != null) { 
+      // @ts-ignore
+      value.encode<string>(this);
+    }
   }
 
   // We override encode_number, for which we don't need these

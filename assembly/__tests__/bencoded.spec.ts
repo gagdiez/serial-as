@@ -2,13 +2,13 @@ import {Borsh} from '../borsh'
 import {Encoder} from '../index'
 import { u128, base64 } from "near-sdk-as";
 
-@encodable
+@serializable
 class Pair{
   public s1:i32;
   public s2:i32;
 }
 
-@encodable
+@serializable
 class Test{
   public number:i32;
   public str:string;

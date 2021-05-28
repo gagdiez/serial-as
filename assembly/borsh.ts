@@ -1,7 +1,7 @@
 import {Encoder} from ".";
 import { u128 } from "near-sdk-as";
 
-class Buffer{
+class Buffer {
   public offset:u32 = 0;
   public buffer_size:u32 = 2;
   public start:usize = heap.alloc(this.buffer_size);
