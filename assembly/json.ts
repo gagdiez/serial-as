@@ -6,10 +6,6 @@ export class JSON extends Encoder<string>{
   public starting_object:bool = true
   public inner_encode:string[] = []
 
-  constructor(){
-    super()
-  }
-
   get_encoded_object():string{
     return this.inner_encode.join('')
   }
