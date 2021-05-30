@@ -23,14 +23,14 @@ describe("Borsh Encoder", () => {
     let test:Test = {number:256, str:"testing", arr:[p1, p2]}
 
     // borsh
-    // 256 -> [0, 1, 0, 0]
-    // "testing" 
-    //  -> sizeof utf8_encoded as u32+ utf8_encoded as u8[]
-    //  -> [7, 0, 0, 0] + [116, 101, 115, 116, 105, 110, 103] utf8 as u8
-    // [p1, p2]
+    // number:i32 = 256 -> [0, 1, 0, 0]
+    // str:string = "testing" 
+    //  -> sizeof utf8_encoded as u32 = [7, 0, 0, 0]
+    //  -> encoded as utf8 in a u8[] = [116, 101, 115, 116, 105, 110, 103]
+    // arr:Array<Pair> = [p1, p2]
     //  -> sizeof [p1, p2] as u32  = [2, 0, 0, 0]
-    //  -> p1 = [0, 0, 0, 0] + [1, 0, 0, 0]
-    //  -> p2 = [2, 0, 0, 0] + [3, 0, 0, 0]
+    //  -> p1:Pair = {0, 1} -> [0, 0, 0, 0] + [1, 0, 0, 0]
+    //  -> p2:Pair = {2, 3} -> [2, 0, 0, 0] + [3, 0, 0, 0]
     
     let expected:u8[] = [0, 1, 0, 0, 7, 0, 0, 0, 116, 101, 115, 116, 105, 110, 103,
                          2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0]
