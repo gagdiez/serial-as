@@ -53,15 +53,15 @@ export class BorshDecoder extends Decoder<ArrayBuffer>{
   }
 
   // Array --
-  decode_array<T, A extends ArrayLike<T> | null>():A{
+  decode_array<A extends ArrayLike<any> | null>():A{
     // TODO: HANDLE NULL
     const length:u32 = this.decoBuffer.consume<u32>()
 
-    let ret_array:Array<T> = new Array<T>(length)
+    let ret_array:Array<valueof<A>> = new Array<valueof<A>>(length)
 
     //for el in x; repr(el as K)
-    for(let i=0; i<length; i++){
-      ret_array[i] = this.decode<T>()
+    for(let i:u32=0; i < length; i++){
+      ret_array[i] = this.decode<valueof<A>>()
     }
 
     return ret_array
@@ -71,41 +71,42 @@ export class BorshDecoder extends Decoder<ArrayBuffer>{
   decode_null(): void{ /* ?????? */ }
 
   // Set --
-  decode_set<T, S extends Set<T> | null>(): S{
+  decode_set<S extends Set<any> | null>(): S{
     // TODO: HANDLE NULL
     const length:u32 = this.decoBuffer.consume<u32>()
 
-    let ret_set:Set<T> = new Set<T>()
+    let ret_set:Set<valueof<S>> = new Set<valueof<S>>()
 
     //for el in x.sorted(); repr(el as S)
-    for(let i=0; i<length; i++){
-      ret_set.add(this.decode<T>())
+    for(let i:u32=0; i<length; i++){
+      ret_set.add(this.decode<valueof<S>>())
     }
 
     return ret_set
   }
 
   // Map --
-  decode_map<K, V, M extends Map<K, V> | null>(): M{
+  decode_map<M extends Map<any, any> | null>(): M{
     // TODO: HANDLE NULL
     const length:u32 = this.decoBuffer.consume<u32>()
 
-    let ret_map:Map<K, V> = new Map<K, V>()
+    let ret_map:Map<indexof<M>, valueof<M>> = new Map<indexof<M>, valueof<M>>()
 
     // repr(k as K)
     // repr(v as V)
-    for (let i = 0; i < length; i++) {
-      const key:K = this.decode<K>()
-      const value:V = this.decode<V>()
+    for (let i:u32 = 0; i < length; i++) {
+      const key = this.decode<indexof<M>>()
+      const value = this.decode<valueof<M>>()
       ret_map.set(key, value)
     }
     return ret_map
   }
 
-  // Object --
+   // Object --
   decode_object<C>(): C{
-    // @ts-ignore
-    return object.decode<ArrayBuffer>(this)
+    let object:C = instantiate<C>()
+    object.decode<ArrayBuffer>(this)
+    return object
   }
 
   decode_number<T>():T{

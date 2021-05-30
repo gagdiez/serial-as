@@ -46,12 +46,10 @@ describe("Borsh Encoder", () => {
     let res:ArrayBuffer = test.encode<ArrayBuffer>(encoder)
     expect(res).toStrictEqual(expected_buffer)
 
-    /* const decoder = new BorshDecoder(res)
+    const decoder = new BorshDecoder(res)
     let decoded_test:Test = new Test()
     decoded_test.decode<ArrayBuffer>(decoder)
 
-    expect(decoded_test.number).toBe(test.number)
-    expect(decoded_test.str).toBe(test.str)
-    expect(decoded_test.arr).toBe(test.arr) */
+    expect(decoded_test).toStrictEqual(test)
   });
 });

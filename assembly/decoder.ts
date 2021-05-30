@@ -18,19 +18,19 @@ export abstract class Decoder<I>{
   abstract decode_bool(): bool
 
   // Map --
-  abstract decode_map<K, V, M extends Map<K, V> | null>(): M
+  abstract decode_map<M extends Map<any, any> | null>(): M
 
   // Null --
   abstract decode_null(): void
 
-  // Object --
+  // Object
   abstract decode_object<C>(): C
 
   // String --
   abstract decode_string(): string
 
   // Set --
-  abstract decode_set<T, S extends Set<T> | null>(): S
+  abstract decode_set<S extends Set<any> | null>(): S
 
   // Number --
   abstract decode_u8(): u8
@@ -46,7 +46,7 @@ export abstract class Decoder<I>{
   abstract decode_f64(): f64
 
   // Array --
-  abstract decode_array<T, A extends ArrayLike<T> | null>(): A
+  abstract decode_array<A extends ArrayLike<any> | null>(): A
 
 
   decode_number<N = number>():N{
@@ -76,30 +76,33 @@ export abstract class Decoder<I>{
 
 
   // decode --
-  decode<V>(): V {
+  decode<T>(): T {
+    
     // @ts-ignore
-    if (isBoolean<V>()){ return this.decode_bool(); }
+    if (isBoolean<T>()){ return this.decode_bool(); }
 
     // @ts-ignore
-    if (isInteger<V>() || isFloat<V>()){ return this.decode_number<V>(); }
+    if (isInteger<T>() || isFloat<T>()){ return this.decode_number<T>(); }
 
     // @ts-ignore
-    if (isString<V>()) { return this.decode_string(); }
+    if (isString<T>()) { return this.decode_string(); }
+
+    let value:T
 
     // @ts-ignore
     if(value instanceof u128){ return this.decode_u128(); }  // -> we need to get ride of this
 
     // @ts-ignore
-    if(isArrayLike<V>(value)){ return this.decode_array<T, V>(); }
+    if(isArrayLike<T>()){ return this.decode_array<T>(); }
 
     // @ts-ignore
-    //if value instanceof Set){ this.decode_set<V>(); return }
+    if(value instanceof Set){ return this.decode_set<T>(); }
 
     // @ts-ignore
-    //if(value instanceof Map){ this.decode_map<V>(); }
+    if(value instanceof Map){ return this.decode_map<T>(); }
 
     // @ts-ignore
-    return this.decode_object();
+    return this.decode_object<T>();
   }
 
 }
