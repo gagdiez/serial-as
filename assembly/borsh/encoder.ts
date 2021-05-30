@@ -61,14 +61,14 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
 
   // Array --
   encode_array<A extends ArrayLike<any> | null>(value:A):void{
-    if(value == null){return this.encode_null()}
+    if(value == null){ this.encode_null(); return }
 
     // repr(value.len() as u32)
     this.buffer.store<u32>(value.length)
 
     //for el in x; repr(el as K)
     for(let i=0; i<value.length; i++){
-      this.encode<A>(value[i])
+      this.encode<valueof<A>>(value[i])
     }
   }
 
@@ -77,7 +77,7 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
 
   // Set --
   encode_set<S extends Set<any> | null>(set:S): void{
-    if(set == null){return this.encode_null()}
+    if(set == null){ this.encode_null(); return }
 
     let values = set.values();
 
@@ -86,13 +86,13 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
     
     //for el in x.sorted(); repr(el as S)
     for(let i=0; i<values.length; i++){
-      this.encode<S>(values[i])
+      this.encode<valueof<S>>(values[i])
     }
   }
 
   // Map --
   encode_map<M extends Map<any, any> | null>(map:M): void{
-    if(map == null){return this.encode_null()}
+    if(map == null){ this.encode_null(); return }
 
     let keys = map.keys();
 
@@ -102,8 +102,8 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
     // repr(k as K)
     // repr(v as V)
     for (let i = 0; i < keys.length; i++) {
-      this.encode<K>(keys[i])
-      this.encode<V>(map.get(keys[i]))
+      this.encode<indexof<K>>(keys[i])
+      this.encode<valueof<V>>(map.get(keys[i]))
     }
   }
 
