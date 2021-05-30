@@ -1,3 +1,4 @@
-import {BorshEncoder} from './borsh_encoder'
+import {BorshEncoder} from './encoder'
+import {BorshDecoder} from './decoder'
 
-export {BorshEncoder}
+export {BorshEncoder, BorshDecoder}

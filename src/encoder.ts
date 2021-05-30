@@ -32,7 +32,10 @@ class Encoder extends ClassDecorator {
     const _type = getTypeName(node.type);
     
     this.encodeStmts.push(`
-        encoder.encode_field<${_type}>("${name}", this.${name})
+      encoder.encode_field<${_type}>("${name}", this.${name})
+    `);
+    this.decodeStmts.push(`
+      this.${name} = decoder.decode_field<${_type}>("${name}")
     `);
   }
 
@@ -56,15 +59,16 @@ class Encoder extends ClassDecorator {
     }
     `
     const decodeMethod = `
-    decode<__T>(decoder: Decoder<__T>): ${class_name} {
+    decode<__T>(decoder: Decoder<__T>): void {
       ${this.decodeStmts.join(";\n\t")};
       ${node.extendsType != null? "super.decode<__T>(decoder);" : ""}
-      return decoder.get_decoded_object()
     }
     `
-    let member = SimpleParser.parseClassMember(encodeMethod, node);
-
-    node.members.push(member);
+    const encodeMember = SimpleParser.parseClassMember(encodeMethod, node);
+    node.members.push(encodeMember);
+    
+    const decodeMember = SimpleParser.parseClassMember(decodeMethod, node);
+    node.members.push(decodeMember);
   }
 
   get name(): string { return "serializable" }
