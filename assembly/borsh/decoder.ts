@@ -57,7 +57,7 @@ export class BorshDecoder extends Decoder<ArrayBuffer>{
     // TODO: HANDLE NULL
     const length:u32 = this.decoBuffer.consume<u32>()
 
-    let ret_array:Array<valueof<A>> = new Array<valueof<A>>(length)
+    let ret_array:A = instantiate<A>(length)
 
     //for el in x; repr(el as K)
     for(let i:u32=0; i < length; i++){
