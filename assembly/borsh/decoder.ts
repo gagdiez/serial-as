@@ -75,11 +75,11 @@ export class BorshDecoder extends Decoder<ArrayBuffer>{
     // TODO: HANDLE NULL
     const length:u32 = this.decoBuffer.consume<u32>()
 
-    let ret_set:Set<valueof<S>> = new Set<valueof<S>>()
+    let ret_set:Set<indexof<S>> = new Set<indexof<S>>()
 
     //for el in x.sorted(); repr(el as S)
     for(let i:u32=0; i<length; i++){
-      ret_set.add(this.decode<valueof<S>>())
+      ret_set.add(this.decode<indexof<S>>())
     }
 
     return ret_set

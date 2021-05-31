@@ -79,14 +79,14 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
   encode_set<S extends Set<any> | null>(set:S): void{
     if(set == null){ this.encode_null(); return }
 
-    let values = set.values();
+    let values:Array<indexof<S>> = set.values();
 
     // repr(value.len() as u32) 
     this.buffer.store<u32>(values.length)
     
     //for el in x.sorted(); repr(el as S)
-    for(let i=0; i<values.length; i++){
-      this.encode<valueof<S>>(values[i])
+    for(let i:i32=0; i<values.length; i++){
+      this.encode<indexof<S>>(values[i])
     }
   }
 
@@ -102,8 +102,8 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
     // repr(k as K)
     // repr(v as V)
     for (let i = 0; i < keys.length; i++) {
-      this.encode<indexof<K>>(keys[i])
-      this.encode<valueof<V>>(map.get(keys[i]))
+      this.encode<indexof<M>>(keys[i])
+      this.encode<valueof<M>>(map.get(keys[i]))
     }
   }
 

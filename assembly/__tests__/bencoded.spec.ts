@@ -16,6 +16,12 @@ class Test{
 }
 
 @serializable
+class MS{
+  public map:Map<string, u32> = new Map<string, u32>();
+  public set:Set<u32> = new Set<u32>();
+}
+
+@serializable
 export class FooBar {
   foo: i32 = 0;
   bar: u32 = 1;
@@ -79,6 +85,43 @@ describe("Borsh Encoder", () => {
 
     const decoder = new BorshDecoder(res)
     let decoded_test:Test = new Test()
+    decoded_test.decode<ArrayBuffer>(decoder)
+
+    expect(decoded_test).toStrictEqual(test)
+  });
+
+  it("should encode maps and sets", () => {
+    let test:MS = new MS()
+    test.map.set("testing", 0)
+    
+    test.set.add(0)
+    test.set.add(1)
+
+    // borsh
+    // map:Map<string, u32> = ('testing', 0)
+    // -> sizeof [1, 0, 0, 0]
+    // -> 'testing' [7, 0, 0, 0, 116, 101, 115, 116, 105, 110, 103]
+    // -> 0 = [0, 0, 0, 0] 
+    // set:Set<u32> = {0, 1}
+    // -> sizeof [2, 0, 0, 0] + [0, 0, 0, 0] + [1, 0, 0, 0]
+    
+    let expected:u8[] = [1, 0, 0, 0,
+                         7, 0, 0, 0, 116, 101, 115, 116, 105, 110, 103, 0, 0, 0, 0,
+                         2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]
+
+    // Create expected array buffer
+    let expected_buffer:ArrayBuffer = new ArrayBuffer(expected.length)
+
+    for(let i:i32 = 0; i<expected.length; i++){
+      store<u8>(changetype<usize>(expected_buffer) + i*sizeof<u8>(), expected[i])
+    }
+
+    const encoder = new BorshEncoder()
+    let res:ArrayBuffer = test.encode<ArrayBuffer>(encoder)
+    expect(res).toStrictEqual(expected_buffer)
+
+    const decoder = new BorshDecoder(res)
+    let decoded_test:MS = new MS()
     decoded_test.decode<ArrayBuffer>(decoder)
 
     expect(decoded_test).toStrictEqual(test)
