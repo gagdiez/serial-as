@@ -32,12 +32,12 @@ encoder-as aims to create an user-friendly interface to implement serialized enc
   - [ ] Thoughtful testing
 
 **Decoder**
-- [ ] Decide on Decoder's interface
+- [x] Decide on Decoder's interface
   - [x] Draft
-  - [ ] Final form
-- [ ] Implement Transform
+  - [x] Final form
+- [x] Implement Transform
   - [x] Draft
-  - [ ] Final form
+  - [x] Final form
 - [ ] Implement JSON Decoder
   - [ ] Decode Basic types
     - [ ] number, string
@@ -54,6 +54,6 @@ encoder-as aims to create an user-friendly interface to implement serialized enc
     - [x] objects
     - [x] set, map
     - [x] nullables
-  - [ ] Basic testing
+  - [x] Basic testing
   - [ ] Thoughtful testing
 
