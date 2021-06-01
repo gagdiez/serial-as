@@ -15,7 +15,7 @@ export class FooBar {
   arr: Array<Array<string>> = [];
   u32Arr: u32[] = [];
   i32Arr: i32[] = [];
-  u128Val: u128 = u128.from("128");
+  u128Val: u128 = u128.Zero;
   uint8arrays: Array<Uint8Array> = [];
   u64Arr: u64[] = [];
 }
@@ -27,12 +27,24 @@ function initFooBar(f: FooBar): void {
   f.baz = "testing"; 
   f.uint8array[0] = 1
   f.uint8array[1] = 2
-  //f.u128Val = u128.from(128); -> 4 bytes???
+  f.u128Val = u128.from(128);
   f.arr = [["testing"], ["testing"]];
   f.u32Arr = [42, 11]
   f.uint8arrays = [f.uint8array, f.uint8array]
   f.u64Arr = [10000000000, 100000000000];
 }
+
+function u8toArrayBuffer(arr:u8[]):ArrayBuffer{
+  // Create expected array buffer
+  const buffer:ArrayBuffer = new ArrayBuffer(arr.length)
+
+  for(let i:i32 = 0; i<arr.length; i++){
+    store<u8>(changetype<usize>(buffer) + i*sizeof<u8>(), arr[i])
+  }
+  return buffer
+}
+
+
 describe("Borsh Encoder", () => {
   it("should encode simple borsh", () => {
     const p1:Pair = {s1:0, s2:1}
@@ -52,12 +64,7 @@ describe("Borsh Encoder", () => {
     let expected:u8[] = [0, 1, 0, 0, 7, 0, 0, 0, 116, 101, 115, 116, 105, 110, 103,
                          2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0]
 
-    // Create expected array buffer
-    let expected_buffer:ArrayBuffer = new ArrayBuffer(expected.length)
-
-    for(let i:i32 = 0; i<expected.length; i++){
-      store<u8>(changetype<usize>(expected_buffer) + i*sizeof<u8>(), expected[i])
-    }
+    let expected_buffer:ArrayBuffer = u8toArrayBuffer(expected)
 
     const encoder = new BorshEncoder()
     let res:ArrayBuffer = test.encode<ArrayBuffer>(encoder)
@@ -89,12 +96,7 @@ describe("Borsh Encoder", () => {
                          7, 0, 0, 0, 116, 101, 115, 116, 105, 110, 103, 0, 0, 0, 0,
                          2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]
 
-    // Create expected array buffer
-    let expected_buffer:ArrayBuffer = new ArrayBuffer(expected.length)
-
-    for(let i:i32 = 0; i<expected.length; i++){
-      store<u8>(changetype<usize>(expected_buffer) + i*sizeof<u8>(), expected[i])
-    }
+    let expected_buffer:ArrayBuffer = u8toArrayBuffer(expected)
 
     const encoder = new BorshEncoder()
     let res:ArrayBuffer = test.encode<ArrayBuffer>(encoder)
@@ -134,8 +136,7 @@ describe("Borsh Encoder", () => {
         u64Arr: u64[] = [10000000000, 100000000000]
           -> [2, 0, 0, 0]
           -> [0, 228, 11, 84, 2, 0, 0, 0]
-          -> [0, 232, 118, 72, 23, 0, 0, 0]
-          */
+          -> [0, 232, 118, 72, 23, 0, 0, 0]*/
     
                   //             i32,          u32,                 u64val
     let expected:u8[] = [65, 1, 0, 0, 123, 0, 0 ,0, 1, 0, 0, 0, 1, 0, 0 , 0,
@@ -159,12 +160,7 @@ describe("Borsh Encoder", () => {
                          2, 0, 0, 0, 0, 228, 11, 84, 2, 0, 0, 0, 0, 232, 118, 72, 23, 0, 0, 0
                         ]
 
-    // Create expected array buffer
-    let expected_buffer:ArrayBuffer = new ArrayBuffer(expected.length)
-
-    for(let i:i32 = 0; i<expected.length; i++){
-      store<u8>(changetype<usize>(expected_buffer) + i*sizeof<u8>(), expected[i])
-    }
+    let expected_buffer:ArrayBuffer = u8toArrayBuffer(expected)
 
     expect(res).toStrictEqual(expected_buffer)
 

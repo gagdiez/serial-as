@@ -69,8 +69,6 @@ export class MS{
   public set:Set<u32> = new Set<u32>();
 }
 
-
-
 export function initFooBar(f: FooBar): FooBar { 
   f.u32Arr = [42, 11];
   f.foo = 321;
@@ -91,7 +89,7 @@ export function initFooBar(f: FooBar): FooBar {
 export class WeirdMap {
   inner: Map<i32, string | null> = new Map();
 
-  add(i: i32) { 
+  add(i: i32):void{ 
     this.inner.set(i, null);
   }
 }

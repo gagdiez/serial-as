@@ -2,8 +2,6 @@ import {JSONEncoder} from '../json'
 import { Nullables, LargerTest as Test, FooBar, initFooBar, Nested, Extends } from '.';
 
 
-
-
 describe("JSONEncoder Encoder", () => {
   it("should encode nullable", () => {
     const encoder:JSONEncoder = new JSONEncoder()
