@@ -1,38 +1,9 @@
-import {Encoder} from "..";
+import {Encoder, EncodeBuffer} from "..";
 import { u128 } from "near-sdk-as";
-
-class Buffer {
-  public offset:u32 = 0;
-  public buffer_size:u32 = 2;
-  public start:usize = heap.alloc(this.buffer_size);
-
-  resize_if_necessary(needed_space:u32):void{
-    if(this.buffer_size - this.offset < needed_space){
-      this.buffer_size = max(this.buffer_size*2, this.buffer_size + needed_space)
-      this.start = heap.realloc(this.start, this.buffer_size)
-    }
-  }
-  
-  store<T>(value:T):void{
-    this.resize_if_necessary(sizeof<T>())
-    store<T>(this.start + this.offset, value)
-    this.offset += sizeof<T>()
-  }
-
-  copy(src:usize, nBytes:u32):void{
-    this.resize_if_necessary(nBytes)
-    memory.copy(this.start + this.offset, src, nBytes)
-    this.offset += nBytes
-  }
-
-  get_used_buffer():ArrayBuffer{
-    return changetype<ArrayBuffer>(this.start).slice(0, this.offset)
-  }
-}
 
 
 export class BorshEncoder extends Encoder<ArrayBuffer>{
-  public buffer:Buffer = new Buffer()
+  public buffer:EncodeBuffer = new EncodeBuffer()
   
   get_encoded_object():ArrayBuffer{
     return this.buffer.get_used_buffer()
@@ -60,9 +31,7 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
   }
 
   // Array --
-  encode_array<A extends ArrayLike<any> | null>(value:A):void{
-    if(value == null){ this.encode_null(); return }
-
+  encode_array<A extends ArrayLike<any>>(value:A):void{
     // repr(value.len() as u32)
     this.buffer.store<u32>(value.length)
 
@@ -70,19 +39,37 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
     for(let i=0; i<value.length; i++){
       this.encode<valueof<A>>(value[i])
     }
-  }
 
+  }
+  
+  /*
+
+  ```
+  if x.is_some() {
+    repr(1 as u8)
+    repr(x.unwrap() as ident)
+  } else {
+    repr(0 as u8)
+  }
+  ```
+  */
   // Null --
-  encode_null(): void{ /* ?????? */ }
+  encode_nullable<T>(t: T): void { 
+    if (t != null) { 
+      this.buffer.store<u8>(1);
+      this.encode(t!);
+    } else {
+      this.buffer.store<u8>(0);
+    }
+   }
 
   // Set --
-  encode_set<S extends Set<any> | null>(set:S): void{
-    if(set == null){ this.encode_null(); return }
+  encode_set<S extends Set<any>>(set:S): void{
 
-    let values:Array<indexof<S>> = set.values();
+    let values:Array<indexof<S>> = set.values().sort();
 
     // repr(value.len() as u32) 
-    this.buffer.store<u32>(values.length)
+    this.buffer.store<u32>(values.length);
     
     //for el in x.sorted(); repr(el as S)
     for(let i:i32=0; i<values.length; i++){
@@ -91,10 +78,9 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
   }
 
   // Map --
-  encode_map<M extends Map<any, any> | null>(map:M): void{
-    if(map == null){ this.encode_null(); return }
+  encode_map<M extends Map<any, any>>(map:M): void{
 
-    let keys = map.keys();
+    let keys = map.keys().sort();
 
     // repr(keys.len() as u32)
     this.buffer.store<u32>(keys.length)
@@ -120,7 +106,8 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
 
   encode_u128(value:u128):void{
     // little_endian(x)
-    this.buffer.store<u128>(value)
+    this.buffer.store<u64>(value.lo)
+    this.buffer.store<u64>(value.hi)
   }
 
   // We override encode_number, for which we don't need these

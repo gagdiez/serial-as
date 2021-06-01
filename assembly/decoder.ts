@@ -7,9 +7,14 @@ function isNull<T>(t: T): bool {
   return false;
 }
 
-export abstract class Decoder<I>{
+export abstract class Decoder<I> {
 
-  constructor(encoded_object:I){}
+  constructor(protected encoded_object:I){}
+
+  init(encoded_object: I): this { 
+    this.encoded_object = encoded_object; 
+    return this; 
+  }
 
   // Decode Field
   abstract decode_field<T>(name:string):T
@@ -18,10 +23,10 @@ export abstract class Decoder<I>{
   abstract decode_bool(): bool
 
   // Map --
-  abstract decode_map<M extends Map<any, any> | null>(): M
+  abstract decode_map<M extends Map<any, any>>(): M
 
   // Null --
-  abstract decode_null(): void
+  abstract decode_nullable<T>(): T
 
   // Object
   abstract decode_object<C>(): C
@@ -30,7 +35,7 @@ export abstract class Decoder<I>{
   abstract decode_string(): string
 
   // Set --
-  abstract decode_set<S extends Set<any> | null>(): S
+  abstract decode_set<S extends Set<any>>(): S
 
   // Number --
   abstract decode_u8(): u8
@@ -46,7 +51,7 @@ export abstract class Decoder<I>{
   abstract decode_f64(): f64
 
   // Array --
-  abstract decode_array<A extends ArrayLike<any> | null>(): A
+  abstract decode_array<A extends ArrayLike<any>>(): A
 
 
   decode_number<N = number>():N{
@@ -83,6 +88,8 @@ export abstract class Decoder<I>{
 
     // @ts-ignore
     if (isInteger<T>() || isFloat<T>()){ return this.decode_number<T>(); }
+
+    if (isNullable<T>()) { return this.decode_nullable<T>()}
 
     // @ts-ignore
     if (isString<T>()) { return this.decode_string(); }

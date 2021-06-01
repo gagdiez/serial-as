@@ -60,8 +60,8 @@ class Encoder extends ClassDecorator {
     `
     const decodeMethod = `
     decode<__T>(decoder: Decoder<__T>): void {
-      ${this.decodeStmts.join(";\n\t")};
       ${node.extendsType != null? "super.decode<__T>(decoder);" : ""}
+      ${this.decodeStmts.join(";\n\t")};
     }
     `
     const encodeMember = SimpleParser.parseClassMember(encodeMethod, node);

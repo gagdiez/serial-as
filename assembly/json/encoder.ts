@@ -34,9 +34,7 @@ export class JSONEncoder extends Encoder<string>{
   }
 
   // Array --
-  encode_array<K extends ArrayLike<any> | null>(value:K):void{
-    if(value == null){ this.encode_null(); return }
-
+  encode_array<K extends ArrayLike<any>>(value:K):void{
     if(value instanceof Uint8Array){
       this.inner_encode.push(`"${base64.encode(value)}"`); return
     }
@@ -52,12 +50,16 @@ export class JSONEncoder extends Encoder<string>{
   }
 
   // Null --
-  encode_null(): void{ this.inner_encode.push("null") }
+  encode_nullable<T>(t: T): void {
+    if (t == null){ 
+      this.inner_encode.push("null");
+    } else {
+      this.encode(t);
+    }
+  } 
 
   // Set --
-  encode_set<S extends Set<any> | null>(value:S): void{
-    if(value == null){ this.encode_null(); return }
-
+  encode_set<S extends Set<any>>(value:S): void{
     let values = value.values();
     this.inner_encode.push(`{`)
     for (let i = 0; i < values.length; i++) {
@@ -68,8 +70,7 @@ export class JSONEncoder extends Encoder<string>{
   }
 
   // Map --
-  encode_map<M extends Map<any, any> | null>(value:M): void{
-    if(value == null){ this.encode_null(); return }
+  encode_map<M extends Map<any, any>>(value:M): void {
 
     this.inner_encode.push(`{`)
 
