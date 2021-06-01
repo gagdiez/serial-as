@@ -1,25 +1,7 @@
 import {BorshEncoder, BorshDecoder} from '../borsh'
-import {Encoder, Decoder} from '../index'
-import { u128, base64 } from "near-sdk-as";
-
-@serializable
-class Pair{
-  public s1:i32;
-  public s2:i32;
-}
-
-@serializable
-class Test{
-  public number:i32;
-  public str:string = "";
-  public arr:Array<Pair> = [];
-}
-
-@serializable
-class MS{
-  public map:Map<string, u32> = new Map<string, u32>();
-  public set:Set<u32> = new Set<u32>();
-}
+import { MS, Pair, Test } from '.';
+import {Encoder, Decoder} from ".."
+import { u128 } from 'near-sdk-as';
 
 @serializable
 export class FooBar {
@@ -33,10 +15,10 @@ export class FooBar {
   arr: Array<Array<string>> = [];
   u32Arr: u32[] = [];
   i32Arr: i32[] = [];
-  //u128Val: u128 = u128.from("100000000000");
+  u128Val: u128 = u128.from("128");
   uint8arrays: Array<Uint8Array> = [];
   u64Arr: u64[] = [];
-}  
+}
 
 function initFooBar(f: FooBar): void { 
   f.foo = 321;
@@ -51,7 +33,6 @@ function initFooBar(f: FooBar): void {
   f.uint8arrays = [f.uint8array, f.uint8array]
   f.u64Arr = [10000000000, 100000000000];
 }
-
 describe("Borsh Encoder", () => {
   it("should encode simple borsh", () => {
     const p1:Pair = {s1:0, s2:1}
@@ -171,7 +152,7 @@ describe("Borsh Encoder", () => {
                          //                            u32Arr,     i32Arr
                          2, 0, 0, 0, 42, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0,
                          // u128
-                         //128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                         128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                          // Array<Uint8Array>
                          2, 0, 0, 0, 2, 0, 0, 0, 1, 2, 2, 0, 0, 0, 1, 2,
                          // u64Arr

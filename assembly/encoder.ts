@@ -1,4 +1,4 @@
-import { u128 } from "near-sdk-as";
+import { u128 } from "as-bignum";
 
 function isNull<T>(t: T): bool {
   if (isNullable<T>() || isReference<T>()) {
@@ -8,27 +8,30 @@ function isNull<T>(t: T): bool {
 }
 
 export abstract class Encoder<R>{
-
-  abstract encode_field<T>(name:string, value:T):void
+  
   abstract get_encoded_object():R
-
+  
   // Boolean
   abstract encode_bool(value: bool): void
-
+  
   // Map --
-  abstract encode_map<M extends Map<any, any> | null>(value:M): void
-
+  abstract encode_map<M extends Map<any, any>>(value:M): void
+  
   // Null --
-  abstract encode_null(): void
-
+  abstract encode_nullable<V>(value: V): void
+  
   // Object --
   abstract encode_object<C>(value:C): void
+  abstract encode_field<T>(name:string, value:T):void
 
   // String --
   abstract encode_string(value:string): void
 
   // Set --
-  abstract encode_set<S extends Set<any> | null>(value:S): void
+  abstract encode_set<S extends Set<valueof<S>>>(value:S): void
+
+  // Arraylike --
+  abstract encode_array<A extends ArrayLike<valueof<A>>>(value:A): void;
 
   // Number --
   abstract encode_u8(value:u8): void
@@ -42,6 +45,7 @@ export abstract class Encoder<R>{
   abstract encode_u128(value:u128): void
   abstract encode_f32(value:f32): void
   abstract encode_f64(value:f64): void
+
 
   encode_number<N extends number>(value:N):void{
     // @ts-ignore
@@ -66,8 +70,6 @@ export abstract class Encoder<R>{
     if (value instanceof f64){ this.encode_f64(value); return }
   }
 
-  // Array --
-  abstract encode_array<A extends ArrayLike<any> | null>(value:A): void
 
   // Encode --
   encode<V>(value: V): void {
@@ -77,14 +79,15 @@ export abstract class Encoder<R>{
     // @ts-ignore
     if (isInteger<V>() || isFloat<V>()){ this.encode_number<V>(value); return }
 
+    if (isNullable<V>()) { this.encode_nullable<V>(value); return }
+
     // @ts-ignore
     if (isString<V>()) { this.encode_string(value); return }
 
+    
     // @ts-ignore
     if(value instanceof u128){ this.encode_u128(value); return }  // -> we need to get ride of this
-
-    if (isNullable<V>() && value == null) { this.encode_null(); return }
-
+    
     // @ts-ignore
     if (isDefined(value.encode)){ this.encode_object(value); return }
 

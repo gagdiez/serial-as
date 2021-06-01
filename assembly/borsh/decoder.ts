@@ -1,34 +1,13 @@
 import {Decoder} from "..";
 import { u128 } from "near-sdk-as";
-
-class DecoBuffer {
-  public offset:u32 = 0;
-  public start:usize;
-
-  constructor(public ptr_arrBuffer:usize){
-    this.start = ptr_arrBuffer
-  }
- 
-  consume<T>():T{
-    const off = this.offset
-    this.offset += sizeof<T>()
-    return load<T>(this.start + off)    
-  }
-
-  consume_slice(length:u32):ArrayBuffer{
-    const off = this.offset
-    this.offset += length
-    return changetype<ArrayBuffer>(this.start).slice(off, off + length)
-  }
-}
+import { DecodeBuffer } from "../buffer";
 
 export class BorshDecoder extends Decoder<ArrayBuffer>{
-
-  private decoBuffer:DecoBuffer;
+  private decoBuffer:DecodeBuffer;
 
   constructor(encoded_object:ArrayBuffer){
     super(encoded_object)
-    this.decoBuffer = new DecoBuffer(changetype<usize>(encoded_object))
+    this.decoBuffer = new DecodeBuffer(encoded_object)
   }
 
   decode_field<T>(name:string):T{
@@ -53,7 +32,7 @@ export class BorshDecoder extends Decoder<ArrayBuffer>{
   }
 
   // Array --
-  decode_array<A extends ArrayLike<any> | null>():A{
+  decode_array<A extends ArrayLike<any>>(): A {
     // TODO: HANDLE NULL
     const length:u32 = this.decoBuffer.consume<u32>()
 
@@ -68,10 +47,15 @@ export class BorshDecoder extends Decoder<ArrayBuffer>{
   }
 
   // Null --
-  decode_null(): void{ /* ?????? */ }
+  decode_nullable<T>(): T {
+    let option = this.decoBuffer.consume<u8>();
+    if (option) {
+      return this.decode<T>()
+    }
+   }
 
   // Set --
-  decode_set<S extends Set<any> | null>(): S{
+  decode_set<S extends Set<any>>(): S {
     // TODO: HANDLE NULL
     const length:u32 = this.decoBuffer.consume<u32>()
 
@@ -86,7 +70,7 @@ export class BorshDecoder extends Decoder<ArrayBuffer>{
   }
 
   // Map --
-  decode_map<M extends Map<any, any> | null>(): M{
+  decode_map<M extends Map<any, any>>(): M{
     // TODO: HANDLE NULL
     const length:u32 = this.decoBuffer.consume<u32>()
 
@@ -115,7 +99,9 @@ export class BorshDecoder extends Decoder<ArrayBuffer>{
   }
 
   decode_u128():u128{
-    return this.decoBuffer.consume<u128>()
+    const lo = this.decoBuffer.consume<u64>();
+    const hi = this.decoBuffer.consume<u64>();
+    return new u128(lo, hi);
   }
 
   // We override decode_number, for which we don't need these
