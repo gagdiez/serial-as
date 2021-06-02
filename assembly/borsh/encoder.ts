@@ -1,5 +1,5 @@
 import {Encoder, EncodeBuffer} from "..";
-import { u128 } from "near-sdk-as";
+import { u128 } from "as-bignum";
 
 
 export class BorshEncoder extends Encoder<ArrayBuffer>{

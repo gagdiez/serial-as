@@ -1,5 +1,6 @@
 import {Encoder} from "..";
-import { base64, u128 } from "near-sdk-as";
+import { u128 } from "as-bignum";
+import * as base64 from "as-base64";
 
 export class JSONEncoder extends Encoder<string>{
 

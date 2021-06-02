@@ -1,7 +1,7 @@
 import {BorshEncoder, BorshDecoder} from '../borsh'
 import { MS, Pair, Test } from '.';
 import {Encoder, Decoder} from ".."
-import { u128 } from 'near-sdk-as';
+import { u128 } from 'as-bignum';
 
 @serializable
 export class FooBar {
