@@ -49,27 +49,13 @@ export class JSONDecoder extends Decoder<string>{
   decode_string():string{
     // "a\"string"
     this.offset += 1
-
-    let ignore_next:bool = false
     let start:u32 = this.offset
 
-    while(true){
-      if(ignore_next){
-        ignore_next = false
-        this.offset += 1
-        continue 
-      }
-
-      if(this.encoded_object.at(this.offset) == '\\'){
-        ignore_next = true
-      }
-      
-      if(this.encoded_object.at(this.offset) == '"'){
-        break
-      }else{
-        this.offset += 1
-      }
+    // TODO: FIX, this doesn't work for \"
+    while(this.encoded_object.at(this.offset) != '"'){
+      this.offset += 1
     }
+    
     let ret:string = this.encoded_object.slice(start, this.offset)
     this.offset += 1
     return ret
