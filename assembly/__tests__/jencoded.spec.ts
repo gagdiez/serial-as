@@ -27,11 +27,13 @@ class Test {
 describe("JSONEncoder Encoder", () => {
   it("should encode simple JSONEncoder", () => {
     const encoder:JSONEncoder = new JSONEncoder()
-    const test:Test = {number:434, string:"bye",number2:1,arr:[]}
+    let p1:Pair = {s1:1, s2:2}
+    let p2:Pair = {s1:3, s2:4}
+    const test:Test = {number:434, string:"bye",number2:1,arr:[p1, p2]}
     let res:string = test.encode<string>(encoder)
 
     expect(res)
-    .toBe('{"number":434,"string":"bye","number2":1,"arr":[]}')
+    .toBe('{"number":434,"string":"bye","number2":1,"arr":[{"s1":1,"s2":2},{"s1":3,"s2":4}]}')
 
     const decoder:JSONDecoder = new JSONDecoder(res)
     let deco:Test = new Test()

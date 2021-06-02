@@ -27,7 +27,7 @@ export class JSONDecoder extends Decoder<string>{
     // get value
     const ret:T = this.decode<T>()
     
-    // pass over ,
+    // pass over , or }
     this.offset += 1
     return ret
   }
@@ -143,10 +143,9 @@ export class JSONDecoder extends Decoder<string>{
    // Object --
   decode_object<C>(): C{
     // {object}
-    this.offset += 1  // skip {
+    this.first = true
     let object:C = instantiate<C>()
     object.decode<string>(this)
-    this.offset += 1  // skip }
     return object
   }
 
