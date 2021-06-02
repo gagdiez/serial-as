@@ -1,4 +1,4 @@
-import { u128 } from "near-sdk-as";
+import { u128 } from "as-bignum";
 
 function isNull<T>(t: T): bool {
   if (isNullable<T>() || isReference<T>()) {

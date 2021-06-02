@@ -1,4 +1,5 @@
-import { base64, u128 } from "near-sdk-as";
+import { u128 } from "as-bignum";
+import * as base64 from "as-base64";
 import { Encoder, Decoder } from "..";
 
 @serializable
@@ -9,20 +10,22 @@ export class Pair {
 
 @serializable
 export class Test {
-  public number:i32;
-  public str:string = "";
-  public arr:Array<Pair> = [];
+  public number: i32;
+  public str: string = "";
+  public arr: Array<Pair> = [];
 }
 
 @serializable
-export class LargerTest{
-  public number:i32=2;
-  public str:string="testing";
-  public arr:Array<i32>=[0,1];
-  public arpa:Array<Pair>=[{s1:0, s2:1}, {s1:2, s2:3}];
+export class LargerTest {
+  public number: i32 = 2;
+  public str: string = "testing";
+  public arr: Array<i32> = [0, 1];
+  public arpa: Array<Pair> = [
+    { s1: 0, s2: 1 },
+    { s1: 2, s2: 3 },
+  ];
   public f32_zero: f32;
 }
-
 
 @serializable
 export class FooBar {
@@ -41,7 +44,7 @@ export class FooBar {
   uint8arrays: Array<Uint8Array> = [];
   // TODO: Fix u64 array
   u64Arr: u64[] = [];
-}  
+}
 
 @serializable
 export class Nested {
@@ -64,12 +67,12 @@ export class Extends extends FooBar {
 }
 
 @serializable
-export class MS{
-  public map:Map<string, u32> = new Map<string, u32>();
-  public set:Set<u32> = new Set<u32>();
+export class MS {
+  public map: Map<string, u32> = new Map<string, u32>();
+  public set: Set<u32> = new Set<u32>();
 }
 
-export function initFooBar(f: FooBar): FooBar { 
+export function initFooBar(f: FooBar): FooBar {
   f.u32Arr = [42, 11];
   f.foo = 321;
   f.bar = 123;
@@ -89,7 +92,7 @@ export function initFooBar(f: FooBar): FooBar {
 export class WeirdMap {
   inner: Map<i32, string | null> = new Map();
 
-  add(i: i32):void{ 
+  add(i: i32): void {
     this.inner.set(i, null);
   }
 }
