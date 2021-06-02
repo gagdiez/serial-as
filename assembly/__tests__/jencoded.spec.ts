@@ -19,21 +19,22 @@ class Pair {
 @serializable
 class Test {
   public number: i32;
-  public str: string = "";
+  public string: string = "";
+  number2: i32;
   public arr: Array<Pair> = [];
 }
 
 describe("JSONEncoder Encoder", () => {
   it("should encode simple JSONEncoder", () => {
     const encoder:JSONEncoder = new JSONEncoder()
-    const test:Simple = {number:434, string:"bye",number2:1,arr:[0,0]}
+    const test:Test = {number:434, string:"bye",number2:1,arr:[]}
     let res:string = test.encode<string>(encoder)
 
     expect(res)
-    .toBe('{"number":434,"string":"bye","number2":1,"arr":[0,0]}')
+    .toBe('{"number":434,"string":"bye","number2":1,"arr":[]}')
 
     const decoder:JSONDecoder = new JSONDecoder(res)
-    let deco:Simple = new Simple()
+    let deco:Test = new Test()
     deco.decode<string>(decoder)
     expect(test)
     .toStrictEqual(deco)

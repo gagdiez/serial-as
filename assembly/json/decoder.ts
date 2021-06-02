@@ -77,6 +77,11 @@ export class JSONDecoder extends Decoder<string>{
   // Array --
   decode_array<A extends ArrayLike<any>>(): A {
     //[v1,v2,...,v4]
+    if(this.encoded_object.at(this.offset+1) == ']'){
+      //empty array
+      this.offset += 2
+      return instantiate<A>(0)
+    }
 
     let tmp_array:Array<valueof<A>> = new Array<valueof<A>>()
 
