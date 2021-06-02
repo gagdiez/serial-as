@@ -1,4 +1,5 @@
-import {Encoder, EncodeBuffer} from "..";
+import {Encoder} from "..";
+import {EncodeBuffer} from "./buffer"
 import { u128 } from "as-bignum";
 
 

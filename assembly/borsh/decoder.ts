@@ -1,6 +1,6 @@
 import {Decoder} from "..";
 import { u128 } from "as-bignum";
-import { DecodeBuffer } from "../buffer";
+import { DecodeBuffer } from "./buffer";
 
 export class BorshDecoder extends Decoder<ArrayBuffer>{
   private decoBuffer:DecodeBuffer;
