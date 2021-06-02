@@ -1,4 +1,4 @@
 import {JSONEncoder} from './encoder'
-//import {JSONDecoder} from './decoder'
+import {JSONDecoder} from './decoder'
 
-export {JSONEncoder}
+export {JSONEncoder, JSONDecoder}

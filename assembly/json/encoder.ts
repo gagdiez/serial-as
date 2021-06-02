@@ -100,7 +100,6 @@ export class JSONEncoder extends Encoder<string>{
     }
   }
 
-  // We override encode_number, for which we don't need these
   encode_u8(value:u8): void{ this.inner_encode.push(value.toString()) }
   encode_i8(value:i8): void{ this.inner_encode.push(value.toString()) }
   encode_u16(value:u16): void{ this.inner_encode.push(value.toString()) }
