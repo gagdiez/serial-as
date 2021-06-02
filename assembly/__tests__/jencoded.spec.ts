@@ -1,42 +1,37 @@
 import {JSONEncoder, JSONDecoder} from '../json'
 import {Encoder, Decoder} from ".."
-import { Nullables, LargerTest as Test, FooBar, initFooBar, Nested, Extends } from '.';
-
-@serializable
-class Simple{
-  number:u32 = 3;
-  string:string = "hi";
-  number2:u32 = 3;
-  arr:Array<u32> = [0,0]
-}
-
-@serializable
-class Pair {
-  public s1: i32;
-  public s2: i32;
-}
-
-@serializable
-class AuxTest {
-  public number: i32;
-  public string: string = "";
-  number2: i32;
-  public arr: Array<Pair> = [];
-}
+import { Nullables, LargerTest as Test, FooBar, initFooBar, Nested, Extends, MS } from '.';
 
 describe("JSONEncoder Encoder", () => {
-  it("should encode simple JSONEncoder", () => {
+  it("should encode empty Sets and Maps", () => {
     const encoder:JSONEncoder = new JSONEncoder()
-    let p1:Pair = {s1:1, s2:2}
-    let p2:Pair = {s1:3, s2:4}
-    const test:AuxTest = {number:434, string:"bye",number2:1,arr:[p1, p2]}
+    const test:MS = new MS()
     let res:string = test.encode<string>(encoder)
 
     expect(res)
-    .toBe('{"number":434,"string":"bye","number2":1,"arr":[{"s1":1,"s2":2},{"s1":3,"s2":4}]}')
+    .toBe('{"map":{},"set":{}}')
 
     const decoder:JSONDecoder = new JSONDecoder(res)
-    let deco:AuxTest = new AuxTest()
+    let deco:MS = new MS()
+    deco.decode<string>(decoder)
+    expect(test)
+    .toStrictEqual(deco)
+  });
+
+  it("should encode non-empty Sets and Maps", () => {
+    const encoder:JSONEncoder = new JSONEncoder()
+    const test:MS = new MS()
+    test.map.set('hi', 1)
+    test.set.add(256)
+    test.set.add(4)
+
+    let res:string = test.encode<string>(encoder)
+
+    expect(res)
+    .toBe('{"map":{"hi":1},"set":{256,4}}')
+
+    const decoder:JSONDecoder = new JSONDecoder(res)
+    let deco:MS = new MS()
     deco.decode<string>(decoder)
     expect(test)
     .toStrictEqual(deco)
@@ -65,7 +60,7 @@ describe("JSONEncoder Encoder", () => {
     expect(test)
     .toStrictEqual(deco)
   });
-/*
+
   it("should encode complex JSONEncoder", () => {
     const encoder:JSONEncoder = new JSONEncoder()
     const original = new FooBar();
@@ -75,6 +70,12 @@ describe("JSONEncoder Encoder", () => {
 
     expect(res)
     .toBe('{"foo":321,"bar":123,"u64Val":"4294967297","u64_zero":"0","i64Val":"-64","flag":true,"baz":"foo","uint8array":"aGVsbG8sIHdvcmxkIQ==","arr":[["Hello"],["World"]],"u32Arr":[42,11],"i32Arr":[],"u128Val":"128","uint8arrays":["aGVsbG8sIHdvcmxkIQ==","aGVsbG8sIHdvcmxkIQ=="],"u64Arr":["10000000000","100000000000"]}')
+
+    const decoder:JSONDecoder = new JSONDecoder(res)
+    let deco:FooBar = new FooBar()
+    deco.decode<string>(decoder)
+    expect(original)
+    .toStrictEqual(deco)
   });
 
   it("should encode nested JSONEncoder", () => {
@@ -84,6 +85,12 @@ describe("JSONEncoder Encoder", () => {
     let res:string = original.encode<string>(encoder)
     expect(res)
     .toBe('{"f":{"foo":321,"bar":123,"u64Val":"4294967297","u64_zero":"0","i64Val":"-64","flag":true,"baz":"foo","uint8array":"aGVsbG8sIHdvcmxkIQ==","arr":[["Hello"],["World"]],"u32Arr":[42,11],"i32Arr":[],"u128Val":"128","uint8arrays":["aGVsbG8sIHdvcmxkIQ==","aGVsbG8sIHdvcmxkIQ=="],"u64Arr":["10000000000","100000000000"]}}')
+
+    const decoder:JSONDecoder = new JSONDecoder(res)
+    let deco:Nested = new Nested()
+    deco.decode<string>(decoder)
+    expect(original)
+    .toStrictEqual(deco)
   });
 
   it("should encode JSONEncoder with inheritence", () => {
@@ -93,5 +100,11 @@ describe("JSONEncoder Encoder", () => {
     let res:string = original.encode<string>(encoder)
     expect(res)
     .toBe('{"foo":321,"bar":123,"u64Val":"4294967297","u64_zero":"0","i64Val":"-64","flag":true,"baz":"foo","uint8array":"aGVsbG8sIHdvcmxkIQ==","arr":[["Hello"],["World"]],"u32Arr":[42,11],"i32Arr":[],"u128Val":"128","uint8arrays":["aGVsbG8sIHdvcmxkIQ==","aGVsbG8sIHdvcmxkIQ=="],"u64Arr":["10000000000","100000000000"],"x":[true]}')
-  }); */
+
+    const decoder:JSONDecoder = new JSONDecoder(res)
+    let deco:Extends = new Extends()
+    deco.decode<string>(decoder)
+    expect(original)
+    .toStrictEqual(deco)
+  });
 });

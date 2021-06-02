@@ -1,5 +1,6 @@
 import {Decoder} from "..";
 import { u128 } from "as-bignum";
+import * as base64 from "as-base64";
 
 export class JSONDecoder extends Decoder<string>{
 
@@ -76,29 +77,30 @@ export class JSONDecoder extends Decoder<string>{
 
   // Array --
   decode_array<A extends ArrayLike<any>>(): A {
-    //[v1,v2,...,v4]
+    //[v1,v2,...,v4] or "uint8_encoded_as64"
+    let ret:A
+    if(ret instanceof Uint8Array){
+      let u8arr = this.decode_string();
+      return <A>base64.decode(u8arr)
+    }
+
     if(this.encoded_object.at(this.offset+1) == ']'){
       //empty array
       this.offset += 2
       return instantiate<A>(0)
     }
 
-    let tmp_array:Array<valueof<A>> = new Array<valueof<A>>()
+    // Not empty
+    ret = instantiate<A>()
 
     while(this.encoded_object.at(this.offset) != ']'){
       this.offset += 1
-      tmp_array.push(this.decode<valueof<A>>())
+      ret.push(this.decode<valueof<A>>())
     }
 
     this.offset += 1  // skip ]
-
-    let ret_array:A = instantiate<A>(tmp_array.length)
-    for(let i:i32=0; i < tmp_array.length; i++){
-      ret_array[i] = tmp_array[i]
-    }
-
-    
-    return ret_array
+  
+    return ret
   }
 
   // Null --
@@ -111,15 +113,20 @@ export class JSONDecoder extends Decoder<string>{
   // Set --
   decode_set<T>(): Set<T> {
     // {val,val,val}
+    if(this.encoded_object.at(this.offset+1) == '}'){
+      //empty set
+      this.offset += 2
+      return new Set<T>()
+    }
+
     let ret_set:Set<T> = new Set<T>()
 
-    this.offset += 1
-
-    //for el in x; repr(el as K)
-    while(this.encoded_object.at(this.offset-1) != '}'){
-      ret_set.add(this.decode<T>())
+    while(this.encoded_object.at(this.offset) != '}'){
       this.offset += 1
+      ret_set.add(this.decode<T>())
     }
+
+    this.offset += 1  // skip }
 
     return ret_set
   }
@@ -127,16 +134,23 @@ export class JSONDecoder extends Decoder<string>{
   // Map --
   decode_map<K, V>(): Map<K, V>{
     // {key:val,key:val}
-    this.offset += 1
+    if(this.encoded_object.at(this.offset+1) == '}'){
+      //empty map
+      this.offset += 2
+      return new Map<K, V>()
+    }
 
     let ret_map:Map<K, V> = new Map<K, V>()
-    while(this.encoded_object.at(this.offset-1) != '}'){
+    while(this.encoded_object.at(this.offset) != '}'){
+      this.offset += 1
       const key = this.decode<K>()
       this.offset += 1  // skip :
       const value = this.decode<V>()
-      this.offset += 1  // skip , or }
       ret_map.set(key, value)
     }
+
+    this.offset += 1  // skip }
+
     return ret_map
   }
 
