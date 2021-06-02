@@ -1,6 +1,6 @@
 import {JSONEncoder, JSONDecoder} from '../json'
 import {Encoder, Decoder} from ".."
-import { Nullables, LargerTest, FooBar, initFooBar, Nested, Extends } from '.';
+import { Nullables, LargerTest as Test, FooBar, initFooBar, Nested, Extends } from '.';
 
 @serializable
 class Simple{
@@ -17,7 +17,7 @@ class Pair {
 }
 
 @serializable
-class Test {
+class AuxTest {
   public number: i32;
   public string: string = "";
   number2: i32;
@@ -29,20 +29,20 @@ describe("JSONEncoder Encoder", () => {
     const encoder:JSONEncoder = new JSONEncoder()
     let p1:Pair = {s1:1, s2:2}
     let p2:Pair = {s1:3, s2:4}
-    const test:Test = {number:434, string:"bye",number2:1,arr:[p1, p2]}
+    const test:AuxTest = {number:434, string:"bye",number2:1,arr:[p1, p2]}
     let res:string = test.encode<string>(encoder)
 
     expect(res)
     .toBe('{"number":434,"string":"bye","number2":1,"arr":[{"s1":1,"s2":2},{"s1":3,"s2":4}]}')
 
     const decoder:JSONDecoder = new JSONDecoder(res)
-    let deco:Test = new Test()
+    let deco:AuxTest = new AuxTest()
     deco.decode<string>(decoder)
     expect(test)
     .toStrictEqual(deco)
   });
   
-/*   it("should encode nullable", () => {
+  it("should encode nullable", () => {
     const encoder:JSONEncoder = new JSONEncoder()
     const test:Nullables = new Nullables()
     let res:string = test.encode<string>(encoder)
@@ -64,7 +64,7 @@ describe("JSONEncoder Encoder", () => {
     deco.decode<string>(decoder)
     expect(test)
     .toStrictEqual(deco)
-  }); */
+  });
 /*
   it("should encode complex JSONEncoder", () => {
     const encoder:JSONEncoder = new JSONEncoder()
