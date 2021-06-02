@@ -7,5 +7,5 @@ export class BorshSerializer extends Serializer<ArrayBuffer, BorshEncoder, Borsh
   private static singleton: BorshSerializer = new BorshSerializer();
 
   static decoder(t: ArrayBuffer): BorshDecoder { return BorshSerializer.singleton.decoder(t); }
-  static enecoder(): BorshEncoder { return BorshSerializer.singleton.encoder(); }
+  static encoder(): BorshEncoder { return BorshSerializer.singleton.encoder(); }
 }
