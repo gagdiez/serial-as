@@ -42,19 +42,14 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
 
   }
   
-  /*
-
-  ```
-  if x.is_some() {
+  // Null --
+  encode_nullable<T>(t: T): void { 
+  /*if x.is_some() {
     repr(1 as u8)
     repr(x.unwrap() as ident)
   } else {
     repr(0 as u8)
-  }
-  ```
-  */
-  // Null --
-  encode_nullable<T>(t: T): void { 
+  }  */
     if (t != null) { 
       this.buffer.store<u8>(1);
       this.encode(t!);
@@ -64,21 +59,21 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
    }
 
   // Set --
-  encode_set<S extends Set<any>>(set:S): void{
+  encode_set<T>(set:Set<T>): void{
 
-    let values:Array<indexof<S>> = set.values().sort();
+    let values:Array<T> = set.values().sort();
 
     // repr(value.len() as u32) 
     this.buffer.store<u32>(values.length);
     
     //for el in x.sorted(); repr(el as S)
     for(let i:i32=0; i<values.length; i++){
-      this.encode<indexof<S>>(values[i])
+      this.encode<T>(values[i])
     }
   }
 
   // Map --
-  encode_map<M extends Map<any, any>>(map:M): void{
+  encode_map<K, V>(map:Map<K, V>): void{
 
     let keys = map.keys().sort();
 
@@ -88,8 +83,8 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
     // repr(k as K)
     // repr(v as V)
     for (let i = 0; i < keys.length; i++) {
-      this.encode<indexof<M>>(keys[i])
-      this.encode<valueof<M>>(map.get(keys[i]))
+      this.encode<K>(keys[i])
+      this.encode<V>(map.get(keys[i]))
     }
   }
 

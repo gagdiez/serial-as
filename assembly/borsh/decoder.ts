@@ -55,32 +55,31 @@ export class BorshDecoder extends Decoder<ArrayBuffer>{
    }
 
   // Set --
-  decode_set<S extends Set<any>>(): S {
-    // TODO: HANDLE NULL
+  decode_set<T>(): Set<T> {
     const length:u32 = this.decoBuffer.consume<u32>()
 
-    let ret_set:Set<indexof<S>> = new Set<indexof<S>>()
+    let ret_set:Set<T> = new Set<T>()
 
     //for el in x.sorted(); repr(el as S)
     for(let i:u32=0; i<length; i++){
-      ret_set.add(this.decode<indexof<S>>())
+      ret_set.add(this.decode<T>())
     }
 
     return ret_set
   }
 
   // Map --
-  decode_map<M extends Map<any, any>>(): M{
+  decode_map<K, V>(): Map<K, V>{
     // TODO: HANDLE NULL
     const length:u32 = this.decoBuffer.consume<u32>()
 
-    let ret_map:Map<indexof<M>, valueof<M>> = new Map<indexof<M>, valueof<M>>()
+    let ret_map:Map<K, V> = new Map<K, V>()
 
     // repr(k as K)
     // repr(v as V)
     for (let i:u32 = 0; i < length; i++) {
-      const key = this.decode<indexof<M>>()
-      const value = this.decode<valueof<M>>()
+      const key = this.decode<K>()
+      const value = this.decode<V>()
       ret_map.set(key, value)
     }
     return ret_map

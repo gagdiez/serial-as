@@ -23,7 +23,7 @@ export abstract class Decoder<I> {
   abstract decode_bool(): bool
 
   // Map --
-  abstract decode_map<M extends Map<any, any>>(): M
+  abstract decode_map<K, V>(): Map<K, V>
 
   // Null --
   abstract decode_nullable<T>(): T
@@ -35,7 +35,7 @@ export abstract class Decoder<I> {
   abstract decode_string(): string
 
   // Set --
-  abstract decode_set<S extends Set<any>>(): S
+  abstract decode_set<T>(): Set<T>
 
   // Number --
   abstract decode_u8(): u8
@@ -103,10 +103,10 @@ export abstract class Decoder<I> {
     if(isArrayLike<T>()){ return this.decode_array<T>(); }
 
     // @ts-ignore
-    if(value instanceof Set){ return this.decode_set<T>(); }
+    if(value instanceof Set){ return this.decode_set<indexof<T>>(); }
 
     // @ts-ignore
-    if(value instanceof Map){ return this.decode_map<T>(); }
+    if(value instanceof Map){ return this.decode_map<indexof<T>, valueof<T>>(); }
 
     // @ts-ignore
     return this.decode_object<T>();

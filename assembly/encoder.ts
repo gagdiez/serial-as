@@ -15,7 +15,7 @@ export abstract class Encoder<R>{
   abstract encode_bool(value: bool): void
   
   // Map --
-  abstract encode_map<M extends Map<any, any>>(value:M): void
+  abstract encode_map<K, V>(value:Map<K, V>): void
   
   // Null --
   abstract encode_nullable<V>(value: V): void
@@ -28,7 +28,7 @@ export abstract class Encoder<R>{
   abstract encode_string(value:string): void
 
   // Set --
-  abstract encode_set<S extends Set<valueof<S>>>(value:S): void
+  abstract encode_set<T>(value:Set<T>): void
 
   // Arraylike --
   abstract encode_array<A extends ArrayLike<valueof<A>>>(value:A): void;
@@ -95,10 +95,10 @@ export abstract class Encoder<R>{
     if(isArrayLike<V>(value)){ this.encode_array<V>(value); return }
 
     // @ts-ignore
-    if(value instanceof Set){ this.encode_set<V>(value); return }
+    if(value instanceof Set){ this.encode_set<indexof<V>>(value); return }
 
     // @ts-ignore
-    if(value instanceof Map){ this.encode_map<V>(value); }
+    if(value instanceof Map){ this.encode_map<indexof<V>, valueof<V>>(value); }
   }
 
 }

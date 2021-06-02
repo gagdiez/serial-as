@@ -60,27 +60,27 @@ export class JSONEncoder extends Encoder<string>{
   } 
 
   // Set --
-  encode_set<S extends Set<any>>(value:S): void{
+  encode_set<T>(value:Set<T>): void{
     let values = value.values();
     this.inner_encode.push(`{`)
     for (let i = 0; i < values.length; i++) {
-      this.encode<indexof<S>>(values[i])
+      this.encode<T>(values[i])
       if(i != values.length-1){ this.inner_encode.push(`,`) }
     }
     this.inner_encode.push(`}`)
   }
 
   // Map --
-  encode_map<M extends Map<any, any>>(value:M): void {
+  encode_map<K, V>(value:Map<K, V>): void {
 
     this.inner_encode.push(`{`)
 
     let keys = value.keys();
 
     for (let i = 0; i < keys.length; i++) {
-      this.encode<indexof<M>>(keys[i])
+      this.encode<K>(keys[i])
       this.inner_encode.push(':')
-      this.encode<valueof<M>>(value.get(keys[i]))
+      this.encode<V>(value.get(keys[i]))
 
       if(i != keys.length-1){ this.inner_encode.push(`,`) }
     }
