@@ -4,6 +4,7 @@ import { u128 } from "as-bignum";
 
 
 export class BorshEncoder extends Encoder<ArrayBuffer>{
+
   public buffer:EncodeBuffer = new EncodeBuffer()
   
   get_encoded_object():ArrayBuffer{
@@ -22,13 +23,7 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
 
   // String --
   encode_string(value:string):void{
-    const utf8_enc:ArrayBuffer = String.UTF8.encode(value)
-    
-    // repr(encoded.len() as u32)
-    this.buffer.store<u32>(utf8_enc.byteLength)
-    
-    // repr(encoded as Vec<u8>) 
-    this.buffer.copy(changetype<usize>(utf8_enc), utf8_enc.byteLength)
+    this.encode_array_buffer(String.UTF8.encode(value));
   }
 
   // Array --
@@ -40,10 +35,17 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
     for(let i=0; i<value.length; i++){
       this.encode<valueof<A>>(value[i])
     }
+  }
 
+  encode_array_buffer(value: ArrayBuffer): void {
+    // repr(encoded.len() as u32)
+    this.buffer.store<u32>(value.byteLength)
+        
+    // repr(encoded as Vec<u8>) 
+    this.buffer.store_bytes(value, value.byteLength)
   }
   
-  // Null --
+  // Null -- "Option"
   encode_nullable<T>(t: T): void { 
   /*if x.is_some() {
     repr(1 as u8)
@@ -96,6 +98,13 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
   }
 
   encode_number<T>(value:T):void{
+    if (isFloat<T>()) { 
+      if (value instanceof f32) { 
+        assert(<f32><unknown>value != f32.NaN, "For portability reasons we do not allow f32s to be encoded as Nan")
+      } else {
+        assert(<f64><unknown>value != f64.NaN, "For portability reasons we do not allow f64s to be encoded as Nan")
+      }
+    }
     // little_endian(x)    
     this.buffer.store<T>(value)
   }
@@ -117,6 +126,16 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
   encode_i64(value:i64): void{}
   encode_f32(value:f32): void{}
   encode_f64(value:f64): void{}
+
+  encode_arraybuffer_view<Type extends ArrayBuffer>(arr: Type): void {
+    this.buffer.store<u32>(arr.byteLength);
+    //@ts-ignore
+    if (isDefined(arr.dataStart)) { 
+      //@ts-ignore
+      this.buffer.store_bytes(arr.dataStart, arr.byteLength);
+    }
+  }
+    
 
   // We override encode_array_like, for which we don't need these
   encode_u8array(value:Uint8Array): void{}

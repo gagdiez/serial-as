@@ -50,6 +50,10 @@ export class JSONEncoder extends Encoder<string>{
     this.inner_encode.push(`]`)
   }
 
+  encode_array_buffer(value: ArrayBuffer): void {
+    throw new Error("Method not implemented.");
+  }
+
   // Null --
   encode_nullable<T>(t: T): void {
     if (t == null){ 

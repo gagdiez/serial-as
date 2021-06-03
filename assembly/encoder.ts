@@ -33,6 +33,13 @@ export abstract class Encoder<R>{
   // Arraylike --
   abstract encode_array<A extends ArrayLike<valueof<A>>>(value:A): void;
 
+  abstract encode_array_buffer(value: ArrayBuffer): void; 
+
+  encode_arraybuffer_view<T>(value: T): void {
+    // @ts-ignore
+    this.encode_array(value);
+  }
+
   // Number --
   abstract encode_u8(value:u8): void
   abstract encode_i8(value:i8): void
@@ -92,13 +99,20 @@ export abstract class Encoder<R>{
     if (isDefined(value.encode)){ this.encode_object(value); return }
 
     // @ts-ignore
+    if (value instanceof ArrayBufferView) { this.encode_arraybuffer_view(value); return;}
+
+    // @ts-ignore
     if(isArrayLike<V>(value)){ this.encode_array<V>(value); return }
 
     // @ts-ignore
     if(value instanceof Set){ this.encode_set<indexof<V>>(value); return }
 
     // @ts-ignore
-    if(value instanceof Map){ this.encode_map<indexof<V>, valueof<V>>(value); }
+    if(value instanceof Map){ this.encode_map<indexof<V>, valueof<V>>(value); } else {
+          ERROR(`Failed to encode ${value} with type ${nameof<V>()}.
+        Perhaps you're missing an 'encode' method on your class`);
+    }
+
   }
 
 }

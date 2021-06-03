@@ -22,11 +22,9 @@ export class BorshDecoder extends Decoder<ArrayBuffer>{
 
   // String --
   decode_string():string{
-    const lenght:u32 = this.decoBuffer.consume<u32>()
-
-    const encoded_string = this.decoBuffer.consume_slice(lenght)
+    const encoded_string = this.decode_array_buffer();
     const decoded_string:string = String.UTF8.decode(encoded_string)
-    
+
     // repr(decoded as Vec<u8>) 
     return decoded_string
   }
@@ -44,6 +42,11 @@ export class BorshDecoder extends Decoder<ArrayBuffer>{
     }
 
     return ret_array
+  }
+
+  decode_array_buffer(): ArrayBuffer { 
+    const length:u32 = this.decoBuffer.consume<u32>()
+    return this.decoBuffer.consume_slice(length);
   }
 
   // Null --
@@ -101,6 +104,11 @@ export class BorshDecoder extends Decoder<ArrayBuffer>{
     const lo = this.decoBuffer.consume<u64>();
     const hi = this.decoBuffer.consume<u64>();
     return new u128(lo, hi);
+  }
+
+  decode_typed_array<K, T extends TypedArray<K>>(): T {
+    const byteLength = this.decoBuffer.consume<u32>();
+    new TypedArray()
   }
 
   // We override decode_number, for which we don't need these
