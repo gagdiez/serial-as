@@ -1,12 +1,9 @@
 import { u128 } from "as-bignum";
 
-function isNull<T>(t: T): bool {
-  if (isNullable<T>() || isReference<T>()) {
-    return changetype<usize>(t) == 0;
-  }
-  return false;
-}
-
+/**
+ * Top level abstract Encoder class which defines default 
+ * methods, `encode` and `encode_number`, which use tyu
+ */
 export abstract class Encoder<R>{
   
   abstract get_encoded_object():R
@@ -31,11 +28,23 @@ export abstract class Encoder<R>{
   abstract encode_set<T>(value:Set<T>): void
 
   // Arraylike --
+  // @ts-ignore
   abstract encode_array<A extends ArrayLike<valueof<A>>>(value:A): void;
 
-  abstract encode_array_buffer(value: ArrayBuffer): void; 
+  /**
+   * Encode a typed array. Default treats it as normal array.
+   * @param value Subclass of ArrayBufferView
+   */
+  encode_arraybuffer_view<T extends ArrayBufferView>(value: T): void {
+    // @ts-ignore
+    this.encode_array(value);
+  }
 
-  encode_arraybuffer_view<T>(value: T): void {
+  /**
+   * Encode a static array. Default treats it as normal array.
+   * @param value Static Array
+   */
+  encode_static_array<T>(value: StaticArray<T>): void {
     // @ts-ignore
     this.encode_array(value);
   }
@@ -52,7 +61,6 @@ export abstract class Encoder<R>{
   abstract encode_u128(value:u128): void
   abstract encode_f32(value:f32): void
   abstract encode_f64(value:f64): void
-
 
   encode_number<N extends number>(value:N):void{
     // @ts-ignore
@@ -90,7 +98,6 @@ export abstract class Encoder<R>{
 
     // @ts-ignore
     if (isString<V>()) { this.encode_string(value); return }
-
     
     // @ts-ignore
     if(value instanceof u128){ this.encode_u128(value); return }  // -> we need to get ride of this
@@ -100,6 +107,9 @@ export abstract class Encoder<R>{
 
     // @ts-ignore
     if (value instanceof ArrayBufferView) { this.encode_arraybuffer_view(value); return;}
+
+    // @ts-ignore
+    if (value instanceof StaticArray) { this.encode_static_array<valueof<V>>(value); return;}
 
     // @ts-ignore
     if(isArrayLike<V>(value)){ this.encode_array<V>(value); return }

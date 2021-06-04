@@ -23,7 +23,9 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
 
   // String --
   encode_string(value:string):void{
-    this.encode_array_buffer(String.UTF8.encode(value));
+    const utf8 =  String.UTF8.encode(value);
+    this.buffer.store<u32>(utf8.byteLength);
+    this.buffer.store_bytes(utf8, utf8.byteLength);
   }
 
   // Array --
@@ -35,14 +37,6 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
     for(let i=0; i<value.length; i++){
       this.encode<valueof<A>>(value[i])
     }
-  }
-
-  encode_array_buffer(value: ArrayBuffer): void {
-    // repr(encoded.len() as u32)
-    this.buffer.store<u32>(value.byteLength)
-        
-    // repr(encoded as Vec<u8>) 
-    this.buffer.store_bytes(value, value.byteLength)
   }
   
   // Null -- "Option"
@@ -127,12 +121,12 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
   encode_f32(value:f32): void{}
   encode_f64(value:f64): void{}
 
-  encode_arraybuffer_view<Type extends ArrayBuffer>(arr: Type): void {
-    this.buffer.store<u32>(arr.byteLength);
+  encode_arraybuffer_view<T extends ArrayBufferView>(value: T): void {
+    this.buffer.store<u32>(value.byteLength);
     //@ts-ignore
-    if (isDefined(arr.dataStart)) { 
+    if (isDefined(value.dataStart)) { 
       //@ts-ignore
-      this.buffer.store_bytes(arr.dataStart, arr.byteLength);
+      this.buffer.store_bytes(value.dataStart, value.byteLength);
     }
   }
     

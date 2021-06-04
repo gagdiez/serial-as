@@ -1,7 +1,8 @@
 import {BorshEncoder, BorshDecoder} from '../borsh'
-import { MS, Pair, Test } from '.';
+import { BigObj, MS, Pair, Test } from '.';
 import {Encoder, Decoder} from ".."
 import { u128 } from 'as-bignum';
+import { JSONEncoder } from '../json';
 
 @serializable
 export class FooBar {
@@ -169,5 +170,19 @@ describe("Borsh Encoder", () => {
     decoded_test.decode<ArrayBuffer>(decoder)
 
     expect(decoded_test).toStrictEqual(original)
+  });
+
+  describe("big objects", () => {
+    it("should handle big objects", () => {
+      let bigObj = new BigObj();
+      const encoder = new BorshEncoder();
+      encoder.encode(bigObj);
+      const res = encoder.get_encoded_object();
+      log (res.byteLength);
+      const jencoder = new JSONEncoder();
+      jencoder.encode(bigObj);
+      const jres = String.UTF8.encode(jencoder.get_encoded_object());
+      log(jres.byteLength)
+    })
   });
 });
