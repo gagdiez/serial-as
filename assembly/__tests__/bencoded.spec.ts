@@ -210,6 +210,7 @@ describe("Borsh Encoder", () => {
     for(let i:i32=0; i < 1000; i++){ expected.push(<u8>i*2) }
 
     check_encode<BigObj>(bigObj, expected)
+    check_decode<BigObj>(expected, bigObj)
 
 
 /*     const encoder = new BorshEncoder();
