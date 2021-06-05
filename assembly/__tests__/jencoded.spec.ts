@@ -12,12 +12,12 @@ function check_encode<T>(object:T, expected:string):void{
   expect(res).toBe(expected)
 }
 
-function check_decode<T>(encoded:string, original:T):T{
+function check_decode<T>(encoded:string, original:T):void{
   // Checks that an encoding returns the expected object
   const decoder:JSONDecoder = new JSONDecoder(encoded)
   let deco:T = instantiate<T>()
   deco.decode<string>(decoder)
-  return deco
+  expect(deco).toStrictEqual(original)
 }
 
 describe("JSONEncoder Encoder", () => {
