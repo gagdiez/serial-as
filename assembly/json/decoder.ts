@@ -10,6 +10,8 @@ export class JSONDecoder extends Decoder<string>{
 
   constructor(encoded_object:string){
     super(encoded_object)
+    this.nums.add("-")
+    this.nums.add(".")
     for(let i:u8=0; i < 10; i++){
       this.nums.add(i.toString())
     }
@@ -52,11 +54,15 @@ export class JSONDecoder extends Decoder<string>{
     let start:u32 = this.offset
 
     // TODO: FIX, this doesn't work for \"
-    while(this.encoded_object.at(this.offset) != '"'){
+    while(true){
+      if(this.encoded_object.at(this.offset) == '"' && this.encoded_object.at(this.offset-1) != '\\'){
+        break
+      }
       this.offset += 1
     }
     
     let ret:string = this.encoded_object.slice(start, this.offset)
+    ret = ret.replace('\\"', '"')
     this.offset += 1
     return ret
   }
@@ -160,7 +166,7 @@ export class JSONDecoder extends Decoder<string>{
     return <T>parseInt(this.encoded_object.slice(start, this.offset))
   }
 
-  decode_long<T extends number >():T{
+  decode_long<T = number>():T{
     let number:string = this.decode_string()
     return <T>(parseInt(number))
   }
