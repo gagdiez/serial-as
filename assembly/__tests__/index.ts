@@ -50,9 +50,9 @@ export class Pair {
 export class Arrays {
   public u8Arr: u8[] = [1, 2];
   public u16Arr: u16[] = [3, 4];
-  public u32Arr: u32[] = [4, 5];
-  public u64Arr: u64[] = [6, 7];
-  public u128Arr: u128[] = [u128.from(7), u128.from(8)];
+  public u32Arr: u32[] = [5, 6];
+  public u64Arr: u64[] = [7, 8];
+  public u128Arr: u128[] = [u128.from(9), u128.from(10)];
 
   public i8Arr: i8[] = [-1, -2];
   public i16Arr: i16[] = [-3, -4];
