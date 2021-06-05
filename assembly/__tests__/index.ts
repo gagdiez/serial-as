@@ -1,5 +1,4 @@
 import { u128 } from "as-bignum";
-import * as base64 from "as-base64";
 import { Encoder, Decoder } from "..";
 
 // Test
@@ -108,7 +107,7 @@ export class MixtureTwo {
   i64Val: i64 = -64;
   flag: bool;
   baz: string = "";
-  uint8array: Uint8Array = new Uint8Array(0);
+  uint8array: Uint8Array = new Uint8Array(2);
   arr: Array<Array<string>> = [];
   u32Arr: u32[] = [];
   i32Arr: i32[] = [];
@@ -140,24 +139,4 @@ export class Nested {
 @serializable
 export class MapNullValues {
   inner: Map<i32, string | null> = new Map();
-
-  add(i: i32): void {
-    this.inner.set(i, null);
-  }
-}
-
-export function initMixtureTwo(f: MixtureTwo): MixtureTwo {
-  f.u32Arr = [42, 11];
-  f.foo = 321;
-  f.bar = 123;
-  f.flag = true;
-  f.baz = "foo";
-  f.uint8array = base64.decode("aGVsbG8sIHdvcmxkIQ==");
-  f.u128Val = new u128(128);
-  f.arr = [["Hello"], ["World"]];
-  f.uint8arrays = new Array<Uint8Array>(2);
-  f.uint8arrays[0] = base64.decode("aGVsbG8sIHdvcmxkIQ==");
-  f.uint8arrays[1] = base64.decode("aGVsbG8sIHdvcmxkIQ==");
-  f.u64Arr = [10000000000, 100000000000];
-  return f;
 }

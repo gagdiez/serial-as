@@ -1,7 +1,9 @@
-import {JSONEncoder, JSONDecoder} from '../json'
+import { u128 } from "as-bignum";
 import {Encoder, Decoder} from ".."
-import { Numbers, aString, MapSet, aBoolean, Arrays, ArrayViews,
-         Nullables, MixtureOne, MixtureTwo, Nested, initMixtureTwo, Extends } from '.';
+import * as base64 from "as-base64";
+import {JSONEncoder, JSONDecoder} from '../json'
+
+import { Numbers, aString, MapSet, aBoolean, Arrays, ArrayViews, Nullables, MixtureOne, MixtureTwo, Nested, Extends, MapNullValues } from '.';
 
 
 function check_encode<T>(object:T, expected:string):void{
@@ -18,6 +20,22 @@ function check_decode<T>(encoded:string, original:T):void{
   let deco:T = instantiate<T>()
   deco.decode<string>(decoder)
   expect(deco).toStrictEqual(original)
+}
+
+function initMixtureTwo(f: MixtureTwo): MixtureTwo {
+  f.u32Arr = [42, 11];
+  f.foo = 321;
+  f.bar = 123;
+  f.flag = true;
+  f.baz = "foo";
+  f.uint8array = base64.decode("aGVsbG8sIHdvcmxkIQ==");
+  f.u128Val = new u128(128);
+  f.arr = [["Hello"], ["World"]];
+  f.uint8arrays = new Array<Uint8Array>(2);
+  f.uint8arrays[0] = base64.decode("aGVsbG8sIHdvcmxkIQ==");
+  f.uint8arrays[1] = base64.decode("aGVsbG8sIHdvcmxkIQ==");
+  f.u64Arr = [10000000000, 100000000000];
+  return f;
 }
 
 describe("JSONEncoder Encoder", () => {
@@ -45,7 +63,7 @@ describe("JSONEncoder Encoder", () => {
     check_decode<aBoolean>(expected, bool)
   });
 
-  it("should encode Arrays", () => {
+  it("should encode/decode Arrays", () => {
     const arrays:Arrays = new Arrays()
 
     const expected:string = '{"u8Arr":[1,2],"u16Arr":[3,4],"u32Arr":[5,6],"u64Arr":["7","8"],"u128Arr":["9","10"],"i8Arr":[-1,-2],"i16Arr":[-3,-4],"i32Arr":[-5,-6],"i64Arr":["-7","-8"],"f32Arr":[1.0,2.0],"f64Arr":[3.1,4.2],"arrI32":[0,1],"arrArr":[[]],"arrUint8":[],"arrObj":[{"s1":0,"s2":1},{"s1":2,"s2":3}]}'
@@ -61,7 +79,7 @@ describe("JSONEncoder Encoder", () => {
     //check_decode<ArrayViews>(expected, arrays)
   });
 
-  it("should encode empty Sets and Maps", () => {
+  it("should encode/decode empty Sets and Maps", () => {
     const map_set:MapSet = new MapSet()
     const expected:string = '{"map":{},"set":{}}'
 
@@ -69,7 +87,7 @@ describe("JSONEncoder Encoder", () => {
     check_decode<MapSet>(expected, map_set)
   });
 
-  it("should encode non-empty Sets and Maps", () => {
+  it("should encode/decode non-empty Sets and Maps", () => {
     const map_set:MapSet = new MapSet()
     map_set.map.set('hi', 1)
     map_set.set.add(256)
@@ -89,7 +107,7 @@ describe("JSONEncoder Encoder", () => {
     //check_decode<Nullables>(expected, nullables)
   });
 
-  it("should encode simple Mixtures", () => {
+  it("should encode/decode simple Mixtures", () => {
     const mix:MixtureOne = new MixtureOne()
     const expected:string = '{\"number\":2,\"str\":\"testing\",\"arr\":[0,1],\"arpa\":[{\"s1\":0,\"s2\":1},{\"s1\":2,\"s2\":3}],\"f32_zero\":0.0}'
 
@@ -97,7 +115,7 @@ describe("JSONEncoder Encoder", () => {
     check_decode<MixtureOne>(expected, mix)
   });  
  
-  it("should encode complex Mixtures", () => {
+  it("should encode/decode complex Mixtures", () => {
     const mix:MixtureTwo = new MixtureTwo();
     initMixtureTwo(mix);
     
@@ -107,7 +125,7 @@ describe("JSONEncoder Encoder", () => {
     check_decode<MixtureTwo>(expected, mix)
   });
 
-  it("should encode nested JSONEncoder", () => {
+  it("should encode/decode nested JSONEncoder", () => {
     const nested:Nested = new Nested();
     initMixtureTwo(nested.f);
 
@@ -117,7 +135,7 @@ describe("JSONEncoder Encoder", () => {
     check_decode<Nested>(expected, nested)
   });
 
-  it("should encode JSONEncoder with inheritence", () => {
+  it("should encode/decode JSONEncoder with inheritence", () => {
     const ext:Extends = new Extends();
     initMixtureTwo(ext);
 
@@ -125,5 +143,15 @@ describe("JSONEncoder Encoder", () => {
 
     check_encode<Extends>(ext, expected)
     check_decode<Extends>(expected, ext)
+  });
+
+  it("should encode/decode Maps with null values", () => {
+    const map:MapNullValues = new MapNullValues();
+    map.inner.set(1, null)
+
+    const expected:string = '{"inner":{1:null}}'
+
+    check_encode<MapNullValues>(map, expected)
+    //check_decode<MapNullValues>(expected, map)
   });
 });
