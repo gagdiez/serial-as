@@ -23,9 +23,9 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
 
   // String --
   encode_string(value:string):void{
-    const utf8 =  String.UTF8.encode(value);
+    const utf8 = String.UTF8.encode(value);
     this.buffer.store<u32>(utf8.byteLength);
-    this.buffer.store_bytes(utf8, utf8.byteLength);
+    this.buffer.store_bytes<ArrayBuffer>(utf8, utf8.byteLength);
   }
 
   // Array --
@@ -94,9 +94,9 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
   encode_number<T>(value:T):void{
     if (isFloat<T>()) { 
       if (value instanceof f32) { 
-        assert(<f32><unknown>value != f32.NaN, "For portability reasons we do not allow f32s to be encoded as Nan")
+        assert(value != f32.NaN, "For portability reasons we do not allow f32s to be encoded as Nan")
       } else {
-        assert(<f64><unknown>value != f64.NaN, "For portability reasons we do not allow f64s to be encoded as Nan")
+        assert(value != f64.NaN, "For portability reasons we do not allow f64s to be encoded as Nan")
       }
     }
     // little_endian(x)    
@@ -122,11 +122,11 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
   encode_f64(value:f64): void{}
 
   encode_arraybuffer_view<T extends ArrayBufferView>(value: T): void {
-    this.buffer.store<u32>(value.byteLength);
+    this.buffer.store<u32>(value.byteLength / sizeof<valueof<T>>());
     //@ts-ignore
     if (isDefined(value.dataStart)) { 
       //@ts-ignore
-      this.buffer.store_bytes(value.dataStart, value.byteLength);
+      this.buffer.store_bytes<usize>(value.dataStart, value.byteLength);
     }
   }
     

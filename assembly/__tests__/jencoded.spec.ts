@@ -1,110 +1,202 @@
-import {JSONEncoder, JSONDecoder} from '../json'
+import { u128 } from "as-bignum";
 import {Encoder, Decoder} from ".."
-import { Nullables, LargerTest as Test, FooBar, initFooBar, Nested, Extends, MS } from '.';
+import * as base64 from "as-base64";
+import {JSONEncoder, JSONDecoder} from '../json'
+
+import { Numbers, aString, MapSet, aBoolean, Arrays, ArrayViews, Nullables, MixtureOne, MixtureTwo, Nested, Extends, MapNullValues, BigObj } from '.';
+
+
+function check_encode<T>(object:T, expected:string):void{
+  // Checks that encoding an object returns the expected encoding
+  const encoder:JSONEncoder = new JSONEncoder()
+  encoder.encode(object);
+  let res:string = encoder.get_encoded_object();
+
+  expect(res).toBe(expected)
+}
+
+function check_decode<T>(encoded:string, original:T):void{
+  // Checks that an encoding returns the expected object
+  const decoder:JSONDecoder = new JSONDecoder(encoded)
+  let deco:T =  decoder.decode<T>();
+  expect(deco).toStrictEqual(original)
+}
+
+function initMixtureTwo(f: MixtureTwo): MixtureTwo {
+  f.u32Arr = [42, 11];
+  f.foo = 321;
+  f.bar = 123;
+  f.flag = true;
+  f.baz = "foo";
+  f.uint8array = base64.decode("aGVsbG8sIHdvcmxkIQ==");
+  f.u128Val = new u128(128);
+  f.arr = [["Hello"], ["World"]];
+  f.uint8arrays = new Array<Uint8Array>(2);
+  f.uint8arrays[0] = base64.decode("aGVsbG8sIHdvcmxkIQ==");
+  f.uint8arrays[1] = base64.decode("aGVsbG8sIHdvcmxkIQ==");
+  f.u64Arr = [10000000000, 100000000000];
+  return f;
+}
 
 describe("JSONEncoder Encoder", () => {
-  it("should encode empty Sets and Maps", () => {
-    const encoder:JSONEncoder = new JSONEncoder()
-    const test:MS = new MS()
-    let res:string = test.encode<string>(encoder)
+  it("should encode/decode numbers", () => {
+    const nums:Numbers = new Numbers()
+    const expected:string = '{"u8":1,"u16":2,"u32":3,"u64":"4","u128":"5","i8":-1,"i16":-2,"i32":-3,"i64":"-4","f32":6.0,"f64":7.1}'
 
-    expect(res)
-    .toBe('{"map":{},"set":{}}')
-
-    const decoder:JSONDecoder = new JSONDecoder(res)
-    let deco:MS = new MS()
-    deco.decode<string>(decoder)
-    expect(test)
-    .toStrictEqual(deco)
+    check_encode<Numbers>(nums, expected)
+    check_decode<Numbers>(expected, nums) 
   });
 
-  it("should encode non-empty Sets and Maps", () => {
-    const encoder:JSONEncoder = new JSONEncoder()
-    const test:MS = new MS()
-    test.map.set('hi', 1)
-    test.set.add(256)
-    test.set.add(4)
+  it("should encode/decode just u8", () => {
+    const nums:u8 = 200;
+    const expected:string = '200';
 
-    let res:string = test.encode<string>(encoder)
-
-    expect(res)
-    .toBe('{"map":{"hi":1},"set":{256,4}}')
-
-    const decoder:JSONDecoder = new JSONDecoder(res)
-    let deco:MS = new MS()
-    deco.decode<string>(decoder)
-    expect(test)
-    .toStrictEqual(deco)
+    check_encode(nums, expected)
+    check_decode(expected, nums) 
   });
-  
-  it("should encode nullable", () => {
-    const encoder:JSONEncoder = new JSONEncoder()
-    const test:Nullables = new Nullables()
-    let res:string = test.encode<string>(encoder)
 
-    expect(res)
-    .toBe('{\"u32Arr_null\":null,\"arr_null\":null,\"u64_arr\":null,\"map_null\":null,\"set_null\":null,\"obj_null\":null}')
+  it("should encode/decode just bools", () => {
+    const nums:bool = true;
+    const expected:string = 'true';
+
+    check_encode(nums, expected)
+    check_decode(expected, nums) 
   });
+
+  it("should encode/decode just arrays", () => {
+    const nums:bool[] = [true, false];
+    const expected:string = '[true,false]'
+
+    check_encode(nums, expected)
+    check_decode(expected, nums) 
+  });
+
+
+  it("should encode/decode strings", () => {
+    const str:aString = {str:"h\"i"}
+    const expected:string = '{"str":"h\\"i"}'
  
-  it("should encode simple JSONEncoder", () => {
-    const encoder:JSONEncoder = new JSONEncoder()
-    const test:Test = new Test()
-    let res:string = test.encode<string>(encoder)
-
-    expect(res)
-    .toBe('{\"number\":2,\"str\":\"testing\",\"arr\":[0,1],\"arpa\":[{\"s1\":0,\"s2\":1},{\"s1\":2,\"s2\":3}],\"f32_zero\":0.0}')
-
-    const decoder:JSONDecoder = new JSONDecoder(res)
-    let deco:Test = new Test()
-    deco.decode<string>(decoder)
-    expect(test)
-    .toStrictEqual(deco)
+    check_encode<aString>(str, expected)
+    check_decode<aString>(expected, str)
   });
 
-  it("should encode complex JSONEncoder", () => {
-    const encoder:JSONEncoder = new JSONEncoder()
-    const original = new FooBar();
-    initFooBar(original);
-
-    let res:string = original.encode<string>(encoder)
-
-    expect(res)
-    .toBe('{"foo":321,"bar":123,"u64Val":"4294967297","u64_zero":"0","i64Val":"-64","flag":true,"baz":"foo","uint8array":"aGVsbG8sIHdvcmxkIQ==","arr":[["Hello"],["World"]],"u32Arr":[42,11],"i32Arr":[],"u128Val":"128","uint8arrays":["aGVsbG8sIHdvcmxkIQ==","aGVsbG8sIHdvcmxkIQ=="],"u64Arr":["10000000000","100000000000"]}')
-
-    const decoder:JSONDecoder = new JSONDecoder(res)
-    let deco:FooBar = new FooBar()
-    deco.decode<string>(decoder)
-    expect(original)
-    .toStrictEqual(deco)
+  it("should encode/decode booleans", () => {
+    const bool:aBoolean = new aBoolean()
+    const expected:string = '{"bool":true}'
+ 
+    check_encode<aBoolean>(bool, expected)
+    check_decode<aBoolean>(expected, bool)
   });
 
-  it("should encode nested JSONEncoder", () => {
-    const encoder:JSONEncoder = new JSONEncoder()
-    const original = new Nested();
-    initFooBar(original.f);
-    let res:string = original.encode<string>(encoder)
-    expect(res)
-    .toBe('{"f":{"foo":321,"bar":123,"u64Val":"4294967297","u64_zero":"0","i64Val":"-64","flag":true,"baz":"foo","uint8array":"aGVsbG8sIHdvcmxkIQ==","arr":[["Hello"],["World"]],"u32Arr":[42,11],"i32Arr":[],"u128Val":"128","uint8arrays":["aGVsbG8sIHdvcmxkIQ==","aGVsbG8sIHdvcmxkIQ=="],"u64Arr":["10000000000","100000000000"]}}')
+  it("should encode/decode Arrays", () => {
+    const arrays:Arrays = new Arrays()
 
-    const decoder:JSONDecoder = new JSONDecoder(res)
-    let deco:Nested = new Nested()
-    deco.decode<string>(decoder)
-    expect(original)
-    .toStrictEqual(deco)
+    const expected:string = '{"u8Arr":[1,2],"u16Arr":[3,4],"u32Arr":[5,6],"u64Arr":["7","8"],"u128Arr":["9","10"],"i8Arr":[-1,-2],"i16Arr":[-3,-4],"i32Arr":[-5,-6],"i64Arr":["-7","-8"],"f32Arr":[1.0,2.0],"f64Arr":[3.1,4.2],"arrI32":[0,1],"arrArr":[[]],"arrUint8":[],"arrObj":[{"s1":0,"s2":1},{"s1":2,"s2":3}]}'
+    check_encode<Arrays>(arrays, expected)
+    check_decode<Arrays>(expected, arrays)
   });
 
-  it("should encode JSONEncoder with inheritence", () => {
-    const encoder:JSONEncoder = new JSONEncoder()
-    const original = new Extends();
-    initFooBar(original);
-    let res:string = original.encode<string>(encoder)
-    expect(res)
-    .toBe('{"foo":321,"bar":123,"u64Val":"4294967297","u64_zero":"0","i64Val":"-64","flag":true,"baz":"foo","uint8array":"aGVsbG8sIHdvcmxkIQ==","arr":[["Hello"],["World"]],"u32Arr":[42,11],"i32Arr":[],"u128Val":"128","uint8arrays":["aGVsbG8sIHdvcmxkIQ==","aGVsbG8sIHdvcmxkIQ=="],"u64Arr":["10000000000","100000000000"],"x":[true]}')
+  it("should encode ArrayViews", () => {
+    const arrays:ArrayViews = new ArrayViews()
 
-    const decoder:JSONDecoder = new JSONDecoder(res)
-    let deco:Extends = new Extends()
-    deco.decode<string>(decoder)
-    expect(original)
-    .toStrictEqual(deco)
+    const expected:string = '{"uint8array":"AAA=","uint16array":[0,0],"uint32array":[0,0],"uint64array":["0","0"],"int8array":[0,0],"int16array":[0,0],"int32array":[0,0],"int64array":["0","0"]}'
+    check_encode<ArrayViews>(arrays, expected)
+    //check_decode<ArrayViews>(expected, arrays)
   });
+
+  it("should encode/decode empty Sets and Maps", () => {
+    const map_set:MapSet = new MapSet()
+    const expected:string = '{"map":{},"set":{}}'
+
+    check_encode<MapSet>(map_set, expected)
+    check_decode<MapSet>(expected, map_set)
+  });
+
+  it("should encode/decode non-empty Sets and Maps", () => {
+    const map_set:MapSet = new MapSet()
+    map_set.map.set('hi', 1)
+    map_set.set.add(256)
+    map_set.set.add(4)
+
+    const expected:string = '{"map":{"hi":1},"set":{256,4}}'
+
+    check_encode<MapSet>(map_set, expected)
+    check_decode<MapSet>(expected, map_set)
+  });
+
+  it("should encode nullable", () => {
+    const nullables:Nullables = new Nullables()
+    const expected:string = '{"u32Arr_null":null,"arr_null":null,"u64_arr":null,"map_null":null,"set_null":null,"obj_null":null}'
+    
+    check_encode<Nullables>(nullables, expected)
+    //check_decode<Nullables>(expected, nullables)
+  });
+
+  it("should encode/decode simple Mixtures", () => {
+    const mix:MixtureOne = new MixtureOne()
+    const expected:string = '{\"number\":2,\"str\":\"testing\",\"arr\":[0,1],\"arpa\":[{\"s1\":0,\"s2\":1},{\"s1\":2,\"s2\":3}],\"f32_zero\":0.0}'
+
+    check_encode<MixtureOne>(mix, expected)
+    check_decode<MixtureOne>(expected, mix)
+  });  
+ 
+  it("should encode/decode complex Mixtures", () => {
+    const mix:MixtureTwo = new MixtureTwo();
+    initMixtureTwo(mix);
+    
+    const expected:string = '{"foo":321,"bar":123,"u64Val":"4294967297","u64_zero":"0","i64Val":"-64","flag":true,"baz":"foo","uint8array":"aGVsbG8sIHdvcmxkIQ==","arr":[["Hello"],["World"]],"u32Arr":[42,11],"i32Arr":[],"u128Val":"128","uint8arrays":["aGVsbG8sIHdvcmxkIQ==","aGVsbG8sIHdvcmxkIQ=="],"u64Arr":["10000000000","100000000000"]}'
+
+    check_encode<MixtureTwo>(mix, expected)
+    check_decode<MixtureTwo>(expected, mix)
+  });
+
+  it("should encode/decode nested JSONEncoder", () => {
+    const nested:Nested = new Nested();
+    initMixtureTwo(nested.f);
+
+    const expected:string = '{"f":{"foo":321,"bar":123,"u64Val":"4294967297","u64_zero":"0","i64Val":"-64","flag":true,"baz":"foo","uint8array":"aGVsbG8sIHdvcmxkIQ==","arr":[["Hello"],["World"]],"u32Arr":[42,11],"i32Arr":[],"u128Val":"128","uint8arrays":["aGVsbG8sIHdvcmxkIQ==","aGVsbG8sIHdvcmxkIQ=="],"u64Arr":["10000000000","100000000000"]}}'
+
+    check_encode<Nested>(nested, expected)
+    check_decode<Nested>(expected, nested)
+  });
+
+  it("should encode/decode JSONEncoder with inheritence", () => {
+    const ext:Extends = new Extends();
+    initMixtureTwo(ext);
+
+    const expected:string = '{"foo":321,"bar":123,"u64Val":"4294967297","u64_zero":"0","i64Val":"-64","flag":true,"baz":"foo","uint8array":"aGVsbG8sIHdvcmxkIQ==","arr":[["Hello"],["World"]],"u32Arr":[42,11],"i32Arr":[],"u128Val":"128","uint8arrays":["aGVsbG8sIHdvcmxkIQ==","aGVsbG8sIHdvcmxkIQ=="],"u64Arr":["10000000000","100000000000"],"x":[true]}'
+
+    check_encode<Extends>(ext, expected)
+    check_decode<Extends>(expected, ext)
+  });
+
+  it("should encode/decode Maps with null values", () => {
+    const map:MapNullValues = new MapNullValues();
+    map.inner.set(1, null)
+
+    const expected:string = '{"inner":{1:null}}'
+
+    check_encode<MapNullValues>(map, expected)
+    //check_decode<MapNullValues>(expected, map)
+  });
+
+
+  it("should handle big objects", () => {
+    const bigObj = new BigObj();
+
+    // computed using rust
+    let expected:string = '{"big_num":"340282366920938463463374607431768211455","typed_arr":"AAIEBggKDA4QEhQWGBocHiAiJCYoKiwuMDI0Njg6PD5AQkRGSEpMTlBSVFZYWlxeYGJkZmhqbG5wcnR2eHp8foCChIaIioyOkJKUlpianJ6goqSmqKqsrrCytLa4ury+wMLExsjKzM7Q0tTW2Nrc3uDi5Obo6uzu8PL09vj6/P4AAgQGCAoMDhASFBYYGhweICIkJigqLC4wMjQ2ODo8PkBCREZISkxOUFJUVlhaXF5gYmRmaGpsbnBydHZ4enx+gIKEhoiKjI6QkpSWmJqcnqCipKaoqqyusLK0tri6vL7AwsTGyMrMztDS1NbY2tze4OLk5ujq7O7w8vT2+Pr8/gACBAYICgwOEBIUFhgaHB4gIiQmKCosLjAyNDY4Ojw+QEJERkhKTE5QUlRWWFpcXmBiZGZoamxucHJ0dnh6fH6AgoSGiIqMjpCSlJaYmpyeoKKkpqiqrK6wsrS2uLq8vsDCxMbIyszO0NLU1tja3N7g4uTm6Ors7vDy9Pb4+vz+AAIEBggKDA4QEhQWGBocHiAiJCYoKiwuMDI0Njg6PD5AQkRGSEpMTlBSVFZYWlxeYGJkZmhqbG5wcnR2eHp8foCChIaIioyOkJKUlpianJ6goqSmqKqsrrCytLa4ury+wMLExsjKzM7Q0tTW2Nrc3uDi5Obo6uzu8PL09vj6/P4AAgQGCAoMDhASFBYYGhweICIkJigqLC4wMjQ2ODo8PkBCREZISkxOUFJUVlhaXF5gYmRmaGpsbnBydHZ4enx+gIKEhoiKjI6QkpSWmJqcnqCipKaoqqyusLK0tri6vL7AwsTGyMrMztDS1NbY2tze4OLk5ujq7O7w8vT2+Pr8/gACBAYICgwOEBIUFhgaHB4gIiQmKCosLjAyNDY4Ojw+QEJERkhKTE5QUlRWWFpcXmBiZGZoamxucHJ0dnh6fH6AgoSGiIqMjpCSlJaYmpyeoKKkpqiqrK6wsrS2uLq8vsDCxMbIyszO0NLU1tja3N7g4uTm6Ors7vDy9Pb4+vz+AAIEBggKDA4QEhQWGBocHiAiJCYoKiwuMDI0Njg6PD5AQkRGSEpMTlBSVFZYWlxeYGJkZmhqbG5wcnR2eHp8foCChIaIioyOkJKUlpianJ6goqSmqKqsrrCytLa4ury+wMLExsjKzM7Q0tTW2Nrc3uDi5Obo6uzu8PL09vj6/P4AAgQGCAoMDhASFBYYGhweICIkJigqLC4wMjQ2ODo8PkBCREZISkxOUFJUVlhaXF5gYmRmaGpsbnBydHZ4enx+gIKEhoiKjI6QkpSWmJqcnqCipKaoqqyusLK0tri6vL7AwsTGyMrMzg=="}'
+
+    check_encode<BigObj>(bigObj, expected)
+    check_decode<BigObj>(expected, bigObj)
+
+/*  const encoder = new BorshEncoder();
+    encoder.encode(bigObj);
+    const res = encoder.get_encoded_object();
+    log (res.byteLength);
+    const jencoder = new JSONEncoder();
+    jencoder.encode(bigObj);
+    const jres = String.UTF8.encode(jencoder.get_encoded_object());
+    log(jres.byteLength) */
+  })
 });
