@@ -3,13 +3,14 @@ import {Encoder, Decoder} from ".."
 import * as base64 from "as-base64";
 import {JSONEncoder, JSONDecoder} from '../json'
 
-import { Numbers, aString, MapSet, aBoolean, Arrays, ArrayViews, Nullables, MixtureOne, MixtureTwo, Nested, Extends, MapNullValues } from '.';
+import { Numbers, aString, MapSet, aBoolean, Arrays, ArrayViews, Nullables, MixtureOne, MixtureTwo, Nested, Extends, MapNullValues, BigObj } from '.';
 
 
 function check_encode<T>(object:T, expected:string):void{
   // Checks that encoding an object returns the expected encoding
   const encoder:JSONEncoder = new JSONEncoder()
-  let res:string = object.encode<string>(encoder)
+  encoder.encode(object);
+  let res:string = encoder.get_encoded_object();
 
   expect(res).toBe(expected)
 }
@@ -17,8 +18,7 @@ function check_encode<T>(object:T, expected:string):void{
 function check_decode<T>(encoded:string, original:T):void{
   // Checks that an encoding returns the expected object
   const decoder:JSONDecoder = new JSONDecoder(encoded)
-  let deco:T = instantiate<T>()
-  deco.decode<string>(decoder)
+  let deco:T =  decoder.decode<T>();
   expect(deco).toStrictEqual(original)
 }
 
@@ -46,6 +46,31 @@ describe("JSONEncoder Encoder", () => {
     check_encode<Numbers>(nums, expected)
     check_decode<Numbers>(expected, nums) 
   });
+
+  it("should encode/decode just u8", () => {
+    const nums:u8 = 200;
+    const expected:string = '200';
+
+    check_encode(nums, expected)
+    check_decode(expected, nums) 
+  });
+
+  it("should encode/decode just bools", () => {
+    const nums:bool = true;
+    const expected:string = 'true';
+
+    check_encode(nums, expected)
+    check_decode(expected, nums) 
+  });
+
+  it("should encode/decode just arrays", () => {
+    const nums:bool[] = [true, false];
+    const expected:string = '[true,false]'
+
+    check_encode(nums, expected)
+    check_decode(expected, nums) 
+  });
+
 
   it("should encode/decode strings", () => {
     const str:aString = {str:"h\"i"}
@@ -154,4 +179,24 @@ describe("JSONEncoder Encoder", () => {
     check_encode<MapNullValues>(map, expected)
     //check_decode<MapNullValues>(expected, map)
   });
+
+
+  it("should handle big objects", () => {
+    const bigObj = new BigObj();
+
+    // computed using rust
+    let expected:string = '{"big_num":"340282366920938463463374607431768211455","typed_arr":"AAIEBggKDA4QEhQWGBocHiAiJCYoKiwuMDI0Njg6PD5AQkRGSEpMTlBSVFZYWlxeYGJkZmhqbG5wcnR2eHp8foCChIaIioyOkJKUlpianJ6goqSmqKqsrrCytLa4ury+wMLExsjKzM7Q0tTW2Nrc3uDi5Obo6uzu8PL09vj6/P4AAgQGCAoMDhASFBYYGhweICIkJigqLC4wMjQ2ODo8PkBCREZISkxOUFJUVlhaXF5gYmRmaGpsbnBydHZ4enx+gIKEhoiKjI6QkpSWmJqcnqCipKaoqqyusLK0tri6vL7AwsTGyMrMztDS1NbY2tze4OLk5ujq7O7w8vT2+Pr8/gACBAYICgwOEBIUFhgaHB4gIiQmKCosLjAyNDY4Ojw+QEJERkhKTE5QUlRWWFpcXmBiZGZoamxucHJ0dnh6fH6AgoSGiIqMjpCSlJaYmpyeoKKkpqiqrK6wsrS2uLq8vsDCxMbIyszO0NLU1tja3N7g4uTm6Ors7vDy9Pb4+vz+AAIEBggKDA4QEhQWGBocHiAiJCYoKiwuMDI0Njg6PD5AQkRGSEpMTlBSVFZYWlxeYGJkZmhqbG5wcnR2eHp8foCChIaIioyOkJKUlpianJ6goqSmqKqsrrCytLa4ury+wMLExsjKzM7Q0tTW2Nrc3uDi5Obo6uzu8PL09vj6/P4AAgQGCAoMDhASFBYYGhweICIkJigqLC4wMjQ2ODo8PkBCREZISkxOUFJUVlhaXF5gYmRmaGpsbnBydHZ4enx+gIKEhoiKjI6QkpSWmJqcnqCipKaoqqyusLK0tri6vL7AwsTGyMrMztDS1NbY2tze4OLk5ujq7O7w8vT2+Pr8/gACBAYICgwOEBIUFhgaHB4gIiQmKCosLjAyNDY4Ojw+QEJERkhKTE5QUlRWWFpcXmBiZGZoamxucHJ0dnh6fH6AgoSGiIqMjpCSlJaYmpyeoKKkpqiqrK6wsrS2uLq8vsDCxMbIyszO0NLU1tja3N7g4uTm6Ors7vDy9Pb4+vz+AAIEBggKDA4QEhQWGBocHiAiJCYoKiwuMDI0Njg6PD5AQkRGSEpMTlBSVFZYWlxeYGJkZmhqbG5wcnR2eHp8foCChIaIioyOkJKUlpianJ6goqSmqKqsrrCytLa4ury+wMLExsjKzM7Q0tTW2Nrc3uDi5Obo6uzu8PL09vj6/P4AAgQGCAoMDhASFBYYGhweICIkJigqLC4wMjQ2ODo8PkBCREZISkxOUFJUVlhaXF5gYmRmaGpsbnBydHZ4enx+gIKEhoiKjI6QkpSWmJqcnqCipKaoqqyusLK0tri6vL7AwsTGyMrMzg=="}'
+
+    check_encode<BigObj>(bigObj, expected)
+    check_decode<BigObj>(expected, bigObj)
+
+/*  const encoder = new BorshEncoder();
+    encoder.encode(bigObj);
+    const res = encoder.get_encoded_object();
+    log (res.byteLength);
+    const jencoder = new JSONEncoder();
+    jencoder.encode(bigObj);
+    const jres = String.UTF8.encode(jencoder.get_encoded_object());
+    log(jres.byteLength) */
+  })
 });

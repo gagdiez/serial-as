@@ -22,11 +22,9 @@ export class BorshDecoder extends Decoder<ArrayBuffer>{
 
   // String --
   decode_string():string{
-    const lenght:u32 = this.decoBuffer.consume<u32>()
-
-    const encoded_string = this.decoBuffer.consume_slice(lenght)
+    const encoded_string = this.decode_array_buffer();
     const decoded_string:string = String.UTF8.decode(encoded_string)
-    
+
     // repr(decoded as Vec<u8>) 
     return decoded_string
   }
@@ -46,12 +44,26 @@ export class BorshDecoder extends Decoder<ArrayBuffer>{
     return ret_array
   }
 
+  decode_array_buffer(): ArrayBuffer { 
+    const length:u32 = this.decoBuffer.consume<u32>()
+    return this.decoBuffer.consume_slice(length);
+  }
+
+  decode_array_buffer_view<B extends ArrayBufferView>(): B {
+    const length:u32 = this.decoBuffer.consume<u32>();
+    // @ts-ignore
+    const arrBufferView = instantiate<ArrayBuffer>(length, alignof<valueof<B>>());
+    return changetype<B>(arrBufferView);
+
+  }
+
   // Null --
-  decode_nullable<T>(): T {
+  decode_nullable<T>(): T | null {
     let option = this.decoBuffer.consume<u8>();
     if (option) {
       return this.decode<T>()
     }
+    return null;
    }
 
   // Set --
@@ -86,13 +98,13 @@ export class BorshDecoder extends Decoder<ArrayBuffer>{
   }
 
    // Object --
-  decode_object<C>(): C{
+  decode_object<C extends object>(): C{
     let object:C = instantiate<C>()
     object.decode<ArrayBuffer>(this)
     return object
   }
 
-  decode_number<T>():T{
+  decode_number<T>():T {
     // little_endian(x)
     return this.decoBuffer.consume<T>()
   }
@@ -101,6 +113,13 @@ export class BorshDecoder extends Decoder<ArrayBuffer>{
     const lo = this.decoBuffer.consume<u64>();
     const hi = this.decoBuffer.consume<u64>();
     return new u128(lo, hi);
+  }
+
+  decode_typed_array<K>(): StaticArray<K> {
+    const byteLength = this.decoBuffer.consume<u32>();
+    const res = new StaticArray<K>(byteLength);
+    this.decoBuffer.consume_copy(changetype<usize>(res), byteLength);
+    return res;
   }
 
   // We override decode_number, for which we don't need these

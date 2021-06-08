@@ -1,7 +1,8 @@
 import {BorshEncoder, BorshDecoder} from '../borsh'
-import { MapSet, MixtureOne, Numbers, aString, aBoolean, Arrays, ArrayViews, Nullables, MixtureTwo, Nested, Extends, MapNullValues } from '.';
+import { BigObj, MapSet, MixtureOne, Numbers, aString, aBoolean, Arrays, ArrayViews, Nullables, MixtureTwo, Nested, Extends, MapNullValues } from '.';
 import {Encoder, Decoder} from ".."
 import { u128 } from 'as-bignum';
+import { JSONEncoder } from '../json';
 
 @serializable
 export class FooBar {
@@ -133,7 +134,7 @@ describe("Borsh Encoder", () => {
     const expected:u8[] = [0, 0, 0, 0, 0, 0]
     
     check_encode<Nullables>(nullables, expected)
-    //check_decode<Nullables>(expected, nullables)
+    check_decode<Nullables>(expected, nullables)
   });
 
   it("should encode/decode simple Mixtures", () => {
@@ -197,6 +198,29 @@ describe("Borsh Encoder", () => {
     const expected:u8[] = [1, 0, 0, 0, 1, 0, 0, 0, 0]
 
     check_encode<MapNullValues>(map, expected)
-    //check_decode<MapNullValues>(expected, map)
+    check_decode<MapNullValues>(expected, map)
   });
+
+  it("should handle big objects", () => {
+    const bigObj = new BigObj();
+    let expected:u8[] = []
+
+    for(let i:i32=0; i < 16; i++){ expected.push(<u8>255) }
+    expected = expected.concat([232, 3, 0, 0])
+    for(let i:i32=0; i < 1000; i++){ expected.push(<u8>i*2) }
+
+    check_encode<BigObj>(bigObj, expected)
+    check_decode<BigObj>(expected, bigObj)
+
+
+/*     const encoder = new BorshEncoder();
+    encoder.encode(bigObj);
+    const res = encoder.get_encoded_object();
+    log (res.byteLength);
+    const jencoder = new JSONEncoder();
+    jencoder.encode(bigObj);
+    const jres = String.UTF8.encode(jencoder.get_encoded_object());
+    log(jres.byteLength) */
+  })
+
 });

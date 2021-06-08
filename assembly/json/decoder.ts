@@ -19,7 +19,7 @@ export class JSONDecoder extends Decoder<string>{
 
   decode_field<T>(name:string):T{
     if(this.first){
-      this.offset +=1
+      this.offset += 1
       this.first = false
     }
 
@@ -96,10 +96,11 @@ export class JSONDecoder extends Decoder<string>{
   }
 
   // Null --
-  decode_nullable<T>(): T {
+  decode_nullable<T>(): T | null{
     if (this.encoded_object.slice(this.offset, this.offset+5) != "null,"){
       return this.decode<T>()
     }
+    return null
    }
 
   // Set --
@@ -147,7 +148,7 @@ export class JSONDecoder extends Decoder<string>{
   }
 
    // Object --
-  decode_object<C>(): C{
+  decode_object<C extends object>(): C{
     // {object}
     this.first = true
     let object:C = instantiate<C>()
@@ -155,12 +156,11 @@ export class JSONDecoder extends Decoder<string>{
     return object
   }
 
-  decode_int<T = number>():T{
+  decode_int<T extends number>():T{
 
     let start:u32 = this.offset
-
     // faster than performing regex?
-    while(this.nums.has(this.encoded_object.at(this.offset))){
+    while(this.offset < <u32>this.encoded_object.length && this.nums.has(this.encoded_object.at(this.offset))){
       this.offset += 1
     }
 
@@ -177,7 +177,7 @@ export class JSONDecoder extends Decoder<string>{
     return u128.from(number)
   }
 
-  decode_float<T = number>():T{
+  decode_float<T extends number>():T{
     let start:u32 = this.offset
 
     // faster than performing regex?

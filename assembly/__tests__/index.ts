@@ -140,3 +140,15 @@ export class Nested {
 export class MapNullValues {
   inner: Map<i32, string | null> = new Map();
 }
+
+@serializable
+export class BigObj {
+  big_num: u128 = u128.Max;
+  typed_arr: Uint8Array = new Uint8Array(1000);
+
+  constructor(){
+    for (let i = 0; i < this.typed_arr.length; i++) {
+      this.typed_arr[i] = i * 2;
+    }
+  }
+}

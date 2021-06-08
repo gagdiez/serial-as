@@ -3,3 +3,5 @@ assembly
 src/
 as-pect.config.js
 jest.config.js
+build
+.vscode

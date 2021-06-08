@@ -14,7 +14,7 @@ export class JSONEncoder extends Encoder<string>{
   encode_field<K>(name:string, value:K):void{
     if(this.starting_object){
       this.inner_encode.push("{")
-    }else{ 
+    } else{ 
       this.inner_encode[this.inner_encode.length-1] = ","
     }
     
@@ -44,12 +44,17 @@ export class JSONEncoder extends Encoder<string>{
     this.inner_encode.push(`[`)
 
     for(let i=0; i<value.length; i++){
+      // @ts-ignore
       this.encode<valueof<K>>(value[i])
       if(i != value.length-1){ this.inner_encode.push(`,`) }
     }
 
     this.inner_encode.push(`]`)
   }
+
+  // encode_array_buffer(value: ArrayBuffer): void {
+    
+  // }
 
   // Null --
   encode_nullable<T>(t: T): void {

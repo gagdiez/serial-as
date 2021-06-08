@@ -25,6 +25,15 @@ export class EncodeBuffer {
   get_used_buffer():ArrayBuffer{
     return changetype<ArrayBuffer>(this.start).slice(0, this.offset)
   }
+
+  store_bytes<T>(t: T, nBytes: u32): void { 
+    if (!isReference<T>() && !(t instanceof usize)) { 
+      ERROR(`Type ${nameof<T>()} must be a reference type or usize`);
+    }
+    this.copy(changetype<usize>(t), nBytes);
+  }
+
+
 }
 
 export class DecodeBuffer {
@@ -45,5 +54,10 @@ export class DecodeBuffer {
     const off = this.offset
     this.offset += length
     return changetype<ArrayBuffer>(this.start).slice(off, off + length)
+  }
+
+  consume_copy(src: usize, length: u32): void {
+    memory.copy(this.start + this.offset, src, length);
+    this.offset += length;
   }
 }

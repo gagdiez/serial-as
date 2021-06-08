@@ -26,10 +26,10 @@ export abstract class Decoder<I> {
   abstract decode_map<K, V>(): Map<K, V>
 
   // Null --
-  abstract decode_nullable<T>(): T
+  abstract decode_nullable<T>(): T | null
 
   // Object
-  abstract decode_object<C>(): C
+  abstract decode_object<C extends object>(): C
 
   // String --
   abstract decode_string(): string
@@ -51,8 +51,20 @@ export abstract class Decoder<I> {
   abstract decode_f64(): f64
 
   // Array --
-  abstract decode_array<A extends ArrayLike<any>>(): A
+  abstract decode_array<A extends ArrayLike<any>>(): A;
 
+  decode_array_buffer_view<B extends ArrayBufferView>(): B {
+    return changetype<B>(this.decode_array());
+  }
+
+    /**
+   * Encode a static array. Default treats it as normal array.
+   * @param value Static Array
+   */
+  decode_static_array<T>(): StaticArray<T> {
+    // @ts-ignore
+    return changetype<T>(this.encode_array(value));
+  }
 
   decode_number<N = number>():N{
     let test:N
@@ -89,7 +101,7 @@ export abstract class Decoder<I> {
     // @ts-ignore
     if (isInteger<T>() || isFloat<T>()){ return this.decode_number<T>(); }
 
-    if (isNullable<T>()) { return this.decode_nullable<T>()}
+    if (isNullable<T>()) { return <T>this.decode_nullable<T>()}
 
     // @ts-ignore
     if (isString<T>()) { return this.decode_string(); }
