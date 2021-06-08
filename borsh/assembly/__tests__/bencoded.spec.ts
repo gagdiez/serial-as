@@ -1,8 +1,6 @@
-import {BorshEncoder, BorshDecoder} from '../borsh'
-import { BigObj, MapSet, MixtureOne, Numbers, aString, aBoolean, Arrays, ArrayViews, Nullables, MixtureTwo, Nested, Extends, MapNullValues } from '.';
-import {Encoder, Decoder} from ".."
+import {BorshEncoder, BorshDecoder} from '..'
+import { BigObj, MapSet, MixtureOne, Numbers, aString, aBoolean, Arrays, ArrayViews, Nullables, MixtureTwo, Nested, Extends, MapNullValues } from '@encoder-as/tests';
 import { u128 } from 'as-bignum';
-import { JSONEncoder } from '../json';
 
 @serializable
 export class FooBar {
@@ -48,7 +46,8 @@ function u8toArrayBuffer(arr:u8[]):ArrayBuffer{
 function check_encode<T>(object:T, expected_u8:u8[]):void{
   // Checks that encoding an object returns the expected encoding
   const encoder:BorshEncoder = new BorshEncoder()
-  let res:ArrayBuffer = object.encode<ArrayBuffer>(encoder)
+  encoder.encode(object);
+  let res:ArrayBuffer = encoder.get_encoded_object();
 
   const expected:ArrayBuffer = u8toArrayBuffer(expected_u8)
   expect(res).toStrictEqual(expected)
@@ -60,8 +59,7 @@ function check_decode<T>(encoded_u8:u8[], original:T):void{
   const encoded:ArrayBuffer = u8toArrayBuffer(encoded_u8)
 
   const decoder:BorshDecoder = new BorshDecoder(encoded)
-  let deco:T = instantiate<T>()
-  deco.decode<ArrayBuffer>(decoder)
+  let deco:T = decoder.decode<T>();
   expect(deco).toStrictEqual(original)
 }
 

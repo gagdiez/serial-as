@@ -7,9 +7,9 @@
   "repository": "https://github.com/gagdiez/encoder-as",
   "author": "Guillermo Gallardo",
   "license": "MIT",
-  "private": false,
+  "private": true,
   "scripts": {
-    "test": "jest && asp",
+    "test": "asp",
     "build": "rimraf dist/ && tsc"
   },
   "peerDependencies": {
@@ -27,9 +27,11 @@
     "ts-node": "^8.6.2",
     "typescript": "^3.8.3"
   },
-  "dependencies": {
-    "as-base64": "^0.2.0",
-    "as-bignum": "^0.2.17",
-    "visitor-as": "^0.6.0"
-  }
+  "workspaces": [
+    "core",
+    "json",
+    "borsh",
+    "transform",
+    "tests"
+  ]
 }

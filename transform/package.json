@@ -1,0 +1,16 @@
+{
+  "name": "@encoder-as/transform",
+  "version": "0.0.0",
+  "description": "Serialization for Assemblyscript",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "Guillermo Gallardo and Willem Wyndham",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "visitor-as": "^0.6.0"
+  },
+  "scripts": {
+    "build": "tsc"
+  }
+}

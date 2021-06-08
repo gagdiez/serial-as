@@ -1,0 +1,14 @@
+{
+  "name": "@encoder-as/core",
+  "version": "0.0.0",
+  "description": "Serialization for Assemblyscript",
+  "main": "dist/index.js",
+  "types": "assembly/index.ts",
+  "author": "Guillermo Gallardo and Willem Wyndham",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "as-bignum": "^0.2.17",
+    "@encoder-as/transform": "0.0.0"
+  }
+}

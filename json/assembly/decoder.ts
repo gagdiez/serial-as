@@ -1,4 +1,4 @@
-import {Decoder} from "..";
+import {Decoder} from "@encoder-as/core";
 import { u128 } from "as-bignum";
 import * as base64 from "as-base64";
 
@@ -73,7 +73,7 @@ export class JSONDecoder extends Decoder<string>{
     let ret:A
     if(ret instanceof Uint8Array){
       let u8arr = this.decode_string();
-      return <A>base64.decode(u8arr)
+      return changetype<A>(base64.decode(u8arr))
     }
 
     if(this.encoded_object.at(this.offset+1) == ']'){
@@ -167,7 +167,7 @@ export class JSONDecoder extends Decoder<string>{
     return <T>parseInt(this.encoded_object.slice(start, this.offset))
   }
 
-  decode_long<T = number>():T{
+  decode_long<T extends number>():T{
     let number:string = this.decode_string()
     return <T>(parseInt(number))
   }

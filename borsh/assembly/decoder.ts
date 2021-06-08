@@ -1,4 +1,4 @@
-import {Decoder} from "..";
+import {Decoder} from "@encoder-as/core";
 import { u128 } from "as-bignum";
 import { DecodeBuffer } from "./buffer";
 

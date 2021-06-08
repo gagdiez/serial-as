@@ -1,5 +1,5 @@
-import {Encoder} from "..";
-import {EncodeBuffer} from "./buffer"
+import {Encoder, isNumber} from "@encoder-as/core";
+import {EncodeBuffer} from "./buffer";
 import { u128 } from "as-bignum";
 
 
@@ -52,6 +52,15 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
       this.encode(t!);
     } else {
       this.buffer.store<u8>(0);
+    }
+   }
+
+   encodeStaticArray<T>(value: StaticArray<valueof<T>>): void {
+     if (isNumber<T>()) {
+      this.buffer.store<u32>(value.length);
+      this.buffer.store_bytes<usize>(changetype<usize>(value), value.length * sizeof<T>());
+    } else {
+      this.encode_array(value);
     }
    }
 
@@ -122,12 +131,9 @@ export class BorshEncoder extends Encoder<ArrayBuffer>{
   encode_f64(value:f64): void{}
 
   encode_arraybuffer_view<T extends ArrayBufferView>(value: T): void {
-    this.buffer.store<u32>(value.byteLength / sizeof<valueof<T>>());
     //@ts-ignore
-    if (isDefined(value.dataStart)) { 
-      //@ts-ignore
-      this.buffer.store_bytes<usize>(value.dataStart, value.byteLength);
-    }
+    this.buffer.store<u32>(value.byteLength / sizeof<valueof<T>>());
+    this.buffer.store_bytes<usize>(value.dataStart, value.byteLength);
   }
     
 

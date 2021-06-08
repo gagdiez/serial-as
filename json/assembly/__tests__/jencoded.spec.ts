@@ -1,9 +1,8 @@
 import { u128 } from "as-bignum";
-import {Encoder, Decoder} from ".."
 import * as base64 from "as-base64";
-import {JSONEncoder, JSONDecoder} from '../json'
+import {JSONEncoder, JSONDecoder} from '..'
 
-import { Numbers, aString, MapSet, aBoolean, Arrays, ArrayViews, Nullables, MixtureOne, MixtureTwo, Nested, Extends, MapNullValues, BigObj } from '.';
+import { Numbers, aString, MapSet, aBoolean, Arrays, ArrayViews, Nullables, MixtureOne, MixtureTwo, Nested, Extends, MapNullValues, BigObj } from '@encoder-as/tests';
 
 
 function check_encode<T>(object:T, expected:string):void{
