@@ -1,5 +1,4 @@
-import { Encoder } from "./encoder";
-import { Decoder } from "./decoder";
+import { Encoder, Decoder } from ".";
 
 function emptyNew<T>(): T {
   return changetype<T>(__new(offsetof<T>(), idof<T>()));
@@ -9,7 +8,7 @@ function emptyNew<T>(): T {
  * Top Level Seraializer
  */
 export class Serializer<T, E extends Encoder<T>, D extends Decoder<T>> {
-  
+
   encoder(): E {
     return emptyNew<E>();
   }

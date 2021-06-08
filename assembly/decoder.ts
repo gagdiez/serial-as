@@ -1,23 +1,16 @@
 import { u128 } from "as-bignum";
 
-function isNull<T>(t: T): bool {
-  if (isNullable<T>() || isReference<T>()) {
-    return changetype<usize>(t) == 0;
-  }
-  return false;
-}
-
 export abstract class Decoder<I> {
 
-  constructor(protected encoded_object:I){}
+  constructor(protected encoded_object: I) { }
 
-  init(encoded_object: I): this { 
-    this.encoded_object = encoded_object; 
-    return this; 
+  init(encoded_object: I): this {
+    this.encoded_object = encoded_object;
+    return this;
   }
 
   // Decode Field
-  abstract decode_field<T>(name:string):T
+  abstract decode_field<T>(name: string): T
 
   // Boolean
   abstract decode_bool(): bool
@@ -54,27 +47,27 @@ export abstract class Decoder<I> {
   abstract decode_array<A extends ArrayLike<any>>(): A
 
 
-  decode_number<N = number>():N{
-    let test:N
+  decode_number<N = number>(): N {
+    let test: N
 
     // @ts-ignore
-    if (test instanceof u8){ return this.decode_u8(); }
+    if (test instanceof u8) { return this.decode_u8(); }
     // @ts-ignore
-    if (test instanceof i8){ return this.decode_i8(); }
+    if (test instanceof i8) { return this.decode_i8(); }
     // @ts-ignore
-    if (test instanceof u16){ return this.decode_u16(); }
+    if (test instanceof u16) { return this.decode_u16(); }
     // @ts-ignore
-    if (test instanceof i16){ return this.decode_i16(); }
+    if (test instanceof i16) { return this.decode_i16(); }
     // @ts-ignore
-    if (test instanceof u32){ return this.decode_u32(); }
+    if (test instanceof u32) { return this.decode_u32(); }
     // @ts-ignore
-    if (test instanceof i32){ return this.decode_i32(); }
+    if (test instanceof i32) { return this.decode_i32(); }
     // @ts-ignore
-    if (test instanceof u64){ return this.decode_u64(); }
+    if (test instanceof u64) { return this.decode_u64(); }
     // @ts-ignore
-    if (test instanceof i64){ return this.decode_i64(); }
+    if (test instanceof i64) { return this.decode_i64(); }
     // @ts-ignore
-    if (test instanceof f32){ return this.decode_f32(); }
+    if (test instanceof f32) { return this.decode_f32(); }
     // @ts-ignore
     return this.decode_f64();
   }
@@ -82,31 +75,31 @@ export abstract class Decoder<I> {
 
   // decode --
   decode<T>(): T {
-    
-    // @ts-ignore
-    if (isBoolean<T>()){ return this.decode_bool(); }
 
     // @ts-ignore
-    if (isInteger<T>() || isFloat<T>()){ return this.decode_number<T>(); }
+    if (isBoolean<T>()) { return this.decode_bool(); }
 
-    if (isNullable<T>()) { return this.decode_nullable<T>()}
+    // @ts-ignore
+    if (isInteger<T>() || isFloat<T>()) { return this.decode_number<T>(); }
+
+    if (isNullable<T>()) { return this.decode_nullable<T>() }
 
     // @ts-ignore
     if (isString<T>()) { return this.decode_string(); }
 
-    let value:T
+    let value: T
 
     // @ts-ignore
-    if(value instanceof u128){ return this.decode_u128(); }  // -> we need to get ride of this
+    if (value instanceof u128) { return this.decode_u128(); }  // -> we need to get ride of this
 
     // @ts-ignore
-    if(isArrayLike<T>()){ return this.decode_array<T>(); }
+    if (isArrayLike<T>()) { return this.decode_array<T>(); }
 
     // @ts-ignore
-    if(value instanceof Set){ return this.decode_set<indexof<T>>(); }
+    if (value instanceof Set) { return this.decode_set<indexof<T>>(); }
 
     // @ts-ignore
-    if(value instanceof Map){ return this.decode_map<indexof<T>, valueof<T>>(); }
+    if (value instanceof Map) { return this.decode_map<indexof<T>, valueof<T>>(); }
 
     // @ts-ignore
     return this.decode_object<T>();

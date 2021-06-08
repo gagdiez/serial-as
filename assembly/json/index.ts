@@ -1,4 +1,2 @@
-import {JSONEncoder} from './encoder'
-import {JSONDecoder} from './decoder'
-
-export {JSONEncoder, JSONDecoder}
+export * from "./encoder";
+export * from "./decoder";
