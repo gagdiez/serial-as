@@ -134,7 +134,7 @@ describe("Borsh Encoder", () => {
     const expected:u8[] = [0, 0, 0, 0, 0, 0]
     
     check_encode<Nullables>(nullables, expected)
-    //check_decode<Nullables>(expected, nullables)
+    check_decode<Nullables>(expected, nullables)
   });
 
   it("should encode/decode simple Mixtures", () => {
@@ -198,7 +198,7 @@ describe("Borsh Encoder", () => {
     const expected:u8[] = [1, 0, 0, 0, 1, 0, 0, 0, 0]
 
     check_encode<MapNullValues>(map, expected)
-    //check_decode<MapNullValues>(expected, map)
+    check_decode<MapNullValues>(expected, map)
   });
 
   it("should handle big objects", () => {
