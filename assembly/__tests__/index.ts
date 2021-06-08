@@ -30,13 +30,13 @@ export class Numbers {
 }
 
 @serializable
-export class aString{
-  str:String = "";
+export class aString {
+  str: String = "";
 }
 
 @serializable
-export class aBoolean{
-  bool:bool = true;
+export class aBoolean {
+  bool: bool = true;
 }
 
 @serializable
@@ -64,7 +64,7 @@ export class Arrays {
   public arrI32: Array<i32> = [0, 1];
   public arrArr: Array<Array<string>> = [[]];
   public arrUint8: Array<Uint8Array> = [];
-  public arrObj: Array<Pair> = [{s1:0, s2:1}, {s1:2, s2:3}];
+  public arrObj: Array<Pair> = [{ s1: 0, s2: 1 }, { s1: 2, s2: 3 }];
 }
 
 @serializable
