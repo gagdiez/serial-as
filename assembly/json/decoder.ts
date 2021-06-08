@@ -19,7 +19,7 @@ export class JSONDecoder extends Decoder<string>{
 
   decode_field<T>(name:string):T{
     if(this.first){
-      this.offset +=1
+      this.offset += 1
       this.first = false
     }
 
@@ -96,10 +96,11 @@ export class JSONDecoder extends Decoder<string>{
   }
 
   // Null --
-  decode_nullable<T>(): T {
+  decode_nullable<T>(): T | null{
     if (this.encoded_object.slice(this.offset, this.offset+5) != "null,"){
       return this.decode<T>()
     }
+    return null
    }
 
   // Set --
