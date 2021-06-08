@@ -7,31 +7,71 @@ export class JSONDecoder extends Decoder<string>{
   public offset:u32 = 0
   public first:bool = true
   public nums:Set<string> = new Set<string>()
+  public floats:Set<string> = new Set<string>()
 
   constructor(encoded_object:string){
     super(encoded_object)
     this.nums.add("-")
-    this.nums.add(".")
+    this.nums.add("+")
+    this.nums.add(" ")
+    
+    this.floats.add("-")
+    this.floats.add("+")
+    this.floats.add(" ")
+
+    this.floats.add(".")
+    this.floats.add("e")
+    this.floats.add("E")
+    
     for(let i:u8=0; i < 10; i++){
       this.nums.add(i.toString())
+      this.floats.add(i.toString())
+    }    
+  }
+
+  skip_spaces():void{
+    while(this.offset < <u32>this.encoded_object.length && this.encoded_object.at(this.offset) == " "){
+      this.offset += 1
     }
   }
 
+  decode<T>():T{
+    this.skip_spaces()
+    const res:T = super.decode<T>()
+    this.skip_spaces()
+    return res
+  }
+
   decode_field<T>(name:string):T{
+
+    this.skip_spaces()
+
     if(this.first){
       this.offset += 1
       this.first = false
     }
 
+    this.skip_spaces()
+
     // "name":value,
-    // pass over "name":
-    this.offset += name.length + 3
+    // pass over "name"
+    this.offset += name.length + 2
+
+    this.skip_spaces()
+
+    // pass over :
+    this.offset += 1
+
+    this.skip_spaces()
 
     // get value
     const ret:T = this.decode<T>()
     
+    this.skip_spaces()
+
     // pass over , or }
     this.offset += 1
+
     return ret
   }
 
@@ -53,7 +93,6 @@ export class JSONDecoder extends Decoder<string>{
     this.offset += 1
     let start:u32 = this.offset
 
-    // TODO: FIX, this doesn't work for \"
     while(true){
       if(this.encoded_object.at(this.offset) == '"' && this.encoded_object.at(this.offset-1) != '\\'){
         break
@@ -97,11 +136,12 @@ export class JSONDecoder extends Decoder<string>{
 
   // Null --
   decode_nullable<T>(): T | null{
-    if (this.encoded_object.slice(this.offset, this.offset+5) != "null,"){
-      return this.decode<T>()
+    if (this.encoded_object.slice(this.offset, this.offset+4) == "null"){
+      this.offset += 4
+      return null
     }
-    return null
-   }
+    return this.decode<T>()
+  }
 
   // Set --
   decode_set<T>(): Set<T> {
@@ -181,7 +221,7 @@ export class JSONDecoder extends Decoder<string>{
     let start:u32 = this.offset
 
     // faster than performing regex?
-    while(this.nums.has(this.encoded_object.at(this.offset))){
+    while(this.offset < <u32>this.encoded_object.length && this.floats.has(this.encoded_object.at(this.offset))){
       this.offset += 1
     }
 
