@@ -160,7 +160,7 @@ export class JSONDecoder extends Decoder<string>{
 
     let start:u32 = this.offset
     // faster than performing regex?
-    while(this.nums.has(this.encoded_object.at(this.offset))){
+    while(this.offset < <u32>this.encoded_object.length && this.nums.has(this.encoded_object.at(this.offset))){
       this.offset += 1
     }
 

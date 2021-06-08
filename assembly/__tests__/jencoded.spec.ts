@@ -9,7 +9,8 @@ import { Numbers, aString, MapSet, aBoolean, Arrays, ArrayViews, Nullables, Mixt
 function check_encode<T>(object:T, expected:string):void{
   // Checks that encoding an object returns the expected encoding
   const encoder:JSONEncoder = new JSONEncoder()
-  let res:string = object.encode<string>(encoder)
+  encoder.encode(object);
+  let res:string = encoder.get_encoded_object();
 
   expect(res).toBe(expected)
 }
@@ -17,8 +18,7 @@ function check_encode<T>(object:T, expected:string):void{
 function check_decode<T>(encoded:string, original:T):void{
   // Checks that an encoding returns the expected object
   const decoder:JSONDecoder = new JSONDecoder(encoded)
-  let deco:T = instantiate<T>()
-  deco.decode<string>(decoder)
+  let deco:T =  decoder.decode<T>();
   expect(deco).toStrictEqual(original)
 }
 
@@ -46,6 +46,31 @@ describe("JSONEncoder Encoder", () => {
     check_encode<Numbers>(nums, expected)
     check_decode<Numbers>(expected, nums) 
   });
+
+  it("should encode/decode just u8", () => {
+    const nums:u8 = 200;
+    const expected:string = '200';
+
+    check_encode(nums, expected)
+    check_decode(expected, nums) 
+  });
+
+  it("should encode/decode just bools", () => {
+    const nums:bool = true;
+    const expected:string = 'true';
+
+    check_encode(nums, expected)
+    check_decode(expected, nums) 
+  });
+
+  it("should encode/decode just arrays", () => {
+    const nums:bool[] = [true, false];
+    const expected:string = '[true,false]'
+
+    check_encode(nums, expected)
+    check_decode(expected, nums) 
+  });
+
 
   it("should encode/decode strings", () => {
     const str:aString = {str:"h\"i"}
