@@ -1,5 +1,5 @@
 {
-  "name": "@encoder-as/borsh",
+  "name": "@serial-as/borsh",
   "version": "0.0.0",
   "description": "JSON Serializer for Assemblyscript",
   "main": "index.js",
@@ -9,6 +9,6 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "@encoder-as/core": "0.0.0"
+    "@serial-as/core": "0.0.0"
   }
 }

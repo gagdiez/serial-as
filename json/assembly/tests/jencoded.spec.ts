@@ -1,6 +1,6 @@
 import { u128 } from "as-bignum";
 import * as base64 from "as-base64";
-import {JSONEncoder, JSONDecoder} from '@encoder-as/json'
+import {JSONEncoder, JSONDecoder} from '@serial-as/json'
 
 import { Numbers, aString, MapSet, aBoolean, Arrays, ArrayViews, Nullables, MixtureOne, MixtureTwo, Nested, Extends, MapNullValues, BigObj } from '.';
 

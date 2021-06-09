@@ -1,6 +1,6 @@
 import {BorshEncoder} from './encoder'
 import {BorshDecoder} from './decoder'
-import {Serializer} from '@encoder-as/core';
+import {Serializer} from '@serial-as/core';
 export {BorshEncoder, BorshDecoder};
 export * from "./buffer";
 

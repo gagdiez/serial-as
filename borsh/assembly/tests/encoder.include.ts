@@ -1,1 +1,1 @@
-import "@encoder-as/core";
+import "@serial-as/core";

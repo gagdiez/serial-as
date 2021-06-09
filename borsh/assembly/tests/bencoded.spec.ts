@@ -1,4 +1,4 @@
-import {BorshEncoder, BorshDecoder} from '@encoder-as/borsh'
+import {BorshEncoder, BorshDecoder} from '@serial-as/borsh'
 import { BigObj, MapSet, MixtureOne, Numbers, aString, aBoolean, Arrays, ArrayViews, Nullables, MixtureTwo, Nested, Extends, MapNullValues } from '.';
 import { u128 } from 'as-bignum';
 

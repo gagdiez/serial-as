@@ -10,7 +10,7 @@
   "private": true,
   "scripts": {
     "test": "asp",
-    "build": "yarn workspace @encoder-as/transform build"
+    "build": "yarn workspace @serial-as/transform build"
   },
   "peerDependencies": {
     "assemblyscript": "^0.18.31"

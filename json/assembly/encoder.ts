@@ -1,4 +1,4 @@
-import {Encoder} from "@encoder-as/core"
+import {Encoder} from "@serial-as/core"
 import { u128 } from "as-bignum";
 import * as base64 from "as-base64";
 

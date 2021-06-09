@@ -1,4 +1,4 @@
-import { Encoder, isNumber } from "@encoder-as/core";
+import { Encoder, isNumber } from "@serial-as/core";
 import { EncodeBuffer } from "./buffer";
 import { u128 } from "as-bignum";
 
