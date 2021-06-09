@@ -1,23 +1,22 @@
-import {BorshEncoder, BorshDecoder} from '@serial-as/borsh'
-import { BigObj, MapSet, MixtureOne, Numbers, aString, aBoolean, Arrays, ArrayViews, Nullables, MixtureTwo, Nested, Extends, MapNullValues } from '.';
+import {BorshSerializer, BorshDeserializer} from '..'
+import {
+  BigObj,
+  MapSet,
+  MixtureOne,
+  Numbers,
+  aString,
+  aBoolean,
+  Arrays,
+  ArrayViews,
+  Nullables,
+  MixtureTwo,
+  Nested,
+  Extends,
+  MapNullValues,
+} from "@encoder-as/tests";
 import { u128 } from 'as-bignum';
 
-@serializable
-export class FooBar {
-  foo: i32 = 0;
-  bar: u32 = 1;
-  u64Val: u64 = 4294967297;
-  i64Val: i64 = -64;
-  flag: bool;
-  baz: string = "";
-  uint8array: Uint8Array = new Uint8Array(2);
-  arr: Array<Array<string>> = [];
-  u32Arr: u32[] = [];
-  i32Arr: i32[] = [];
-  u128Val: u128 = u128.Zero;
-  uint8arrays: Array<Uint8Array> = [];
-  u64Arr: u64[] = [];
-}
+
 
 function initMixtureTwo(f: MixtureTwo): void { 
   f.foo = 321;
@@ -45,7 +44,7 @@ function u8toArrayBuffer(arr:u8[]):ArrayBuffer{
 
 function check_encode<T>(object:T, expected:ArrayBuffer):void{
   // Checks that encoding an object returns the expected encoding
-  const encoder:BorshEncoder = new BorshEncoder()
+  const encoder:BorshSerializer = new BorshSerializer()
   encoder.encode(object)
   let res:ArrayBuffer = encoder.get_encoded_object()
 
@@ -54,7 +53,7 @@ function check_encode<T>(object:T, expected:ArrayBuffer):void{
 
 function check_decode<T>(encoded:ArrayBuffer, original:T):void{
   // Checks that an encoding returns the expected object
-  const decoder:BorshDecoder = new BorshDecoder(encoded)
+  const decoder:BorshDeserializer = new BorshDeserializer(encoded)
   let deco:T = decoder.decode<T>()
   expect(deco).toStrictEqual(original)
 }
@@ -69,7 +68,7 @@ function check_single_number<T = number>(N:T):void{
   check_decode<T>(expected, N)
 }
 
-describe("BorshEncoder Serializing Types", () => {
+describe("BorshSerializer Serializing Types", () => {
   it("should encode/decode single numbers", () => {
     check_single_number<u8>(100)
     check_single_number<u16>(101)

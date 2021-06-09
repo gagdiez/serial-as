@@ -3,9 +3,6 @@
   "version": "0.0.0",
   "description": "JSON Serializer for Assemblyscript",
   "main": "index.js",
-  "scripts": {
-    "test": "cd .. && yarn asp --file jencoded"
-  },
   "types": "assembly/index.ts",
   "repository": "https://github.com/gagdiez/serial-as",
   "author": "Guillermo Gallardo and Willem Wyndham",
@@ -14,5 +11,8 @@
   "dependencies": {
     "@serial-as/core": "0.0.0",
     "as-base64": "^0.2.0"
+  },
+  "devDependencies": {
+    "@encoder-as/tests": "0.0.0"
   }
 }

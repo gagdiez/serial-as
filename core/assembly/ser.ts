@@ -5,7 +5,7 @@ import { u128 } from "as-bignum";
  * methods, `encode` and `encode_number`, which use tyu
  */
 @global
-export abstract class Encoder<R>{
+export abstract class Serializer<R>{
   
   abstract get_encoded_object():R
   
@@ -19,7 +19,7 @@ export abstract class Encoder<R>{
   abstract encode_nullable<V>(value: V): void
   
   // Object --
-  abstract encode_object<C>(value:C): void
+  abstract encode_object<C extends object>(value:C): void
   abstract encode_field<T>(name:string, value:T):void
 
   // String --

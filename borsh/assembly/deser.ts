@@ -1,8 +1,8 @@
-import {Decoder} from "@serial-as/core";
+import {Deserializer} from "@serial-as/core";
 import { u128 } from "as-bignum";
 import { DecodeBuffer } from "./buffer";
 
-export class BorshDecoder extends Decoder<ArrayBuffer>{
+export class BorshDeserializer extends Deserializer<ArrayBuffer>{
   private decoBuffer:DecodeBuffer;
 
   constructor(encoded_object:ArrayBuffer){
@@ -101,7 +101,7 @@ export class BorshDecoder extends Decoder<ArrayBuffer>{
    // Object --
   decode_object<C extends object>(): C{
     let object:C = instantiate<C>()
-    object.decode<ArrayBuffer>(this)
+    object.decode(this)
     return object
   }
 

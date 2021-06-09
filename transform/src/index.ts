@@ -52,15 +52,14 @@ class Encoder extends ClassDecorator {
     this.visit(node.members);
 
     const encodeMethod = `
-    encode<__T>(encoder: Encoder<__T>): __T {
+    encode<__T>(encoder: __T): void {
       ${node.extendsType != null? "super.encode<__T>(encoder);" : ""}
       ${this.encodeStmts.join(";\n\t")};
-      return encoder.get_encoded_object()
     }
     `
     const decodeMethod = `
-    decode<__T>(decoder: Decoder<__T>): void {
-      ${node.extendsType != null? "super.decode<__T>(decoder);" : ""}
+    decode<__T>(decoder: __T): void {
+      ${node.extendsType != null? "super.decode(decoder);" : ""}
       ${this.decodeStmts.join(";\n\t")};
     }
     `

@@ -1,4 +1,4 @@
-import {JSONEncoder} from './encoder'
-import {JSONDecoder} from './decoder'
+import {JSONSerializer} from './ser';
+import {JSONDeserializer} from './deser';
 
-export {JSONEncoder, JSONDecoder}
+export {JSONSerializer, JSONDeserializer};

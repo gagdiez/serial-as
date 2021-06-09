@@ -10,6 +10,8 @@
   "private": true,
   "scripts": {
     "test": "asp",
+    "test:borsh": "asp -f bencode",
+    "test:json": "asp -f jencode",
     "build": "yarn workspace @serial-as/transform build"
   },
   "peerDependencies": {

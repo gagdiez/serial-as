@@ -1,0 +1,10 @@
+{
+  "name": "@encoder-as/tests",
+  "version": "0.0.0",
+  "description": "Serialization for Assemblyscript",
+  "main": "dist/index.js",
+  "types": "assembly/index.ts",
+  "author": "Guillermo Gallardo and Willem Wyndham",
+  "license": "MIT",
+  "private": true
+}
