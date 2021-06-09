@@ -37,6 +37,7 @@ function initMixtureTwo(f: MixtureTwo): MixtureTwo {
 }
 
 
+
 function check_single_number<T extends number>(N:T):void{
 
   let expected:string =  N.toString();
