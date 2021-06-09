@@ -4,7 +4,10 @@
   "description": "JSON Serializer for Assemblyscript",
   "main": "index.js",
   "types": "assembly/index.ts",
-  "repository": "https://github.com/gagdiez/encoder-as",
+  "repository": "https://github.com/gagdiez/serial-as",
+  "scripts": {
+    "test": "cd .. && yarn asp --file bencoded" 
+  },
   "author": "Guillermo Gallardo and Willem Wyndham",
   "license": "MIT",
   "private": false,
