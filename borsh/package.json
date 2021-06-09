@@ -13,5 +13,8 @@
   },
   "devDependencies": {
     "@encoder-as/tests": "0.0.0"
+  },
+  "scripts": {
+    "test": "asp"
   }
 }

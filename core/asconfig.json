@@ -1,3 +1,6 @@
 {
-  "extends": "../asconfig.json"
+  "extends": "../asconfig.json",
+  "options": {
+    "lib": "assembly/index.ts"
+  }
 }

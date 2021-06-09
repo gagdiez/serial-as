@@ -4,6 +4,7 @@ import { u128 } from "as-bignum";
  * Top level abstract Encoder class which defines default 
  * methods, `encode` and `encode_number`, which use tyu
  */
+@global
 export abstract class Encoder<R>{
   
   abstract get_encoded_object():R
