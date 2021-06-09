@@ -7,10 +7,10 @@
   "repository": "https://github.com/gagdiez/encoder-as",
   "author": "Guillermo Gallardo",
   "license": "MIT",
-  "private": false,
+  "private": true,
   "scripts": {
-    "test": "jest && asp",
-    "build": "rimraf dist/ && tsc"
+    "test": "yarn workspace tests test",
+    "build": "yarn workspace @encoder-as/transform build"
   },
   "peerDependencies": {
     "assemblyscript": "^0.18.31"
@@ -19,7 +19,8 @@
     "@as-pect/cli": "^6.1.1",
     "@types/jest": "^25.1.4",
     "@types/node": "^13.9.1",
-    "assemblyscript": "^0.18.31",
+    "asbuild": "^0.2.0",
+    "assemblyscript": "^0.19.2",
     "jest": "^25.1.0",
     "prettier": "^2.0.4",
     "rimraf": "^3.0.2",
@@ -27,9 +28,11 @@
     "ts-node": "^8.6.2",
     "typescript": "^3.8.3"
   },
-  "dependencies": {
-    "as-base64": "^0.2.0",
-    "as-bignum": "^0.2.17",
-    "visitor-as": "^0.6.0"
-  }
+  "workspaces": [
+    "core",
+    "json",
+    "borsh",
+    "transform",
+    "tests"
+  ]
 }

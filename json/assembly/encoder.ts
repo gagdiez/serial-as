@@ -1,4 +1,4 @@
-import {Encoder} from "..";
+import {Encoder} from "@encoder-as/core"
 import { u128 } from "as-bignum";
 import * as base64 from "as-base64";
 
@@ -62,9 +62,10 @@ export class JSONEncoder extends Encoder<string>{
     if (t == null){ 
       this.inner_encode.push("null");
     } else {
-      this.encode(t);
+      // @ts-ignore
+      this.encode(<NonNullable<T>>t);
     }
-  } 
+  }
 
   // Set --
   encode_set<T>(value:Set<T>): void{

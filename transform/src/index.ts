@@ -1,4 +1,4 @@
-import { TypeNode, ClassDeclaration, FieldDeclaration, MethodDeclaration } from "visitor-as/as";
+import { TypeNode, ClassDeclaration, FieldDeclaration, MethodDeclaration, Source } from "visitor-as/as";
 import { SimpleParser, ClassDecorator, registerDecorator } from "visitor-as";
 import { toString, isMethodNamed, getName } from 'visitor-as/dist/utils';
 
@@ -72,6 +72,10 @@ class Encoder extends ClassDecorator {
   }
 
   get name(): string { return "serializable" }
+
+  get sourceFilter() {
+    return (_:any) => true;
+  }
  
   visitMethodDeclaration(node: MethodDeclaration): void { }
 }

@@ -1,4 +1,4 @@
-import {Decoder} from "..";
+import {Decoder} from "@encoder-as/core";
 import { u128 } from "as-bignum";
 import { DecodeBuffer } from "./buffer";
 
@@ -38,6 +38,7 @@ export class BorshDecoder extends Decoder<ArrayBuffer>{
 
     //for el in x; repr(el as K)
     for(let i:u32=0; i < length; i++){
+      // @ts-ignore
       ret_array[i] = this.decode<valueof<A>>()
     }
 

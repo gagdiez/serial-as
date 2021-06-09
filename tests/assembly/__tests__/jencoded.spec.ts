@@ -1,10 +1,8 @@
 import { u128 } from "as-bignum";
-import {Encoder, Decoder} from ".."
 import * as base64 from "as-base64";
-import {JSONEncoder, JSONDecoder} from '../json'
+import {JSONEncoder, JSONDecoder} from '@encoder-as/json'
 
-import { Numbers, aString, MapSet, aBoolean, Arrays, ArrayViews, Nullables, MixtureOne, MixtureTwo, Nested, Extends, MapNullValues, BigObj } from '.';
-
+import { Numbers, aString, MapSet, aBoolean, Arrays, ArrayViews, Nullables, MixtureOne, MixtureTwo, Nested, Extends, MapNullValues, BigObj } from '..';
 
 function check_encode<T>(object:T, expected:string):void{
   // Checks that encoding an object returns the expected encoding
@@ -39,10 +37,12 @@ function initMixtureTwo(f: MixtureTwo): MixtureTwo {
 }
 
 
-function check_single_number<T = number>(N:T):void{
+
+function check_single_number<T extends number>(N:T):void{
 
   let expected:string =  N.toString();
 
+  // @ts-ignore
   if(N instanceof u64 || N instanceof i64){
     expected = `"${expected}"`
   }

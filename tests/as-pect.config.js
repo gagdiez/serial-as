@@ -16,9 +16,9 @@ module.exports = {
     /** A runtime must be provided here. */
     // "--runtime": ["none"], // Acceptable values are: full, half, stub (arena), and none
     "--transform": [
-      "./src/encoder.ts",
-    //  "./src/borsh.encoder.ts",
-      ],
+      "@encoder-as/transform/src/index.ts",
+    // //  "./src/borsh.encoder.ts",
+      ]
   },
   /**
    * A set of regexp that will disclude source files from testing.

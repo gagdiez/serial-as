@@ -6,7 +6,7 @@ function isNull<T>(t: T): bool {
   }
   return false;
 }
-
+@global
 export abstract class Decoder<I> {
 
   constructor(protected encoded_object:I){}
