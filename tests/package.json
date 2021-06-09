@@ -1,5 +1,5 @@
 {
-  "name": "@encoder-as/tests",
+  "name": "tests",
   "version": "0.0.0",
   "description": "Serialization for Assemblyscript",
   "main": "dist/index.js",

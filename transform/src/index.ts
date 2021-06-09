@@ -43,7 +43,6 @@ class Encoder extends ClassDecorator {
     if (!node.members || node.members.some(isMethodNamed("encode"))) {
       return;
     }
-    console.log(`hello ${getName(node)}`);
     
     this.currentClass = node;
     const class_name:string = getName(node)

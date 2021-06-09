@@ -2,7 +2,7 @@ module.exports = {
   /**
    * A set of globs passed to the glob package that qualify typescript files for testing.
    */
-  include: ["**/*/assembly/__tests__/**/*.spec.ts"],
+  include: ["assembly/__tests__/**/*.spec.ts"],
   /**
    * A set of globs passed to the glob package that quality files to be added to each test.
    */
@@ -18,7 +18,7 @@ module.exports = {
     "--transform": [
       "@encoder-as/transform/src/index.ts",
     // //  "./src/borsh.encoder.ts",
-      ],
+      ]
   },
   /**
    * A set of regexp that will disclude source files from testing.

@@ -11,6 +11,6 @@
     "visitor-as": "^0.6.0"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "rimraf dist/ && tsc"
   }
 }

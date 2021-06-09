@@ -1,9 +1,8 @@
 import { u128 } from "as-bignum";
 import * as base64 from "as-base64";
-import {JSONEncoder, JSONDecoder} from '..'
+import {JSONEncoder, JSONDecoder} from '@encoder-as/json'
 
-import { Numbers, aString, MapSet, aBoolean, Arrays, ArrayViews, Nullables, MixtureOne, MixtureTwo, Nested, Extends, MapNullValues, BigObj } from '@encoder-as/tests';
-
+import { Numbers, aString, MapSet, aBoolean, Arrays, ArrayViews, Nullables, MixtureOne, MixtureTwo, Nested, Extends, MapNullValues, BigObj } from '..';
 
 function check_encode<T>(object:T, expected:string):void{
   // Checks that encoding an object returns the expected encoding
@@ -37,21 +36,46 @@ function initMixtureTwo(f: MixtureTwo): MixtureTwo {
   return f;
 }
 
-describe("JSONEncoder Encoder", () => {
-  it("should encode/decode numbers", () => {
-    const nums:Numbers = new Numbers()
-    const expected:string = '{"u8":1,"u16":2,"u32":3,"u64":"4","u128":"5","i8":-1,"i16":-2,"i32":-3,"i64":"-4","f32":6.0,"f64":7.1}'
 
-    check_encode<Numbers>(nums, expected)
-    check_decode<Numbers>(expected, nums) 
+function check_single_number<T extends number>(N:T):void{
+
+  let expected:string =  N.toString();
+
+  // @ts-ignore
+  if(N instanceof u64 || N instanceof i64){
+    expected = `"${expected}"`
+  }
+
+  check_encode<T>(N, expected)
+  check_decode<T>(expected, N)
+}
+
+describe("JSONEncoder Serializing Types", () => {
+  it("should encode/decode numbers", () => {
+    check_single_number<u8>(100)
+    check_single_number<u16>(101)
+    check_single_number<u32>(102)
+    check_single_number<u64>(103)
+    check_single_number<i8>(-100)
+    check_single_number<i16>(-101)
+    check_single_number<i32>(-102)
+    check_single_number<i64>(-103)
+
+    check_decode<u8>(" 123 ", 123)
   });
 
-  it("should encode/decode just u8", () => {
-    const nums:u8 = 200;
-    const expected:string = '200';
+  it("should encode/decode floats", () => {
+    check_single_number<f64>(7.23)
+    check_single_number<f64>(10e2)
+    check_single_number<f64>(10E2)
+    check_decode<f64>(" 7.23 ", 7.23)
+  })
 
-    check_encode(nums, expected)
-    check_decode(expected, nums) 
+  it("should encode/decode u128", () => {
+    let N:u128 = u128.from("100")
+    let expected:string = '"100"'
+    check_encode(N, expected)
+    check_decode(expected, N)
   });
 
   it("should encode/decode just bools", () => {
@@ -70,6 +94,23 @@ describe("JSONEncoder Encoder", () => {
     check_decode(expected, nums) 
   });
 
+  it("should handle spaces", () => {
+    const nums:bool[] = [true, false];
+    const space_encoded:string = ' [ true , false ] '
+
+    check_decode(space_encoded, nums) 
+  });
+
+})
+
+describe("JSONEncoder Serializing Objects", () => {
+  it("should encode/decode numbers", () => {
+    const nums:Numbers = new Numbers()
+    const expected:string = '{"u8":1,"u16":2,"u32":3,"u64":"4","u128":"5","i8":-1,"i16":-2,"i32":-3,"i64":"-4","f32":6.0,"f64":7.1}'
+
+    check_encode<Numbers>(nums, expected)
+    check_decode<Numbers>(expected, nums) 
+  });
 
   it("should encode/decode strings", () => {
     const str:aString = {str:"h\"i"}
@@ -128,7 +169,7 @@ describe("JSONEncoder Encoder", () => {
     const expected:string = '{"u32Arr_null":null,"arr_null":null,"u64_arr":null,"map_null":null,"set_null":null,"obj_null":null}'
     
     check_encode<Nullables>(nullables, expected)
-    //check_decode<Nullables>(expected, nullables)
+    check_decode<Nullables>(expected, nullables)
   });
 
   it("should encode/decode simple Mixtures", () => {
@@ -147,6 +188,15 @@ describe("JSONEncoder Encoder", () => {
 
     check_encode<MixtureTwo>(mix, expected)
     check_decode<MixtureTwo>(expected, mix)
+  });
+
+  it("should decode Mixtures with spaces", () => {
+    const mix:MixtureTwo = new MixtureTwo();
+    initMixtureTwo(mix);
+    
+    const encoded_spaces:string = '{ "foo": 321, "bar":123, "u64Val" : "4294967297","u64_zero":     "0","i64Val": "-64", "flag":    true , "baz":"foo","uint8array":"aGVsbG8sIHdvcmxkIQ==","arr":[["Hello"],["World"]],"u32Arr":[42,11],"i32Arr":[],"u128Val":"128","uint8arrays":["aGVsbG8sIHdvcmxkIQ==","aGVsbG8sIHdvcmxkIQ=="],"u64Arr":["10000000000","100000000000"]}'
+
+    check_decode<MixtureTwo>(encoded_spaces, mix)
   });
 
   it("should encode/decode nested JSONEncoder", () => {
@@ -176,7 +226,7 @@ describe("JSONEncoder Encoder", () => {
     const expected:string = '{"inner":{1:null}}'
 
     check_encode<MapNullValues>(map, expected)
-    //check_decode<MapNullValues>(expected, map)
+    check_decode<MapNullValues>(expected, map)
   });
 
 
@@ -188,14 +238,5 @@ describe("JSONEncoder Encoder", () => {
 
     check_encode<BigObj>(bigObj, expected)
     check_decode<BigObj>(expected, bigObj)
-
-/*  const encoder = new BorshEncoder();
-    encoder.encode(bigObj);
-    const res = encoder.get_encoded_object();
-    log (res.byteLength);
-    const jencoder = new JSONEncoder();
-    jencoder.encode(bigObj);
-    const jres = String.UTF8.encode(jencoder.get_encoded_object());
-    log(jres.byteLength) */
   })
 });

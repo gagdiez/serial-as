@@ -9,8 +9,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "test": "asp",
-    "build": "rimraf dist/ && tsc"
+    "test": "yarn workspace tests test",
+    "build": "yarn workspace @encoder-as/transform build"
   },
   "peerDependencies": {
     "assemblyscript": "^0.18.31"
@@ -20,7 +20,7 @@
     "@types/jest": "^25.1.4",
     "@types/node": "^13.9.1",
     "asbuild": "^0.2.0",
-    "assemblyscript": "^0.18.31",
+    "assemblyscript": "^0.19.2",
     "jest": "^25.1.0",
     "prettier": "^2.0.4",
     "rimraf": "^3.0.2",

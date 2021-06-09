@@ -10,11 +10,5 @@
   "private": false,
   "dependencies": {
     "@encoder-as/core": "0.0.0"
-  },
-  "devDependencies": {
-    "@encoder-as/tests": "0.0.0"
-  },
-  "scripts": {
-    "test": "asp"
   }
 }

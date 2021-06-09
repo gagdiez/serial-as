@@ -2,6 +2,7 @@ import {BorshEncoder} from './encoder'
 import {BorshDecoder} from './decoder'
 import {Serializer} from '@encoder-as/core';
 export {BorshEncoder, BorshDecoder};
+export * from "./buffer";
 
 export class BorshSerializer extends Serializer<ArrayBuffer, BorshEncoder, BorshDecoder> {
   private static singleton: BorshSerializer = new BorshSerializer();
