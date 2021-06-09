@@ -1,5 +1,5 @@
 import {BorshEncoder, BorshDecoder} from '@encoder-as/borsh'
-import { BigObj, MapSet, MixtureOne, Numbers, aString, aBoolean, Arrays, ArrayViews, Nullables, MixtureTwo, Nested, Extends, MapNullValues } from '..';
+import { BigObj, MapSet, MixtureOne, Numbers, aString, aBoolean, Arrays, ArrayViews, Nullables, MixtureTwo, Nested, Extends, MapNullValues } from '.';
 import { u128 } from 'as-bignum';
 
 @serializable
