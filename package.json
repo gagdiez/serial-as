@@ -9,7 +9,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "test": "yarn workspace tests test",
+    "test": "asp",
     "build": "yarn workspace @encoder-as/transform build"
   },
   "peerDependencies": {
