@@ -13,11 +13,9 @@ export class JSONDecoder extends Decoder<string>{
     super(encoded_object)
     this.nums.add("-")
     this.nums.add("+")
-    this.nums.add(" ")
     
     this.floats.add("-")
     this.floats.add("+")
-    this.floats.add(" ")
 
     this.floats.add(".")
     this.floats.add("e")
@@ -29,8 +27,21 @@ export class JSONDecoder extends Decoder<string>{
     }    
   }
 
+  finished():bool{
+    return this.offset == <u32>this.encoded_object.length
+  }
+
+  current_char():string{
+    return this.encoded_object.at(this.offset)
+  }
+
+  escaped_char():bool{
+    if(this.offset == 0){ return false }
+    return this.encoded_object.at(this.offset-1) == '\\'
+  }
+
   skip_spaces():void{
-    while(this.offset < <u32>this.encoded_object.length && this.encoded_object.at(this.offset) == " "){
+    while(!this.finished() && this.current_char() == " "){
       this.offset += 1
     }
   }
@@ -43,6 +54,7 @@ export class JSONDecoder extends Decoder<string>{
   }
 
   decode_field<T>(name:string):T{
+    // "name":value,
 
     this.skip_spaces()
 
@@ -53,7 +65,6 @@ export class JSONDecoder extends Decoder<string>{
 
     this.skip_spaces()
 
-    // "name":value,
     // pass over "name"
     this.offset += name.length + 2
 
@@ -94,7 +105,7 @@ export class JSONDecoder extends Decoder<string>{
     let start:u32 = this.offset
 
     while(true){
-      if(this.encoded_object.at(this.offset) == '"' && this.encoded_object.at(this.offset-1) != '\\'){
+      if((this.current_char() == '"' || this.current_char() == "'") && !this.escaped_char()){
         break
       }
       this.offset += 1
@@ -102,6 +113,7 @@ export class JSONDecoder extends Decoder<string>{
     
     let ret:string = this.encoded_object.slice(start, this.offset)
     ret = ret.replace('\\"', '"')
+    ret = ret.replace("\\'", "'")
     this.offset += 1
     return ret
   }
@@ -116,23 +128,26 @@ export class JSONDecoder extends Decoder<string>{
       return changetype<A>(base64.decode(u8arr))
     }
 
-    if(this.encoded_object.at(this.offset+1) == ']'){
+    this.offset += 1 // skip [
+    this.skip_spaces()
+
+    if(this.current_char() == ']'){
       //empty array
-      this.offset += 2
+      this.offset += 1
       return instantiate<A>(0)
     }
 
     // Not empty
     ret = instantiate<A>()
 
-    while(this.encoded_object.at(this.offset) != ']'){
-      this.offset += 1;
-      // @ts-ignore
+    while(this.current_char() != ']'){
+      if(this.current_char() == ','){ this.offset += 1}
+      //@ts-ignore
       ret.push(this.decode<valueof<A>>())
     }
-
-    this.offset += 1  // skip ]
   
+    this.offset += 1  // skip: ]
+
     return ret
   }
 
@@ -148,16 +163,21 @@ export class JSONDecoder extends Decoder<string>{
   // Set --
   decode_set<T>(): Set<T> {
     // {val,val,val}
-    if(this.encoded_object.at(this.offset+1) == '}'){
+    this.offset += 1  // skip {
+
+    this.skip_spaces()
+
+    if(this.current_char() == '}'){
       //empty set
-      this.offset += 2
+      this.offset += 1
       return new Set<T>()
     }
 
+    // not empty
     let ret_set:Set<T> = new Set<T>()
 
-    while(this.encoded_object.at(this.offset) != '}'){
-      this.offset += 1
+    while(this.current_char() != '}'){
+      if(this.current_char() == ','){ this.offset += 1}
       ret_set.add(this.decode<T>())
     }
 
@@ -169,16 +189,22 @@ export class JSONDecoder extends Decoder<string>{
   // Map --
   decode_map<K, V>(): Map<K, V>{
     // {key:val,key:val}
-    if(this.encoded_object.at(this.offset+1) == '}'){
+    this.offset += 1  // skip {
+    
+    this.skip_spaces()
+
+    if(this.current_char() == '}'){
       //empty map
-      this.offset += 2
+      this.offset += 1
       return new Map<K, V>()
     }
 
+    // non empty
     let ret_map:Map<K, V> = new Map<K, V>()
-    while(this.encoded_object.at(this.offset) != '}'){
-      this.offset += 1
-      const key = this.decode<K>()
+    while(this.current_char() != '}'){
+      if(this.current_char() == ','){ this.offset += 1}
+
+      const key = this.decode<K>()  
       this.offset += 1  // skip :
       const value = this.decode<V>()
       ret_map.set(key, value)
@@ -202,7 +228,7 @@ export class JSONDecoder extends Decoder<string>{
 
     let start:u32 = this.offset
     // faster than performing regex?
-    while(this.offset < <u32>this.encoded_object.length && this.nums.has(this.encoded_object.at(this.offset))){
+    while(!this.finished() && this.nums.has(this.current_char())){
       this.offset += 1
     }
 
@@ -210,12 +236,12 @@ export class JSONDecoder extends Decoder<string>{
   }
 
   decode_long<T extends number>():T{
-    let number:string = this.decode_string()
+    let number:string = this.decode<string>()
     return <T>(parseInt(number))
   }
   
   decode_u128():u128{
-    let number:string = this.decode_string()
+    let number:string = this.decode<string>()
     return u128.from(number)
   }
 
@@ -223,7 +249,7 @@ export class JSONDecoder extends Decoder<string>{
     let start:u32 = this.offset
 
     // faster than performing regex?
-    while(this.offset < <u32>this.encoded_object.length && this.floats.has(this.encoded_object.at(this.offset))){
+    while(!this.finished() && this.floats.has(this.current_char())){
       this.offset += 1
     }
 

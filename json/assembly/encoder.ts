@@ -32,6 +32,7 @@ export class JSONEncoder extends Encoder<string>{
   // String --
   encode_string(value:string):void{
     value = value.replace('"', '\\"')
+    value = value.replace("'", "\\'")
     this.inner_encode.push(`"${value}"`)
   }
 

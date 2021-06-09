@@ -22,7 +22,7 @@ export class Numbers {
   public i8: i8 = -1;
   public i16: i16 = -2;
   public i32: i32 = -3;
-  public i64: i64 = -1;
+  public i64: i64 = -4;
 
   public f32: f32 = 6.0;
   public f64: f64 = 7.1;
