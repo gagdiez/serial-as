@@ -87,6 +87,14 @@ describe("JSONEncoder Serializing Types", () => {
     check_decode(expected, nums) 
   });
 
+  it("should encode/decode just strings", () => {
+    const str:string = 'h\"i';
+    const expected:string = '"h\\"i"';
+
+    check_encode(str, expected)
+    check_decode(expected, str) 
+  });
+
   it("should encode/decode just arrays", () => {
     const nums:bool[] = [true, false];
     const expected:string = '[true,false]'
@@ -95,11 +103,28 @@ describe("JSONEncoder Serializing Types", () => {
     check_decode(expected, nums) 
   });
 
+  it("should encode/decode just map", () => {
+    const map:Map<i32, string> = new Map()
+    map.set(1, "hi")
+
+    const expected:string = '{1:"hi"}'
+
+    check_encode(map, expected)
+    check_decode(expected, map) 
+  });
+
   it("should handle spaces", () => {
     const nums:bool[] = [true, false];
-    const space_encoded:string = ' [ true , false ] '
+    const arr_encoded:string = ' [ true , false ] '
 
-    check_decode(space_encoded, nums) 
+    check_decode(arr_encoded, nums)
+
+    const map_encoded:string = ' { 1 : "hel\\"lo" } '
+
+    let map:Map<i32, string> = new Map()
+    map.set(1, 'hel\"lo')
+
+    check_decode(map_encoded, map)
   });
 
 })
