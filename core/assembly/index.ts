@@ -1,26 +1,19 @@
-import { Serializer } from "./ser";
-import { Deserializer } from "./deser";
+import { Serializer } from "./serializer";
+import { Deserializer } from "./deserializer";
 
-export * from "./utils";
+export * from "./utils"
 export {Serializer, Deserializer}
 
-function emptyNew<T>(): T {
-  return changetype<T>(__new(offsetof<T>(), idof<T>()));
-}
-
-/**
- * Top Level Seraializer
- */
-export class Serial<T, E extends Serializer<T>, D extends Deserializer<T>> {
+export class Serial<__R, E extends Serializer<__R>, D extends Deserializer<__R>> {
   
-  encoder(): E {
-    return emptyNew<E>();
+  encode<O>(object:O): __R {
+    let encoder:E = instantiate<E>();
+    encoder.encode(object)
+    return encoder.get_encoded_object();
   }
 
-  decoder(t: T): D {
-    return (emptyNew<D>()).init(t);
+  decode<O>(t: __R): O {
+    const decoder:D = instantiate<D>(t)
+    return decoder.decode<O>()
   }
 }
-
-
-

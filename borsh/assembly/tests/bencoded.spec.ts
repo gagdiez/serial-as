@@ -1,22 +1,24 @@
-import {BorshSerializer, BorshDeserializer} from '..'
-import {
-  BigObj,
-  MapSet,
-  MixtureOne,
-  Numbers,
-  aString,
-  aBoolean,
-  Arrays,
-  ArrayViews,
-  Nullables,
-  MixtureTwo,
-  Nested,
-  Extends,
-  MapNullValues,
-} from "@encoder-as/tests";
+import { Borsh } from '@serial-as/borsh'
+import { BigObj, MapSet, MixtureOne, Numbers, aString, aBoolean, Arrays, ArrayViews, Nullables, MixtureTwo, Nested, Extends, MapNullValues } from '@serial-as/tests';
 import { u128 } from 'as-bignum';
 
 
+@serializable
+export class FooBar {
+  foo: i32 = 0;
+  bar: u32 = 1;
+  u64Val: u64 = 4294967297;
+  i64Val: i64 = -64;
+  flag: bool;
+  baz: string = "";
+  uint8array: Uint8Array = new Uint8Array(2);
+  arr: Array<Array<string>> = [];
+  u32Arr: u32[] = [];
+  i32Arr: i32[] = [];
+  u128Val: u128 = u128.Zero;
+  uint8arrays: Array<Uint8Array> = [];
+  u64Arr: u64[] = [];
+}
 
 function initMixtureTwo(f: MixtureTwo): void { 
   f.foo = 321;
@@ -44,20 +46,18 @@ function u8toArrayBuffer(arr:u8[]):ArrayBuffer{
 
 function check_encode<T>(object:T, expected:ArrayBuffer):void{
   // Checks that encoding an object returns the expected encoding
-  const encoder:BorshSerializer = new BorshSerializer()
-  encoder.encode(object)
-  let res:ArrayBuffer = encoder.get_encoded_object()
+  //const borsh:Borsh = new Borsh()
+  let res:ArrayBuffer = Borsh.encode(object)
 
   expect(res).toStrictEqual(expected)
 }
 
 function check_decode<T>(encoded:ArrayBuffer, original:T):void{
   // Checks that an encoding returns the expected object
-  const decoder:BorshDeserializer = new BorshDeserializer(encoded)
-  let deco:T = decoder.decode<T>()
+  //const borsh:Borsh = new Borsh()
+  let deco:T = Borsh.decode<T>(encoded)
   expect(deco).toStrictEqual(original)
 }
-
 
 function check_single_number<T = number>(N:T):void{
 
@@ -68,7 +68,8 @@ function check_single_number<T = number>(N:T):void{
   check_decode<T>(expected, N)
 }
 
-describe("BorshSerializer Serializing Types", () => {
+
+describe("BorshEncoder Serializing Types", () => {
   it("should encode/decode single numbers", () => {
     check_single_number<u8>(100)
     check_single_number<u16>(101)
@@ -260,5 +261,4 @@ describe("Borsh serialize objects", () => {
     check_encode<BigObj>(bigObj, expected_arr)
     check_decode<BigObj>(expected_arr, bigObj)
   })
-
 });

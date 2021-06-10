@@ -1,8 +1,8 @@
 # Encoder / Decoder AS
 
-encoder-as aims to create an user-friendly interface to implement serialized encoder-decoders for the assemblyscript language. A serialized encoder is that which iterates through the fields of a well-defined Object and encodes its values into a pre-defined encoding type. A serialized decoder knows how to take a serialized object and transform it back into its decoded form.
+serial-as aims to create an user-friendly interface to implement serialized encoder-decoders for the assemblyscript language. A serialized encoder is that which iterates through the fields of a well-defined Object and encodes its values into a pre-defined encoding type. A serialized decoder knows how to take a serialized object and transform it back into its decoded form.
 
-**encoder-as** simplifies creating a serialized encoder-decoder by taking care of 'walking' through the object, and providing developers with two classes: Encoder and Decoder. The developer then simply needs to extend such classes and implement its abstract methods, indicating how basic types (number, string, array, ...) should be encoded.
+**serial-as** simplifies creating a serialized encoder-decoder by taking care of 'walking' through the object, and providing developers with two classes: Encoder and Decoder. The developer then simply needs to extend such classes and implement its abstract methods, indicating how basic types (number, string, array, ...) should be encoded.
 
 ## WIP
 **Encoder**

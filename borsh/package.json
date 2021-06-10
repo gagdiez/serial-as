@@ -12,6 +12,6 @@
     "@serial-as/core": "0.0.0"
   },
   "devDependencies": {
-    "@encoder-as/tests": "0.0.0"
+    "@serial-as/tests": "0.0.0"
   }
 }

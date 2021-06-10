@@ -1,11 +1,11 @@
 {
-  "name": "encoder-as",
+  "name": "serial-as",
   "version": "1.0.0",
-  "description": "A generic encoder-decoder",
+  "description": "A serializer template for the assemblyscript language ",
   "main": "dist",
   "types": "dist",
-  "repository": "https://github.com/gagdiez/encoder-as",
-  "author": "Guillermo Gallardo",
+  "repository": "https://github.com/gagdiez/serial-as",
+  "author": "Guillermo Gallardo & Willem Wyndham",
   "license": "MIT",
   "private": true,
   "scripts": {

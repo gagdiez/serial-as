@@ -1,6 +1,6 @@
 import { u128 } from "as-bignum";
 import * as base64 from "as-base64";
-import {JSONSerializer, JSONDeserializer} from '@serial-as/json'
+import {JSON} from '@serial-as/json'
 import {
   Numbers,
   aString,
@@ -15,21 +15,18 @@ import {
   Extends,
   MapNullValues,
   BigObj,
-} from "@encoder-as/tests";
+} from "@serial-as/tests";
 
 function check_encode<T>(object:T, expected:string):void{
   // Checks that encoding an object returns the expected encoding
-  const encoder:JSONSerializer = new JSONSerializer()
-  encoder.encode(object);
-  let res:string = encoder.get_encoded_object();
+  let res:string = JSON.encode(object);
 
   expect(res).toBe(expected)
 }
 
 function check_decode<T>(encoded:string, original:T):void{
   // Checks that an encoding returns the expected object
-  const decoder:JSONDeserializer = new JSONDeserializer(encoded)
-  let deco:T =  decoder.decode<T>();
+  let deco:T = JSON.decode<T>(encoded);
   expect(deco).toStrictEqual(original)
 }
 
