@@ -126,16 +126,16 @@ export class BorshSerializer extends Serializer<ArrayBuffer> {
   }
 
   // We override encode_number, for which we don't need these
-  encode_u8(value: u8): void {}
-  encode_i8(value: i8): void {}
-  encode_u16(value: u16): void {}
-  encode_i16(value: i16): void {}
-  encode_u32(value: u32): void {}
-  encode_i32(value: i32): void {}
-  encode_u64(value: u64): void {}
-  encode_i64(value: i64): void {}
-  encode_f32(value: f32): void {}
-  encode_f64(value: f64): void {}
+  encode_u8(value: u8): void { }
+  encode_i8(value: i8): void { }
+  encode_u16(value: u16): void { }
+  encode_i16(value: i16): void { }
+  encode_u32(value: u32): void { }
+  encode_i32(value: i32): void { }
+  encode_u64(value: u64): void { }
+  encode_i64(value: i64): void { }
+  encode_f32(value: f32): void { }
+  encode_f64(value: f64): void { }
 
   encode_arraybuffer_view<T extends ArrayBufferView>(value: T): void {
     //@ts-ignore
@@ -144,12 +144,12 @@ export class BorshSerializer extends Serializer<ArrayBuffer> {
   }
 
   // We override encode_array_like, for which we don't need these
-  encode_u8array(value: Uint8Array): void {}
-  encode_i8array(value: Int8Array): void {}
-  encode_u16array(value: Uint16Array): void {}
-  encode_i16array(value: Int16Array): void {}
-  encode_u32array(value: Uint32Array): void {}
-  encode_i32array(value: Int32Array): void {}
-  encode_u64array(value: Uint64Array): void {}
-  encode_i64array(value: Int64Array): void {}
+  encode_u8array(value: Uint8Array): void { }
+  encode_i8array(value: Int8Array): void { }
+  encode_u16array(value: Uint16Array): void { }
+  encode_i16array(value: Int16Array): void { }
+  encode_u32array(value: Uint32Array): void { }
+  encode_i32array(value: Int32Array): void { }
+  encode_u64array(value: Uint64Array): void { }
+  encode_i64array(value: Int64Array): void { }
 }

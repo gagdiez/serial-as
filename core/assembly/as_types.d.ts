@@ -1,5 +1,5 @@
-interface Encoder<T> {}
-interface Decoder<T> {}
+interface Encoder<T> { }
+interface Decoder<T> { }
 interface Object {
   encode<T>(encoder: Encoder<T>): T;
   decode<From>(decoder: Decoder<From>): this;
@@ -9,4 +9,4 @@ interface Object {
  * 
  * Macro to add `encode` method to class
  */
-declare function serializable(a:any): any;
+declare function serializable(a: any): any;
