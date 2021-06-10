@@ -1,6 +1,6 @@
 # Serial-as
 
-**serial-as** simplifies creating serialized encoders/decoders for the assemblyscript language. Furthermore, it readily implements a JSON, and a [Borsh](borsh.io) (de)serializer.
+**serial-as** simplifies creating serialized encoders/decoders for the assemblyscript language. Furthermore, it readily implements a [JSON](https://json.org), and a [Borsh](https://borsh.io) (de)serializer.
 
 ## Installing and Testing
 ```bash
@@ -35,7 +35,7 @@ In order to implement `MyDeserializer` you will need to implement the abstract m
 - `decode_i32():i32`
 - etc.
 
-You can use as examples the Borsh and JSON serializers included in this repository. Simply copy one of the folders, and change the methods implemented on them.
+You can use as examples the [Borsh](./borsh) and [JSON](./json) serializers included in this repository. Simply copy one of the folders, and change the methods implemented on them.
 
 ## How to use your (De)Serializer
 In order for an object to be serializable you need to decorate it with the `@serializable` tag. After this, the object can be used with any Serial object.
@@ -59,7 +59,7 @@ let serialized:string = myserial.serialize(object)
 let decoded:Pair = myserial.deserialize<Pair>(serialized)
 ```
 
-Once more, you can use the Borsh and JSON implementation included in this repository as a guide.
+Once more, you can use the [Borsh](./borsh) and [JSON](./json) implementation included in this repository as a guide.
 
 ## Under the Hood
 Under the hood, **serial-as** implements a [transform](https://www.assemblyscript.org/transforms.html) to visit `@serializable` objects and encode/decode their fields. To do so, the transform uses the methods implemented in the Serializer/Deserializer classes.
