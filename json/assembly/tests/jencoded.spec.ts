@@ -19,6 +19,7 @@ import {
   init_arrays,
 } from "@serial-as/tests";
 
+
 function check_encode<T>(object: T, expected: string): void {
   // Checks that encoding an object returns the expected encoding
   let res: string = JSON.encode(object);
@@ -49,7 +50,6 @@ function initMixtureTwo(f: MixtureTwo): MixtureTwo {
 }
 
 
-
 function check_single_number<T extends number>(N: T): void {
 
   let expected: string = N.toString();
@@ -62,6 +62,7 @@ function check_single_number<T extends number>(N: T): void {
   check_encode<T>(N, expected)
   check_decode<T>(expected, N)
 }
+
 
 describe("JSONSerializer Serializing Types", () => {
   it("should encode/decode numbers", () => {
@@ -140,6 +141,7 @@ describe("JSONSerializer Serializing Types", () => {
   });
 
 })
+
 
 describe("JSONSerializer Serializing Objects", () => {
   it("should encode/decode numbers", () => {
