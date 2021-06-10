@@ -1,8 +1,8 @@
-import {Decoder} from "@encoder-as/core";
+import {Deserializer} from "@serial-as/core";
 import { u128 } from "as-bignum";
 import * as base64 from "as-base64";
 
-export class JSONDecoder extends Decoder<string>{
+export class JSONDeserializer extends Deserializer<string>{
 
   public offset:u32 = 0
   public first:bool = true
@@ -220,7 +220,7 @@ export class JSONDecoder extends Decoder<string>{
     // {object}
     this.first = true
     let object:C = instantiate<C>()
-    object.decode<string>(this)
+    object.decode(this)
     return object
   }
 

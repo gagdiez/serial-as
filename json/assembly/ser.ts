@@ -1,8 +1,8 @@
-import {Encoder} from "@encoder-as/core"
+import {Serializer} from "@serial-as/core"
 import { u128 } from "as-bignum";
 import * as base64 from "as-base64";
 
-export class JSONEncoder extends Encoder<string>{
+export class JSONSerializer extends Serializer<string>{
 
   public starting_object:bool = true
   public inner_encode:string[] = []
@@ -97,15 +97,10 @@ export class JSONEncoder extends Encoder<string>{
   }
 
   // Object --
-  encode_object<C>(value:C): void{
+  encode_object<C extends object>(value:C): void{
     this.starting_object = true
-    if (!isNullable<C>()){
-      // @ts-ignore
-      value.encode<string>(this);
-    } else if (value != null) { 
-      // @ts-ignore
-      value.encode<string>(this);
-    }
+    value.encode(this);
+  
   }
 
   encode_u8(value:u8): void{ this.inner_encode.push(value.toString()) }

@@ -1,17 +1,10 @@
 {
-  "name": "tests",
+  "name": "@serial-as/tests",
   "version": "0.0.0",
   "description": "Serialization for Assemblyscript",
   "main": "dist/index.js",
   "types": "assembly/index.ts",
   "author": "Guillermo Gallardo and Willem Wyndham",
   "license": "MIT",
-  "private": true,
-  "dependencies": {
-    "@encoder-as/borsh": "0.0.0",
-    "@encoder-as/json": "0.0.0"
-  },
-  "scripts": {
-    "test": "asp"
-  }
+  "private": true
 }

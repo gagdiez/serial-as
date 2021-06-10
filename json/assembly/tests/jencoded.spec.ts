@@ -1,22 +1,32 @@
 import { u128 } from "as-bignum";
 import * as base64 from "as-base64";
-import {JSONEncoder, JSONDecoder} from '@encoder-as/json'
-
-import { Numbers, aString, MapSet, aBoolean, Arrays, ArrayViews, Nullables, MixtureOne, MixtureTwo, Nested, Extends, MapNullValues, BigObj } from '..';
+import {JSON} from '@serial-as/json'
+import {
+  Numbers,
+  aString,
+  MapSet,
+  aBoolean,
+  Arrays,
+  ArrayViews,
+  Nullables,
+  MixtureOne,
+  MixtureTwo,
+  Nested,
+  Extends,
+  MapNullValues,
+  BigObj,
+} from "@serial-as/tests";
 
 function check_encode<T>(object:T, expected:string):void{
   // Checks that encoding an object returns the expected encoding
-  const encoder:JSONEncoder = new JSONEncoder()
-  encoder.encode(object);
-  let res:string = encoder.get_encoded_object();
+  let res:string = JSON.encode(object);
 
   expect(res).toBe(expected)
 }
 
 function check_decode<T>(encoded:string, original:T):void{
   // Checks that an encoding returns the expected object
-  const decoder:JSONDecoder = new JSONDecoder(encoded)
-  let deco:T =  decoder.decode<T>();
+  let deco:T = JSON.decode<T>(encoded);
   expect(deco).toStrictEqual(original)
 }
 
@@ -51,7 +61,7 @@ function check_single_number<T extends number>(N:T):void{
   check_decode<T>(expected, N)
 }
 
-describe("JSONEncoder Serializing Types", () => {
+describe("JSONSerializer Serializing Types", () => {
   it("should encode/decode numbers", () => {
     check_single_number<u8>(100)
     check_single_number<u16>(101)
@@ -129,7 +139,7 @@ describe("JSONEncoder Serializing Types", () => {
 
 })
 
-describe("JSONEncoder Serializing Objects", () => {
+describe("JSONSerializer Serializing Objects", () => {
   it("should encode/decode numbers", () => {
     const nums:Numbers = new Numbers()
     const expected:string = '{"u8":1,"u16":2,"u32":3,"u64":"4","u128":"5","i8":-1,"i16":-2,"i32":-3,"i64":"-4","f32":6.0,"f64":7.1}'
@@ -225,7 +235,7 @@ describe("JSONEncoder Serializing Objects", () => {
     check_decode<MixtureTwo>(encoded_spaces, mix)
   });
 
-  it("should encode/decode nested JSONEncoder", () => {
+  it("should encode/decode nested JSONSerializer", () => {
     const nested:Nested = new Nested();
     initMixtureTwo(nested.f);
 
@@ -235,7 +245,7 @@ describe("JSONEncoder Serializing Objects", () => {
     check_decode<Nested>(expected, nested)
   });
 
-  it("should encode/decode JSONEncoder with inheritence", () => {
+  it("should encode/decode JSONSerializer with inheritence", () => {
     const ext:Extends = new Extends();
     initMixtureTwo(ext);
 

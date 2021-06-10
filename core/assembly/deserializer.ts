@@ -7,7 +7,7 @@ function isNull<T>(t: T): bool {
   return false;
 }
 @global
-export abstract class Decoder<I> {
+export abstract class Deserializer<I> {
 
   constructor(protected encoded_object:I){}
 

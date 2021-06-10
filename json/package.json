@@ -1,15 +1,18 @@
 {
-  "name": "@encoder-as/json",
+  "name": "@serial-as/json",
   "version": "0.0.0",
   "description": "JSON Serializer for Assemblyscript",
   "main": "index.js",
   "types": "assembly/index.ts",
-  "repository": "https://github.com/gagdiez/encoder-as",
+  "repository": "https://github.com/gagdiez/serial-as",
   "author": "Guillermo Gallardo and Willem Wyndham",
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "@encoder-as/core": "0.0.0",
+    "@serial-as/core": "0.0.0",
     "as-base64": "^0.2.0"
+  },
+  "devDependencies": {
+    "@serial-as/tests": "0.0.0"
   }
 }

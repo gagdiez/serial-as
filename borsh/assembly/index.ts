@@ -1,12 +1,16 @@
-import {BorshEncoder} from './encoder'
-import {BorshDecoder} from './decoder'
-import {Serializer} from '@encoder-as/core';
-export {BorshEncoder, BorshDecoder};
-export * from "./buffer";
+import {BorshSerializer} from './serializer'
+import {BorshDeserializer} from './deserializer'
 
-export class BorshSerializer extends Serializer<ArrayBuffer, BorshEncoder, BorshDecoder> {
-  private static singleton: BorshSerializer = new BorshSerializer();
+export class Borsh{
+  
+  static encode<O>(object:O): ArrayBuffer {
+    let encoder:BorshSerializer = new BorshSerializer();
+    encoder.encode(object)
+    return encoder.get_encoded_object();
+  }
 
-  static decoder(t: ArrayBuffer): BorshDecoder { return BorshSerializer.singleton.decoder(t); }
-  static encoder(): BorshEncoder { return BorshSerializer.singleton.encoder(); }
+  static decode<O>(t: ArrayBuffer): O {
+    const decoder:BorshDeserializer = new BorshDeserializer(t)
+    return decoder.decode<O>()
+  }
 }

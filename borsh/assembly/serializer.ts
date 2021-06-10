@@ -1,8 +1,8 @@
-import { Encoder, isNumber } from "@encoder-as/core";
+import { Serializer, isNumber } from "@serial-as/core";
 import { EncodeBuffer } from "./buffer";
 import { u128 } from "as-bignum";
 
-export class BorshEncoder extends Encoder<ArrayBuffer> {
+export class BorshSerializer extends Serializer<ArrayBuffer> {
   public buffer: EncodeBuffer = new EncodeBuffer();
 
   get_encoded_object(): ArrayBuffer {
@@ -97,7 +97,7 @@ export class BorshEncoder extends Encoder<ArrayBuffer> {
   // Object --
   encode_object<C>(object: C): void {
     // @ts-ignore
-    object.encode<ArrayBuffer>(this);
+    object.encode(this);
   }
 
   encode_number<T extends number>(value: T): void {

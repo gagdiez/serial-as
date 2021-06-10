@@ -2,11 +2,11 @@ module.exports = {
   /**
    * A set of globs passed to the glob package that qualify typescript files for testing.
    */
-  include: ["assembly/__tests__/**/*.spec.ts"],
+  include: ["./*/assembly/tests/**/*.spec.ts"],
   /**
    * A set of globs passed to the glob package that quality files to be added to each test.
    */
-  add: ["assembly/__tests__/**/*.include.ts"],
+  add: [],
   /**
    * All the compiler flags needed for this test suite. Make sure that a binary file is output.
    */
@@ -16,8 +16,7 @@ module.exports = {
     /** A runtime must be provided here. */
     // "--runtime": ["none"], // Acceptable values are: full, half, stub (arena), and none
     "--transform": [
-      "@encoder-as/transform/src/index.ts",
-    // //  "./src/borsh.encoder.ts",
+      "@serial-as/transform/src/index.ts",
       ]
   },
   /**

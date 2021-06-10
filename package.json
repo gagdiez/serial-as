@@ -1,16 +1,18 @@
 {
-  "name": "encoder-as",
+  "name": "serial-as",
   "version": "1.0.0",
-  "description": "A generic encoder-decoder",
+  "description": "A serializer template for the assemblyscript language ",
   "main": "dist",
   "types": "dist",
-  "repository": "https://github.com/gagdiez/encoder-as",
-  "author": "Guillermo Gallardo",
+  "repository": "https://github.com/gagdiez/serial-as",
+  "author": "Guillermo Gallardo & Willem Wyndham",
   "license": "MIT",
   "private": true,
   "scripts": {
-    "test": "yarn workspace tests test",
-    "build": "yarn workspace @encoder-as/transform build"
+    "test": "asp",
+    "test:borsh": "asp -f bencode",
+    "test:json": "asp -f jencode",
+    "build": "yarn workspace @serial-as/transform build"
   },
   "peerDependencies": {
     "assemblyscript": "^0.18.31"

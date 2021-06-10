@@ -1,6 +1,7 @@
-import {BorshEncoder, BorshDecoder} from '@encoder-as/borsh'
-import { BigObj, MapSet, MixtureOne, Numbers, aString, aBoolean, Arrays, ArrayViews, Nullables, MixtureTwo, Nested, Extends, MapNullValues } from '..';
+import { Borsh } from '@serial-as/borsh'
+import { BigObj, MapSet, MixtureOne, Numbers, aString, aBoolean, Arrays, ArrayViews, Nullables, MixtureTwo, Nested, Extends, MapNullValues } from '@serial-as/tests';
 import { u128 } from 'as-bignum';
+
 
 @serializable
 export class FooBar {
@@ -45,20 +46,18 @@ function u8toArrayBuffer(arr:u8[]):ArrayBuffer{
 
 function check_encode<T>(object:T, expected:ArrayBuffer):void{
   // Checks that encoding an object returns the expected encoding
-  const encoder:BorshEncoder = new BorshEncoder()
-  encoder.encode(object)
-  let res:ArrayBuffer = encoder.get_encoded_object()
+  //const borsh:Borsh = new Borsh()
+  let res:ArrayBuffer = Borsh.encode(object)
 
   expect(res).toStrictEqual(expected)
 }
 
 function check_decode<T>(encoded:ArrayBuffer, original:T):void{
   // Checks that an encoding returns the expected object
-  const decoder:BorshDecoder = new BorshDecoder(encoded)
-  let deco:T = decoder.decode<T>()
+  //const borsh:Borsh = new Borsh()
+  let deco:T = Borsh.decode<T>(encoded)
   expect(deco).toStrictEqual(original)
 }
-
 
 function check_single_number<T = number>(N:T):void{
 
@@ -68,6 +67,7 @@ function check_single_number<T = number>(N:T):void{
   check_encode<T>(N, expected)
   check_decode<T>(expected, N)
 }
+
 
 describe("BorshEncoder Serializing Types", () => {
   it("should encode/decode single numbers", () => {
@@ -261,5 +261,4 @@ describe("Borsh serialize objects", () => {
     check_encode<BigObj>(bigObj, expected_arr)
     check_decode<BigObj>(expected_arr, bigObj)
   })
-
 });
