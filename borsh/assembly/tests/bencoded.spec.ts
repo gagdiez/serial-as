@@ -258,6 +258,16 @@ describe("Borsh serialize objects", () => {
     check_encode<MapNullValues>(map, expected)
     check_decode<MapNullValues>(expected, map)
   });
+  
+  it("should encode/decode Maps with non-null values", () => {
+    const map: MapNullValues = new MapNullValues();
+    map.inner.set(1, "h\"i")
+
+    const expected: ArrayBuffer = u8toArrayBuffer([1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 0, 0, 104, 34, 105])
+
+    check_encode<MapNullValues>(map, expected)
+    check_decode<MapNullValues>(expected, map)
+  });
 
   it("should handle big objects", () => {
     const bigObj = new BigObj();

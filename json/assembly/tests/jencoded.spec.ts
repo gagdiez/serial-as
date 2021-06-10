@@ -279,6 +279,17 @@ describe("JSONSerializer Serializing Objects", () => {
   });
 
 
+  it("should encode/decode Maps with non-null values", () => {
+    const map: MapNullValues = new MapNullValues();
+    map.inner.set(1, "h\"i")
+
+    const expected: string = '{"inner":{1:"h\\\"i"}}'
+
+    check_encode<MapNullValues>(map, expected)
+    check_decode<MapNullValues>(expected, map)
+  });
+
+
   it("should handle big objects", () => {
     const bigObj = new BigObj();
 
