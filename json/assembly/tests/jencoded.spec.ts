@@ -3,6 +3,7 @@ import * as base64 from "as-base64";
 import { JSON } from '@serial-as/json'
 import {
   Numbers,
+  init_numbers,
   aString,
   MapSet,
   aBoolean,
@@ -15,6 +16,7 @@ import {
   Extends,
   MapNullValues,
   BigObj,
+  init_arrays,
 } from "@serial-as/tests";
 
 function check_encode<T>(object: T, expected: string): void {
@@ -142,6 +144,7 @@ describe("JSONSerializer Serializing Types", () => {
 describe("JSONSerializer Serializing Objects", () => {
   it("should encode/decode numbers", () => {
     const nums: Numbers = new Numbers()
+    init_numbers(nums)
     const expected: string = '{"u8":1,"u16":2,"u32":3,"u64":"4","u128":"5","i8":-1,"i16":-2,"i32":-3,"i64":"-4","f32":6.0,"f64":7.1}'
 
     check_encode<Numbers>(nums, expected)
@@ -166,6 +169,7 @@ describe("JSONSerializer Serializing Objects", () => {
 
   it("should encode/decode Arrays", () => {
     const arrays: Arrays = new Arrays()
+    init_arrays(arrays)
 
     const expected: string = '{"u8Arr":[1,2],"u16Arr":[3,4],"u32Arr":[5,6],"u64Arr":["7","8"],"u128Arr":["9","10"],"i8Arr":[-1,-2],"i16Arr":[-3,-4],"i32Arr":[-5,-6],"i64Arr":["-7","-8"],"f32Arr":[1.0,2.0],"f64Arr":[3.1,4.2],"arrI32":[0,1],"arrArr":[[]],"arrUint8":[],"arrObj":[{"s1":0,"s2":1},{"s1":2,"s2":3}]}'
     check_encode<Arrays>(arrays, expected)
@@ -203,6 +207,15 @@ describe("JSONSerializer Serializing Objects", () => {
   it("should encode nullable", () => {
     const nullables: Nullables = new Nullables()
     const expected: string = '{"u32Arr_null":null,"arr_null":null,"u64_arr":null,"map_null":null,"set_null":null,"obj_null":null}'
+
+    check_encode<Nullables>(nullables, expected)
+    check_decode<Nullables>(expected, nullables)
+  });
+
+  it("should encode defined nullable", () => {
+    let nullables: Nullables = new Nullables()
+    nullables.u32Arr_null = [1]
+    const expected: string = '{"u32Arr_null":[1],"arr_null":null,"u64_arr":null,"map_null":null,"set_null":null,"obj_null":null}'
 
     check_encode<Nullables>(nullables, expected)
     check_decode<Nullables>(expected, nullables)

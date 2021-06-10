@@ -1,5 +1,5 @@
 import { Borsh } from '@serial-as/borsh'
-import { BigObj, MapSet, MixtureOne, Numbers, aString, aBoolean, Arrays, ArrayViews, Nullables, MixtureTwo, Nested, Extends, MapNullValues } from '@serial-as/tests';
+import { BigObj, MapSet, MixtureOne, Numbers, aString, aBoolean, Arrays, ArrayViews, Nullables, MixtureTwo, Nested, Extends, MapNullValues, init_numbers, init_arrays } from '@serial-as/tests';
 import { u128 } from 'as-bignum';
 
 
@@ -115,6 +115,7 @@ describe("BorshEncoder Serializing Types", () => {
 describe("Borsh serialize objects", () => {
   it("should encode/decode numbers", () => {
     const nums: Numbers = new Numbers()
+    init_numbers(nums)
     const expected: ArrayBuffer = u8toArrayBuffer([1, 2, 0, 3, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 254, 255, 253, 255, 255, 255, 252, 255, 255, 255, 255, 255, 255, 255, 0, 0, 192, 64, 102, 102, 102, 102, 102, 102, 28, 64])
 
     check_encode<Numbers>(nums, expected)
@@ -139,6 +140,7 @@ describe("Borsh serialize objects", () => {
 
   it("should encode Arrays", () => {
     const arrays: Arrays = new Arrays()
+    init_arrays(arrays)
     const expected: ArrayBuffer = u8toArrayBuffer([2, 0, 0, 0, 1, 2, 2, 0, 0, 0, 3, 0, 4, 0, 2, 0, 0, 0, 5, 0, 0, 0, 6, 0, 0, 0, 2, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 255, 254, 2, 0, 0, 0, 253, 255, 252, 255, 2, 0, 0, 0, 251, 255, 255, 255, 250, 255, 255, 255, 2, 0, 0, 0, 249, 255, 255, 255, 255, 255, 255, 255, 248, 255, 255, 255, 255, 255, 255, 255, 2, 0, 0, 0, 0, 0, 128, 63, 0, 0, 0, 64, 2, 0, 0, 0, 205, 204, 204, 204, 204, 204, 8, 64, 205, 204, 204, 204, 204, 204, 16, 64, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0])
 
     check_encode<Arrays>(arrays, expected)
@@ -176,9 +178,18 @@ describe("Borsh serialize objects", () => {
     check_decode<MapSet>(expected, map_set)
   });
 
-  it("should encode nullable", () => {
+  it("should encode/decode nullable", () => {
     const nullables: Nullables = new Nullables()
     const expected: ArrayBuffer = u8toArrayBuffer([0, 0, 0, 0, 0, 0])
+
+    check_encode<Nullables>(nullables, expected)
+    check_decode<Nullables>(expected, nullables)
+  });
+
+  it("should encode/decode defined nullable", () => {
+    let nullables: Nullables = new Nullables()
+    nullables.u32Arr_null = [1]
+    const expected: ArrayBuffer = u8toArrayBuffer([1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0])
 
     check_encode<Nullables>(nullables, expected)
     check_decode<Nullables>(expected, nullables)

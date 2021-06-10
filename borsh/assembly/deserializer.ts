@@ -62,7 +62,7 @@ export class BorshDeserializer extends Deserializer<ArrayBuffer>{
   decode_nullable<T>(): T | null {
     let option = this.decoBuffer.consume<u8>();
     if (option) {
-      return this.decode<T>()
+      return this.decode<NonNullable<T>>()
     }
     return null;
   }

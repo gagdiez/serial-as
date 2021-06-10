@@ -153,11 +153,11 @@ export class JSONDeserializer extends Deserializer<string>{
 
   // Null --
   decode_nullable<T>(): T | null {
-    if (this.encoded_object.slice(this.offset, this.offset + 4) == "null") {
-      this.offset += 4
+    if (this.current_char() == "n") {
+      this.offset += 4  // skip null
       return null
     }
-    return this.decode<T>()
+    return this.decode<NonNullable<T>>()
   }
 
   // Set --

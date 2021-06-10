@@ -13,19 +13,33 @@ import { u128 } from "as-bignum";
 
 @serializable
 export class Numbers {
-  public u8: u8 = 1;
-  public u16: u16 = 2;
-  public u32: u32 = 3;
-  public u64: u64 = 4;
-  public u128: u128 = u128.from(5);
+  public u8: u8 = 0;
+  public u16: u16 = 0;
+  public u32: u32 = 0;
+  public u64: u64 = 0;
+  public u128: u128 = u128.Zero;
 
-  public i8: i8 = -1;
-  public i16: i16 = -2;
-  public i32: i32 = -3;
-  public i64: i64 = -4;
+  public i8: i8 = 0;
+  public i16: i16 = 0;
+  public i32: i32 = 0;
+  public i64: i64 = 0;
 
-  public f32: f32 = 6.0;
-  public f64: f64 = 7.1;
+  public f32: f32 = 0;
+  public f64: f64 = 0;
+}
+
+export function init_numbers(N:Numbers):void{
+  N.u8 = 1;
+  N.u16 = 2;
+  N.u32 = 3;
+  N.u64 = 4;
+  N.u128 = u128.from(5);
+  N.i8 = -1;
+  N.i16 = -2;
+  N.i32 = -3;
+  N.i64 = -4;
+  N.f32 = 6.0;
+  N.f64 = 7.1;
 }
 
 @serializable
@@ -46,24 +60,43 @@ export class Pair {
 
 @serializable
 export class Arrays {
-  public u8Arr: u8[] = [1, 2];
-  public u16Arr: u16[] = [3, 4];
-  public u32Arr: u32[] = [5, 6];
-  public u64Arr: u64[] = [7, 8];
-  public u128Arr: u128[] = [u128.from(9), u128.from(10)];
+  public u8Arr: u8[] = [1];
+  public u16Arr: u16[] = [3];
+  public u32Arr: u32[] = [5];
+  public u64Arr: u64[] = [7];
+  public u128Arr: u128[] = [u128.from(9)];
 
-  public i8Arr: i8[] = [-1, -2];
-  public i16Arr: i16[] = [-3, -4];
-  public i32Arr: i32[] = [-5, -6];
-  public i64Arr: i64[] = [-7, -8];
+  public i8Arr: i8[] = [-1];
+  public i16Arr: i16[] = [-3];
+  public i32Arr: i32[] = [-5];
+  public i64Arr: i64[] = [-7];
 
-  public f32Arr: f32[] = [1, 2];
-  public f64Arr: f64[] = [3.1, 4.2];
+  public f32Arr: f32[] = [1];
+  public f64Arr: f64[] = [3.1];
 
-  public arrI32: Array<i32> = [0, 1];
+  public arrI32: Array<i32> = [0];
   public arrArr: Array<Array<string>> = [[]];
   public arrUint8: Array<Uint8Array> = [];
-  public arrObj: Array<Pair> = [{s1:0, s2:1}, {s1:2, s2:3}];
+  public arrObj: Array<Pair> = [{s1:0, s2:1}];
+}
+
+export function init_arrays(A:Arrays):void{
+  A.u8Arr.push(2);
+  A.u16Arr.push(4);
+  A.u32Arr.push(6);
+  A.u64Arr.push(8);
+  A.u128Arr.push(u128.from(10));
+
+  A.i8Arr.push(-2);
+  A.i16Arr.push(-4);
+  A.i32Arr.push(-6);
+  A.i64Arr.push(-8);
+
+  A.f32Arr.push(2);
+  A.f64Arr.push(4.2);
+
+  A.arrI32.push(1);
+  A.arrObj.push({s1:2, s2:3});
 }
 
 @serializable
