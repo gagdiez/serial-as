@@ -1,6 +1,6 @@
 {
   "name": "@serial-as/core",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Serialization for Assemblyscript",
   "main": "dist/index.js",
   "types": "assembly/index.ts",
@@ -9,6 +9,6 @@
   "private": false,
   "dependencies": {
     "as-bignum": "^0.2.17",
-    "@serial-as/transform": "0.0.0"
+    "@serial-as/transform": "1.0.0"
   }
 }

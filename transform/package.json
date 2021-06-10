@@ -1,6 +1,6 @@
 {
   "name": "@serial-as/transform",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Serialization for Assemblyscript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
