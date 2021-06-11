@@ -82,6 +82,18 @@ describe("JSONSerializer Serializing Types", () => {
     check_single_number<f64>(7.23)
     check_single_number<f64>(10e2)
     check_single_number<f64>(10E2)
+
+  
+    check_encode<f64>(10E2, "1000.0")
+    check_decode<f64>("10E2", 10E2)
+
+    check_encode<f64>(123456e-5, "1.23456")
+    check_decode<f64>("1.23456", 123456e-5)
+
+    check_encode<f64>(123456E-5, "1.23456")
+    check_decode<f64>("1.23456", 123456E-5)
+    
+    check_decode<f64>(" -0 ", 0.0)
     check_decode<f64>(" 7.23 ", 7.23)
   })
 
