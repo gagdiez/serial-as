@@ -101,10 +101,10 @@ export abstract class Serializer<R>{
     if (isString<V>()) { this.encode_string(value); return }
 
     // @ts-ignore
-    if (value instanceof u128) { this.encode_u128(value); return }  // -> we need to get ride of this
-
+    if (isDefined(value.encode)){ this.encode_object(value); return }
+    
     // @ts-ignore
-    if (isDefined(value.encode)) { this.encode_object(value); return }
+    if(value instanceof u128){ this.encode_u128(value); return }  // -> we need to get ride of this
 
     // @ts-ignore
     if (value instanceof ArrayBufferView) { this.encode_arraybuffer_view(value); return; }
