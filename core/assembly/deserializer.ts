@@ -41,7 +41,7 @@ export abstract class Deserializer<I> {
   // Array --
   abstract decode_array<A extends ArrayLike<any>>(): A;
   abstract decode_arraybuffer(): ArrayBuffer
-  abstract decode_arraybuffer_view<B extends ArrayBufferView>(): B
+  abstract decode_arraybuffer_view<A extends ArrayBufferView>(): A
   abstract decode_static_array<T>(): StaticArray<T>
 
   // Number --

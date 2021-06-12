@@ -174,8 +174,8 @@ export class JSONDeserializer extends Deserializer<string>{
     return this.decode_array_to_type<StaticArray<T>>()
   }
 
-  decode_arraybuffer(): ArrayBuffer {
-    ERROR("not implemented")
+  decode_arraybuffer(): ArrayBuffer{
+    return this.decode_array_to_type<ArrayBuffer>()
   }
 
   // Null --
