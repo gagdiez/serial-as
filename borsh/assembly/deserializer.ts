@@ -22,7 +22,7 @@ export class BorshDeserializer extends Deserializer<ArrayBuffer>{
 
   // String --
   decode_string(): string {
-    const encoded_string = this.decode_array_buffer();
+    const encoded_string = this.decode_arraybuffer();
     const decoded_string: string = String.UTF8.decode(encoded_string)
 
     // repr(decoded as Vec<u8>) 
@@ -45,17 +45,16 @@ export class BorshDeserializer extends Deserializer<ArrayBuffer>{
     return ret_array
   }
 
-  decode_array_buffer(): ArrayBuffer {
+  decode_arraybuffer(): ArrayBuffer {
     const length: u32 = this.decoBuffer.consume<u32>()
     return this.decoBuffer.consume_slice(length);
   }
 
-  decode_array_buffer_view<B extends ArrayBufferView>(): B {
+  decode_arraybuffer_view<B extends ArrayBufferView>(): B {
     const length: u32 = this.decoBuffer.consume<u32>();
     // @ts-ignore
     const arrBufferView = instantiate<ArrayBuffer>(length, alignof<valueof<B>>());
     return changetype<B>(arrBufferView);
-
   }
 
   // Null --

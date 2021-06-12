@@ -32,22 +32,15 @@ export abstract class Serializer<R>{
   // @ts-ignore
   abstract encode_array<A extends ArrayLike<valueof<A>>>(value: A): void;
 
-  /**
-   * Encode a typed array. Default treats it as normal array.
-   * @param value Subclass of ArrayBufferView
-   */
-  encode_arraybuffer_view<T extends ArrayBufferView>(value: T): void {
+  abstract encode_arraybuffer(value: ArrayBuffer): void
+
+  encode_arraybuffer_view(value: ArrayBufferView): void {
     // @ts-ignore
     this.encode_array(value);
   }
 
-  /**
-   * Encode a static array. Default treats it as normal array.
-   * @param value Static Array
-   */
-  encode_static_array<T>(value: StaticArray<T>): void {
-    // @ts-ignore
-    this.encode_array(value);
+  encode_static_array<T>(value: StaticArray<T>): void {  
+    this.encode_array<StaticArray<T>>(value);
   }
 
   // Number --
@@ -105,6 +98,9 @@ export abstract class Serializer<R>{
 
     // @ts-ignore
     if (isDefined(value.encode)) { this.encode_object(value); return }
+
+    // @ts-ignore
+    if (value instanceof ArrayBuffer) { this.encode_arraybuffer(value); return; }    
 
     // @ts-ignore
     if (value instanceof ArrayBufferView) { this.encode_arraybuffer_view(value); return; }

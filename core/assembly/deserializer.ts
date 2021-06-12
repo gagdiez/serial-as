@@ -1,3 +1,4 @@
+import { ArrayViews } from "@serial-as/tests";
 import { u128 } from "as-bignum";
 
 function isNull<T>(t: T): bool {
@@ -53,17 +54,16 @@ export abstract class Deserializer<I> {
   // Array --
   abstract decode_array<A extends ArrayLike<any>>(): A;
 
-  decode_array_buffer_view<B extends ArrayBufferView>(): B {
-    return changetype<B>(this.decode_array());
+  abstract decode_arraybuffer(): ArrayBuffer
+
+  decode_arraybuffer_view<B extends ArrayBufferView>(): B{
+    // @ts-ignore
+    return changetype<B>(this.decode_array(value));
   }
 
-  /**
- * Encode a static array. Default treats it as normal array.
- * @param value Static Array
- */
   decode_static_array<T>(): StaticArray<T> {
     // @ts-ignore
-    return changetype<T>(this.encode_array(value));
+    return changetype<T>(this.decode_array(value));
   }
 
   decode_number<N = number>(): N {
@@ -111,6 +111,15 @@ export abstract class Deserializer<I> {
     // @ts-ignore
     if (value instanceof u128) { return this.decode_u128(); }  // -> we need to get ride of this
 
+    // @ts-ignore
+    if (value instanceof ArrayBuffer) { return this.decode_arraybuffer(); }    
+
+
+    //if (value instanceof ArrayBufferView) { return this.decode_arraybuffer_view(); }
+
+    
+    //if (value instanceof StaticArray) { return this.decode_static_array<valueof<V>>(); }
+    
     // @ts-ignore
     if (isArrayLike<T>()) { return this.decode_array<T>(); }
 

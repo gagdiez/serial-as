@@ -195,7 +195,7 @@ describe("JSONSerializer Serializing Objects", () => {
 
     const expected: string = '{"uint8array":"AAA=","uint16array":[0,0],"uint32array":[0,0],"uint64array":["0","0"],"int8array":[0,0],"int16array":[0,0],"int32array":[0,0],"int64array":["0","0"]}'
     check_encode<ArrayViews>(arrays, expected)
-    //check_decode<ArrayViews>(expected, arrays)
+    check_decode<ArrayViews>(expected, arrays)
   });
 
   it("should encode/decode empty Sets and Maps", () => {
