@@ -38,10 +38,6 @@ export class JSONSerializer extends Serializer<string>{
 
   // Array --
   encode_array<K extends ArrayLike<any>>(value: K): void {
-    if (value instanceof Uint8Array) {
-      this.inner_encode.push(`"${base64.encode(value)}"`); return
-    }
-
     this.inner_encode.push(`[`)
 
     for (let i = 0; i < value.length; i++) {
@@ -54,11 +50,15 @@ export class JSONSerializer extends Serializer<string>{
   }
 
   encode_arraybuffer(value:ArrayBuffer): void {
-    this.encode_array<T>(value);
+    this.encode_array<Uint8Array>(Uint8Array.wrap(value))   
   }
 
   encode_arraybuffer_view<T extends ArrayBufferView>(value:T): void {
-    this.encode_array<T>(value);
+    if (value instanceof Uint8Array) {
+      this.inner_encode.push(`"${base64.encode(value)}"`)
+    }else{
+      this.encode_array<T>(value);
+    }    
   }
 
   encode_static_array<T>(value:StaticArray<T>): void {
