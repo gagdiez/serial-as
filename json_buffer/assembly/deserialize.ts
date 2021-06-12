@@ -163,6 +163,38 @@ export class JSONBuffDeserializer extends Deserializer<Uint8Array>{
     return ret
   }
 
+  decode_array_to_type<A>():A{
+    let decoded:Array<valueof<A>> = this.decode_array<Array<valueof<A>>>()
+
+    let ret:A = instantiate<A>(decoded.length)
+
+    for(let i:i32 = 0; i < decoded.length; i++){
+      ret[i] = decoded[i]
+    }
+
+    return ret
+  }
+
+  decode_arraybuffer_view<A extends ArrayBufferView>(): A {
+    let ret:A
+
+    // @ts-ignore
+    if (ret instanceof Uint8Array) {
+      let u8arr = this.decode_string();
+      return changetype<A>(base64.decode(u8arr))
+    }
+    
+    return this.decode_array_to_type<A>()
+  }
+
+  decode_static_array<T>():StaticArray<T>{
+    return this.decode_array_to_type<StaticArray<T>>()
+  }
+
+  decode_arraybuffer(): ArrayBuffer{
+    return this.decode_array_to_type<ArrayBuffer>()
+  }
+
   // Null --
   decode_nullable<T>(): T | null {
     if (this.current_char() == "n".charCodeAt(0)) {
