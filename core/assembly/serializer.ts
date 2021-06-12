@@ -85,16 +85,16 @@ export abstract class Serializer<R>{
     if (isString<V>()) { this.encode_string(value); return }
 
     // @ts-ignore
-    if (value instanceof u128) { this.encode_u128(value); return }
+    if (isDefined(value.encode)){ this.encode_object(value); return }
+    
+    // @ts-ignore
+    if(value instanceof u128){ this.encode_u128(value); return }
 
     // @ts-ignore
-    if (isDefined(value.encode)) { this.encode_object(value); return }
+    if (value instanceof ArrayBuffer) { this.encode_arraybuffer<V>(value); return; }    
 
     // @ts-ignore
-    if (value instanceof ArrayBuffer) { this.encode_arraybuffer<T>(value); return; }    
-
-    // @ts-ignore
-    if (value instanceof ArrayBufferView) { this.encode_arraybuffer_view(value); return; }
+    if (value instanceof ArrayBufferView) { this.encode_arraybuffer_view<V>(value); return; }
 
     // @ts-ignore
     if (value instanceof StaticArray) { this.encode_static_array<valueof<V>>(value); return; }

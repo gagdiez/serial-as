@@ -71,7 +71,7 @@ export class JSONSerializer extends Serializer<string>{
       this.inner_encode.push("null");
     } else {
       // @ts-ignore
-      this.encode(<NonNullable<T>>t);
+      this.encode<NonNullable<T>>(<NonNullable<T>>t);
     }
   }
 

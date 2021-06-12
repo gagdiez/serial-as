@@ -36,7 +36,7 @@ export class BorshSerializer extends Serializer<ArrayBuffer> {
   }  */
     if (t != null) {
       this.buffer.store<u8>(1);
-      this.encode(<NonNullable<T>>t);
+      this.encode<NonNullable<T>>(<NonNullable<T>>t);
     } else {
       this.buffer.store<u8>(0);
     }
