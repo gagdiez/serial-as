@@ -29,26 +29,10 @@ export abstract class Serializer<R>{
   abstract encode_set<T>(value: Set<T>): void
 
   // Arraylike --
-  // @ts-ignore
-  abstract encode_array<A extends ArrayLike<valueof<A>>>(value: A): void;
-
-  /**
-   * Encode a typed array. Default treats it as normal array.
-   * @param value Subclass of ArrayBufferView
-   */
-  encode_arraybuffer_view<T extends ArrayBufferView>(value: T): void {
-    // @ts-ignore
-    this.encode_array(value);
-  }
-
-  /**
-   * Encode a static array. Default treats it as normal array.
-   * @param value Static Array
-   */
-  encode_static_array<T>(value: StaticArray<T>): void {
-    // @ts-ignore
-    this.encode_array(value);
-  }
+  abstract encode_array<T extends ArrayLike<any>>(value: T): void;
+  abstract encode_arraybuffer(value: ArrayBuffer): void
+  abstract encode_arraybuffer_view<T extends ArrayBufferView>(value: T): void
+  abstract encode_static_array<T>(value: StaticArray<T>): void
 
   // Number --
   abstract encode_u8(value: u8): void
@@ -101,13 +85,16 @@ export abstract class Serializer<R>{
     if (isString<V>()) { this.encode_string(value); return }
 
     // @ts-ignore
-    if (value instanceof u128) { this.encode_u128(value); return }  // -> we need to get ride of this
+    if (isDefined(value.encode)){ this.encode_object(value); return }
+    
+    // @ts-ignore
+    if(value instanceof u128){ this.encode_u128(value); return }
 
     // @ts-ignore
-    if (isDefined(value.encode)) { this.encode_object(value); return }
+    if (value instanceof ArrayBuffer) { this.encode_arraybuffer(value); return; }    
 
     // @ts-ignore
-    if (value instanceof ArrayBufferView) { this.encode_arraybuffer_view(value); return; }
+    if (value instanceof ArrayBufferView) { this.encode_arraybuffer_view<V>(value); return; }
 
     // @ts-ignore
     if (value instanceof StaticArray) { this.encode_static_array<valueof<V>>(value); return; }
@@ -119,11 +106,9 @@ export abstract class Serializer<R>{
     if (value instanceof Set) { this.encode_set<indexof<V>>(value); return }
 
     // @ts-ignore
-    if (value instanceof Map) { this.encode_map<indexof<V>, valueof<V>>(value); } else {
-      ERROR(`Failed to encode ${value} with type ${nameof<V>()}.
-        Perhaps you're missing an 'encode' method on your class`);
-    }
-
+    if (value instanceof Map) { this.encode_map<indexof<V>, valueof<V>>(value); return }
+    
+    ERROR(`Failed to encode ${value} with type ${nameof<V>()}.
+          Perhaps you're missing an 'encode' method on your class`);
   }
-
 }

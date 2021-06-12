@@ -26,18 +26,6 @@ export class BorshSerializer extends Serializer<ArrayBuffer> {
     this.buffer.store_bytes<ArrayBuffer>(utf8, utf8.byteLength);
   }
 
-  // Array --
-  encode_array<A extends ArrayLike<any>>(value: A): void {
-    // repr(value.len() as u32)
-    this.buffer.store<u32>(value.length);
-
-    //for el in x; repr(el as K)
-    for (let i = 0; i < value.length; i++) {
-      // @ts-ignore
-      this.encode<valueof<A>>(value[i]);
-    }
-  }
-
   // Null -- "Option"
   encode_nullable<T>(t: T): void {
     /*if x.is_some() {
@@ -48,13 +36,29 @@ export class BorshSerializer extends Serializer<ArrayBuffer> {
   }  */
     if (t != null) {
       this.buffer.store<u8>(1);
-      this.encode(<NonNullable<T>>t);
+      this.encode<NonNullable<T>>(<NonNullable<T>>t);
     } else {
       this.buffer.store<u8>(0);
     }
   }
 
-  encodeStaticArray<T extends unknown[]>(value: StaticArray<valueof<T>>): void {
+  // Array --
+  encode_array<T extends ArrayLike<any>>(value: T): void {
+    // repr(value.len() as u32)
+    this.buffer.store<u32>(value.length);
+
+    //for el in x; repr(el as K)
+    for (let i = 0; i < value.length; i++) {
+      this.encode<valueof<T>>(value[i]);
+    }
+  }
+
+  encode_arraybuffer(value: ArrayBuffer): void {
+    this.buffer.store<u32>(value.byteLength)
+    this.buffer.copy(changetype<usize>(value), value.byteLength)
+  }
+
+  encode_static_array<T>(value: StaticArray<T>): void {
     if (isNumber<T>()) {
       this.buffer.store<u32>(value.length);
       this.buffer.store_bytes<usize>(

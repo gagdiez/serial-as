@@ -56,8 +56,8 @@ export class DecodeBuffer {
     return changetype<ArrayBuffer>(this.start).slice(off, off + length)
   }
 
-  consume_copy(src: usize, length: u32): void {
-    memory.copy(this.start + this.offset, src, length);
+  consume_copy(dst: usize, length: u32): void {
+    memory.copy(dst, this.start + this.offset, length);
     this.offset += length;
   }
 }

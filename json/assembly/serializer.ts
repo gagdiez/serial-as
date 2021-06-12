@@ -53,9 +53,17 @@ export class JSONSerializer extends Serializer<string>{
     this.inner_encode.push(`]`)
   }
 
-  // encode_array_buffer(value: ArrayBuffer): void {
+  encode_arraybuffer(value:ArrayBuffer): void {
+    this.encode_array<T>(value);
+  }
 
-  // }
+  encode_arraybuffer_view<T extends ArrayBufferView>(value:T): void {
+    this.encode_array<T>(value);
+  }
+
+  encode_static_array<T>(value:StaticArray<T>): void {
+    this.encode_array<StaticArray<T>>(value);
+  }
 
   // Null --
   encode_nullable<T>(t: T): void {
@@ -63,7 +71,7 @@ export class JSONSerializer extends Serializer<string>{
       this.inner_encode.push("null");
     } else {
       // @ts-ignore
-      this.encode(<NonNullable<T>>t);
+      this.encode<NonNullable<T>>(<NonNullable<T>>t);
     }
   }
 
@@ -100,7 +108,6 @@ export class JSONSerializer extends Serializer<string>{
   encode_object<C extends object>(value: C): void {
     this.starting_object = true
     value.encode(this);
-
   }
 
   encode_u8(value: u8): void { this.inner_encode.push(value.toString()) }
