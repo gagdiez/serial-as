@@ -30,11 +30,11 @@ export abstract class Serializer<R>{
 
   // Arraylike --
   // @ts-ignore
-  abstract encode_array<A extends ArrayLike<valueof<A>>>(value: A): void;
+  abstract encode_array<T extends ArrayLike<any>>(value: T): void;
 
-  abstract encode_arraybuffer(value: ArrayBuffer): void
+  abstract encode_arraybuffer<T extends ArrayBuffer>(value: T): void
 
-  encode_arraybuffer_view(value: ArrayBufferView): void {
+  encode_arraybuffer_view<T extends ArrayBuffer>(value: T): void {
     // @ts-ignore
     this.encode_array(value);
   }
@@ -94,13 +94,13 @@ export abstract class Serializer<R>{
     if (isString<V>()) { this.encode_string(value); return }
 
     // @ts-ignore
-    if (value instanceof u128) { this.encode_u128(value); return }  // -> we need to get ride of this
+    if (value instanceof u128) { this.encode_u128(value); return }
 
     // @ts-ignore
     if (isDefined(value.encode)) { this.encode_object(value); return }
 
     // @ts-ignore
-    if (value instanceof ArrayBuffer) { this.encode_arraybuffer(value); return; }    
+    if (value instanceof ArrayBuffer) { this.encode_arraybuffer<T>(value); return; }    
 
     // @ts-ignore
     if (value instanceof ArrayBufferView) { this.encode_arraybuffer_view(value); return; }
@@ -115,11 +115,9 @@ export abstract class Serializer<R>{
     if (value instanceof Set) { this.encode_set<indexof<V>>(value); return }
 
     // @ts-ignore
-    if (value instanceof Map) { this.encode_map<indexof<V>, valueof<V>>(value); } else {
-      ERROR(`Failed to encode ${value} with type ${nameof<V>()}.
-        Perhaps you're missing an 'encode' method on your class`);
-    }
-
+    if (value instanceof Map) { this.encode_map<indexof<V>, valueof<V>>(value); return }
+    
+    ERROR(`Failed to encode ${value} with type ${nameof<V>()}.
+          Perhaps you're missing an 'encode' method on your class`);
   }
-
 }

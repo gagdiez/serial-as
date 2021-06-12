@@ -43,22 +43,22 @@ export class BorshSerializer extends Serializer<ArrayBuffer> {
   }
 
   // Array --
-  encode_array<A extends ArrayLike<any>>(value: A): void {
+  encode_array<T extends ArrayLike<any>>(value: T): void {
     // repr(value.len() as u32)
     this.buffer.store<u32>(value.length);
 
     //for el in x; repr(el as K)
     for (let i = 0; i < value.length; i++) {
-      this.encode<valueof<A>>(value[i]);
+      this.encode<valueof<T>>(value[i]);
     }
   }
 
-  encode_arraybuffer(value: ArrayBuffer): void {
+  encode_arraybuffer<T extends ArrayBuffer>(value: T): void {
     this.buffer.store<u32>(value.byteLength)
     this.buffer.copy(changetype<usize>(value), value.byteLength)
   }
 
-  encode_static_array<T extends unknown[]>(value: StaticArray<valueof<T>>): void {
+  encode_static_array<T>(value: StaticArray<T>): void {
     if (isNumber<T>()) {
       this.buffer.store<u32>(value.length);
       this.buffer.store_bytes<usize>(
