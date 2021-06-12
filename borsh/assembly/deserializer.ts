@@ -50,8 +50,12 @@ export class BorshDeserializer extends Deserializer<ArrayBuffer>{
     return this.decoBuffer.consume_slice(length);
   }
 
-  decode_arraybuffer_view<B extends ArrayBufferView>(): B {
-    return this.decode_array<B>();
+  decode_arraybuffer_view<A extends ArrayBufferView>(): A {
+    return this.decode_array<A>();
+  }
+
+  decode_static_array<T>(): StaticArray<T> {
+    return this.decode_array<StaticArray<T>>();
   }
 
   // Null --

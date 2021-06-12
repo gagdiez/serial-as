@@ -38,6 +38,12 @@ export abstract class Deserializer<I> {
   // Set --
   abstract decode_set<T>(): Set<T>
 
+  // Array --
+  abstract decode_array<A extends ArrayLike<any>>(): A;
+  abstract decode_arraybuffer(): ArrayBuffer
+  abstract decode_arraybuffer_view<B extends ArrayBufferView>(): B
+  abstract decode_static_array<T>(): StaticArray<T>
+
   // Number --
   abstract decode_u8(): u8
   abstract decode_i8(): i8
@@ -50,21 +56,6 @@ export abstract class Deserializer<I> {
   abstract decode_u128(): u128
   abstract decode_f32(): f32
   abstract decode_f64(): f64
-
-  // Array --
-  abstract decode_array<A extends ArrayLike<any>>(): A;
-
-  abstract decode_arraybuffer(): ArrayBuffer
-
-  decode_arraybuffer_view<B extends ArrayBufferView>(): B{
-    // @ts-ignore
-    return this.decode_array<B>();
-  }
-
-  decode_static_array<T>(): StaticArray<T> {
-    // @ts-ignore
-    return changetype<T>(this.decode_array(value));
-  }
 
   decode_number<N = number>(): N {
     let test: N
@@ -114,11 +105,11 @@ export abstract class Deserializer<I> {
     // @ts-ignore
     if (value instanceof ArrayBuffer) { return this.decode_arraybuffer(); }    
 
-
+    // @ts-ignore
     if (value instanceof ArrayBufferView) { return this.decode_arraybuffer_view<T>(); }
 
-    
-    //if (value instanceof StaticArray) { return this.decode_static_array<valueof<V>>(); }
+    // @ts-ignore
+    if (value instanceof StaticArray) { return this.decode_static_array<valueof<T>>(); }
     
     // @ts-ignore
     if (isArrayLike<T>()) { return this.decode_array<T>(); }

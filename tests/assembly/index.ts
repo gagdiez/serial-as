@@ -76,8 +76,9 @@ export class Arrays {
 
   public arrI32: Array<i32> = [0];
   public arrArr: Array<Array<string>> = [[]];
-  //public arrUint8: Array<Uint8Array> = [];
+  public arrUint8: Array<Uint8Array> = [];
   public arrObj: Array<Pair> = [{s1:0, s2:1}];
+  public statI32: StaticArray<i32> = [0];
 }
 
 export function init_arrays(A:Arrays):void{

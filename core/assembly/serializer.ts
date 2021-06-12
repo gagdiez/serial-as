@@ -29,19 +29,10 @@ export abstract class Serializer<R>{
   abstract encode_set<T>(value: Set<T>): void
 
   // Arraylike --
-  // @ts-ignore
   abstract encode_array<T extends ArrayLike<any>>(value: T): void;
-
   abstract encode_arraybuffer<T extends ArrayBuffer>(value: T): void
-
-  encode_arraybuffer_view<T extends ArrayBuffer>(value: T): void {
-    // @ts-ignore
-    this.encode_array(value);
-  }
-
-  encode_static_array<T>(value: StaticArray<T>): void {  
-    this.encode_array<StaticArray<T>>(value);
-  }
+  abstract encode_arraybuffer_view<T extends ArrayBufferView>(value: T): void
+  abstract encode_static_array<T>(value: StaticArray<T>): void
 
   // Number --
   abstract encode_u8(value: u8): void

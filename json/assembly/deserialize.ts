@@ -122,11 +122,6 @@ export class JSONDeserializer extends Deserializer<string>{
   decode_array<A extends ArrayLike<any>>(): A {
     //[v1,v2,...,v4] or "uint8_encoded_as64"
     let ret: A
-    // @ts-ignore
-    if (ret instanceof Uint8Array) {
-      let u8arr = this.decode_string();
-      return changetype<A>(base64.decode(u8arr))
-    }
 
     this.offset += 1 // skip [
     this.skip_spaces()
@@ -149,6 +144,38 @@ export class JSONDeserializer extends Deserializer<string>{
     this.offset += 1  // skip: ]
 
     return ret
+  }
+
+  decode_array_to_type<A>():A{
+    let decoded:Array<valueof<A>> = this.decode_array<Array<valueof<A>>>()
+
+    let ret:A = instantiate<A>(decoded.length)
+
+    for(let i:i32 = 0; i < decoded.length; i++){
+      ret[i] = decoded[i]
+    }
+
+    return ret
+  }
+
+  decode_arraybuffer_view<A extends ArrayBufferView>(): A {
+    let ret:A
+
+    // @ts-ignore
+    if (ret instanceof Uint8Array) {
+      let u8arr = this.decode_string();
+      return changetype<A>(base64.decode(u8arr))
+    }
+    
+    return this.decode_array_to_type<A>()
+  }
+
+  decode_static_array<T>():StaticArray<T>{
+    return this.decode_array_to_type<StaticArray<T>>()
+  }
+
+  decode_arraybuffer(): ArrayBuffer {
+    ERROR("not implemented")
   }
 
   // Null --
