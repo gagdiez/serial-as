@@ -109,7 +109,7 @@ export abstract class Deserializer<I> {
     let value: T
 
     // @ts-ignore
-    if (value instanceof u128) { return this.decode_u128(); }  // -> we need to get ride of this
+    if(value instanceof u128 && !isDefined(value.decode)){ return this.decode_u128(); }  // -> we need to get ride of this
 
     // @ts-ignore
     if (isArrayLike<T>()) { return this.decode_array<T>(); }
