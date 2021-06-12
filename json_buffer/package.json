@@ -1,0 +1,18 @@
+{
+  "name": "@serial-as/json_buffer",
+  "version": "1.0.0",
+  "description": "JSON Serializer for Assemblyscript",
+  "main": "index.js",
+  "types": "assembly/index.ts",
+  "repository": "https://github.com/gagdiez/serial-as",
+  "author": "Guillermo Gallardo and Willem Wyndham",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "@serial-as/core": "1.0.0",
+    "as-base64": "^0.2.0"
+  },
+  "devDependencies": {
+    "@serial-as/tests": "1.0.0"
+  }
+}
