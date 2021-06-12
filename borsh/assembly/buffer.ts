@@ -1,6 +1,6 @@
 export class EncodeBuffer {
   public offset: u32 = 0;
-  public buffer_size: u32 = 2;
+  public buffer_size: u32 = 0;
   public start: usize = heap.alloc(this.buffer_size);
 
   resize_if_necessary(needed_space: u32): void {
@@ -16,24 +16,15 @@ export class EncodeBuffer {
     this.offset += sizeof<T>()
   }
 
-  copy(src: usize, nBytes: u32): void {
-    this.resize_if_necessary(nBytes)
-    memory.copy(this.start + this.offset, src, nBytes)
-    this.offset += nBytes
-  }
-
   get_used_buffer(): ArrayBuffer {
     return changetype<ArrayBuffer>(this.start).slice(0, this.offset)
   }
 
-  store_bytes<T>(t: T, nBytes: u32): void {
-    if (!isReference<T>() && !(t instanceof usize)) {
-      ERROR(`Type ${nameof<T>()} must be a reference type or usize`);
-    }
-    this.copy(changetype<usize>(t), nBytes);
+  store_bytes(src: usize, nBytes: u32): void {
+    this.resize_if_necessary(nBytes)
+    memory.copy(this.start + this.offset, src, nBytes)
+    this.offset += nBytes
   }
-
-
 }
 
 export class DecodeBuffer {
