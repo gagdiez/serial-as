@@ -23,7 +23,7 @@ export class BorshSerializer extends Serializer<ArrayBuffer> {
   encode_string(value: string): void {
     const utf8 = String.UTF8.encode(value);
     this.buffer.store<u32>(utf8.byteLength);
-    this.buffer.store_bytes<ArrayBuffer>(utf8, utf8.byteLength);
+    this.buffer.store_bytes(changetype<usize>(utf8), utf8.byteLength);
   }
 
   // Null -- "Option"
@@ -61,13 +61,13 @@ export class BorshSerializer extends Serializer<ArrayBuffer> {
   encode_arraybuffer_view<T extends ArrayBufferView>(value: T): void {
     //@ts-ignore
     this.buffer.store<u32>(value.byteLength / sizeof<valueof<T>>());
-    this.buffer.store_bytes<usize>(value.dataStart, value.byteLength);
+    this.buffer.store_bytes(value.dataStart, value.byteLength);
   }
 
   encode_static_array<T>(value: StaticArray<T>): void {
     if (isNumber<T>()) {
       this.buffer.store<u32>(value.length);
-      this.buffer.store_bytes<usize>(
+      this.buffer.store_bytes(
         changetype<usize>(value),
         value.length * sizeof<T>()
       );
