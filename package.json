@@ -33,6 +33,7 @@
   "workspaces": [
     "core",
     "json",
+    "json_buffer",
     "borsh",
     "transform",
     "tests"
