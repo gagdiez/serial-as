@@ -175,7 +175,7 @@ export class JSONDeserializer extends Deserializer<string>{
   }
 
   decode_arraybuffer(): ArrayBuffer{
-    return this.decode_array_to_type<ArrayBuffer>()
+    return this.decode_array_to_type<Uint8Array>().buffer
   }
 
   // Null --

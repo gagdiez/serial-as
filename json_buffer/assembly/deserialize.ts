@@ -192,7 +192,7 @@ export class JSONBuffDeserializer extends Deserializer<Uint8Array>{
   }
 
   decode_arraybuffer(): ArrayBuffer{
-    return this.decode_array_to_type<ArrayBuffer>()
+    return this.decode_array_to_type<Uint8Array>().buffer
   }
 
   // Null --

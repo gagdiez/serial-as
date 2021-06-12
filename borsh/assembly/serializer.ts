@@ -55,7 +55,13 @@ export class BorshSerializer extends Serializer<ArrayBuffer> {
 
   encode_arraybuffer(value: ArrayBuffer): void {
     this.buffer.store<u32>(value.byteLength)
-    this.buffer.copy(changetype<usize>(value), value.byteLength)
+    this.buffer.store_bytes(changetype<usize>(value), value.byteLength)
+  }
+
+  encode_arraybuffer_view<T extends ArrayBufferView>(value: T): void {
+    //@ts-ignore
+    this.buffer.store<u32>(value.byteLength / sizeof<valueof<T>>());
+    this.buffer.store_bytes<usize>(value.dataStart, value.byteLength);
   }
 
   encode_static_array<T>(value: StaticArray<T>): void {
@@ -140,12 +146,6 @@ export class BorshSerializer extends Serializer<ArrayBuffer> {
   encode_i64(value: i64): void { }
   encode_f32(value: f32): void { }
   encode_f64(value: f64): void { }
-
-  encode_arraybuffer_view<T extends ArrayBufferView>(value: T): void {
-    //@ts-ignore
-    this.buffer.store<u32>(value.byteLength / sizeof<valueof<T>>());
-    this.buffer.store_bytes<usize>(value.dataStart, value.byteLength);
-  }
 
   // We override encode_array_like, for which we don't need these
   encode_u8array(value: Uint8Array): void { }
