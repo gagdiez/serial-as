@@ -30,7 +30,7 @@ export abstract class Serializer<R>{
 
   // Arraylike --
   abstract encode_array<T extends ArrayLike<any>>(value: T): void;
-  abstract encode_arraybuffer<T extends ArrayBuffer>(value: T): void
+  abstract encode_arraybuffer(value: ArrayBuffer): void
   abstract encode_arraybuffer_view<T extends ArrayBufferView>(value: T): void
   abstract encode_static_array<T>(value: StaticArray<T>): void
 
@@ -91,7 +91,7 @@ export abstract class Serializer<R>{
     if(value instanceof u128){ this.encode_u128(value); return }
 
     // @ts-ignore
-    if (value instanceof ArrayBuffer) { this.encode_arraybuffer<V>(value); return; }    
+    if (value instanceof ArrayBuffer) { this.encode_arraybuffer(value); return; }    
 
     // @ts-ignore
     if (value instanceof ArrayBufferView) { this.encode_arraybuffer_view<V>(value); return; }

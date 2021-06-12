@@ -53,7 +53,7 @@ export class BorshSerializer extends Serializer<ArrayBuffer> {
     }
   }
 
-  encode_arraybuffer<T extends ArrayBuffer>(value: T): void {
+  encode_arraybuffer(value: ArrayBuffer): void {
     this.buffer.store<u32>(value.byteLength)
     this.buffer.copy(changetype<usize>(value), value.byteLength)
   }

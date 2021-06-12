@@ -53,7 +53,7 @@ export class JSONSerializer extends Serializer<string>{
     this.inner_encode.push(`]`)
   }
 
-  encode_arraybuffer<T extends ArrayBuffer>(value:T): void {
+  encode_arraybuffer(value:ArrayBuffer): void {
     this.encode_array<T>(value);
   }
 
