@@ -78,7 +78,7 @@ export class Arrays {
   public arrArr: Array<Array<string>> = [[]];
   public arrUint8: Array<Uint8Array> = [];
   public arrObj: Array<Pair> = [{s1:0, s2:1}];
-  public statI32: StaticArray<i32> = [0];
+  public statI32: StaticArray<i32> = [0, 0];
   public buff: ArrayBuffer = new ArrayBuffer(2);
 }
 
@@ -99,6 +99,8 @@ export function init_arrays(A:Arrays):void{
 
   A.arrI32.push(1);
   A.arrObj.push({s1:2, s2:3});
+
+  A.statI32[1] = 1
 
   store<u8>(changetype<usize>(A.buff), 1)
 }
