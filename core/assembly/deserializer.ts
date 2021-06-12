@@ -58,7 +58,7 @@ export abstract class Deserializer<I> {
 
   decode_arraybuffer_view<B extends ArrayBufferView>(): B{
     // @ts-ignore
-    return changetype<B>(this.decode_array(value));
+    return this.decode_array<B>();
   }
 
   decode_static_array<T>(): StaticArray<T> {
@@ -115,7 +115,7 @@ export abstract class Deserializer<I> {
     if (value instanceof ArrayBuffer) { return this.decode_arraybuffer(); }    
 
 
-    //if (value instanceof ArrayBufferView) { return this.decode_arraybuffer_view(); }
+    if (value instanceof ArrayBufferView) { return this.decode_arraybuffer_view<T>(); }
 
     
     //if (value instanceof StaticArray) { return this.decode_static_array<valueof<V>>(); }

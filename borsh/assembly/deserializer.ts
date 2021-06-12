@@ -51,10 +51,7 @@ export class BorshDeserializer extends Deserializer<ArrayBuffer>{
   }
 
   decode_arraybuffer_view<B extends ArrayBufferView>(): B {
-    const length: u32 = this.decoBuffer.consume<u32>();
-    // @ts-ignore
-    const arrBufferView = instantiate<ArrayBuffer>(length, alignof<valueof<B>>());
-    return changetype<B>(arrBufferView);
+    return this.decode_array<B>();
   }
 
   // Null --
