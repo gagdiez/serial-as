@@ -60,7 +60,6 @@ function check_decode<T>(encoded: ArrayBuffer, original: T): void {
 }
 
 function check_single_number<T = number>(N: T): void {
-
   let expected: ArrayBuffer = new ArrayBuffer(sizeof<T>())
   store<T>(changetype<usize>(expected), N)
 

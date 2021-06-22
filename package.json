@@ -1,7 +1,7 @@
 {
   "name": "serial-as",
   "version": "1.0.0",
-  "description": "A serializer template for the assemblyscript language ",
+  "description": "A serializer template for the assemblyscript language",
   "main": "dist",
   "types": "dist",
   "repository": "https://github.com/gagdiez/serial-as",

@@ -1,7 +1,7 @@
 {
   "name": "@serial-as/borsh",
   "version": "1.0.0",
-  "description": "JSON Serializer for Assemblyscript",
+  "description": "Borsh Serializer for Assemblyscript",
   "main": "index.js",
   "types": "assembly/index.ts",
   "repository": "https://github.com/gagdiez/serial-as",

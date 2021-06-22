@@ -1,12 +1,5 @@
-import { ArrayViews } from "@serial-as/tests";
 import { u128 } from "as-bignum";
 
-function isNull<T>(t: T): bool {
-  if (isNullable<T>() || isReference<T>()) {
-    return changetype<usize>(t) == 0;
-  }
-  return false;
-}
 @global
 export abstract class Deserializer<I> {
 

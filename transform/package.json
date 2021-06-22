@@ -1,7 +1,7 @@
 {
   "name": "@serial-as/transform",
   "version": "1.0.0",
-  "description": "Serialization for Assemblyscript",
+  "description": "Transform to enable serialization in Assemblyscript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "author": "Guillermo Gallardo and Willem Wyndham",

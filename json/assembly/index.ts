@@ -1,6 +1,5 @@
 import { JSONSerializer } from './serializer';
 import { JSONDeserializer } from './deserialize';
-import { Serial } from '@serial-as/core';
 
 export {JSONSerializer, JSONDeserializer}
 

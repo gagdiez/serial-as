@@ -1,7 +1,7 @@
 {
   "name": "@serial-as/tests",
   "version": "1.0.0",
-  "description": "Serialization for Assemblyscript",
+  "description": "Tets for serializers in Assemblyscript",
   "main": "dist/index.js",
   "types": "assembly/index.ts",
   "author": "Guillermo Gallardo and Willem Wyndham",

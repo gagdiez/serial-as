@@ -1,9 +1,6 @@
 import { u128 } from "as-bignum";
 
-/**
- * Top level abstract Encoder class which defines default 
- * methods, `encode` and `encode_number`, which use tyu
- */
+
 @global
 export abstract class Serializer<R>{
 
@@ -91,7 +88,7 @@ export abstract class Serializer<R>{
     if(value instanceof u128){ this.encode_u128(value); return }
 
     // @ts-ignore
-    if (value instanceof ArrayBuffer) { this.encode_arraybuffer(value); return; }    
+    if (value instanceof ArrayBuffer) { this.encode_arraybuffer(value); return; }
 
     // @ts-ignore
     if (value instanceof ArrayBufferView) { this.encode_arraybuffer_view<V>(value); return; }
@@ -109,6 +106,6 @@ export abstract class Serializer<R>{
     if (value instanceof Map) { this.encode_map<indexof<V>, valueof<V>>(value); return }
     
     ERROR(`Failed to encode ${value} with type ${nameof<V>()}.
-          Perhaps you're missing an 'encode' method on your class`);
+           Perhaps you're missing an 'encode' method on your class`);
   }
 }
