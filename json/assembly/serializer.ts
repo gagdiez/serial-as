@@ -31,8 +31,8 @@ export class JSONSerializer extends Serializer<string>{
 
   // String --
   encode_string(value: string): void {
-    value = value.replace('"', '\\"')
-    value = value.replace("'", "\\'")
+    value = value.replaceAll('"', '\\"')
+    value = value.replaceAll("'", "\\'")
     this.inner_encode.push(`"${value}"`)
   }
 

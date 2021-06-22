@@ -112,8 +112,8 @@ export class JSONDeserializer extends Deserializer<string>{
     }
 
     let ret: string = this.encoded_object.slice(start, this.offset)
-    ret = ret.replace('\\"', '"')
-    ret = ret.replace("\\'", "'")
+    ret = ret.replaceAll('\\"', '"')
+    ret = ret.replaceAll("\\'", "'")
     this.offset += 1
     return ret
   }
