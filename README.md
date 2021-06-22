@@ -1,6 +1,6 @@
 # Serial-as
 
-**serial-as** simplifies creating serialized encoders/decoders for the assemblyscript language. Furthermore, it readily implements a [JSON](https://json.org), and a [Borsh](https://borsh.io) (de)serializer.
+**serial-as** simplifies creating serialized encoders/decoders for the assemblyscript language. Furthermore, it readily implements a [JSON](./json), and a [Borsh](./borsh) (de)serializer.
 
 ## Installing and Testing
 ```bash
