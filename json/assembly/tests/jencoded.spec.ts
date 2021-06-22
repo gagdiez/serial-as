@@ -113,8 +113,8 @@ describe("JSONSerializer Serializing Types", () => {
   });
 
   it("should encode/decode just strings", () => {
-    const str: string = 'h\"i';
-    const expected: string = '"h\\"i"';
+    let str: string = '"h"i"';
+    let expected: string = '"\\"h\\"i\\""';
 
     check_encode(str, expected)
     check_decode(expected, str)

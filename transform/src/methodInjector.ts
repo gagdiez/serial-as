@@ -19,11 +19,6 @@ export class MethodInjector extends BaseVisitor {
   encodeStmts: string[];
   decodeStmts: string[];
 
-/*   constructor(public encoder:string="JSON",
-              public res_type:string="string"){
-    super();
-  } */
-
   visitFieldDeclaration(node: FieldDeclaration): void {
     const name = toString(node.name);
     if (!node.type) {

@@ -1,4 +1,4 @@
-import { Deserializer } from "@serial-as/core";
+import { Deserializer, isNumber } from "@serial-as/core";
 import { u128 } from "as-bignum";
 import { DecodeBuffer } from "./buffer";
 
@@ -51,11 +51,17 @@ export class BorshDeserializer extends Deserializer<ArrayBuffer>{
   }
 
   decode_arraybuffer_view<A extends ArrayBufferView>(): A {
-    return this.decode_array<A>();
+    const length = this.decoBuffer.consume<u32>();
+    let res:A = instantiate<A>(length)
+    this.decoBuffer.consume_copy(res.dataStart, sizeof<valueof<A>>()*length)
+    return res
   }
 
   decode_static_array<T>(): StaticArray<T> {
-    return this.decode_array<StaticArray<T>>();
+    const length = this.decoBuffer.consume<u32>();
+    const res = new StaticArray<T>(length);
+    this.decoBuffer.consume_copy(changetype<usize>(res), sizeof<T>()*length);
+    return res;
   }
 
   // Null --
@@ -114,13 +120,6 @@ export class BorshDeserializer extends Deserializer<ArrayBuffer>{
     const lo = this.decoBuffer.consume<u64>();
     const hi = this.decoBuffer.consume<u64>();
     return new u128(lo, hi);
-  }
-
-  decode_typed_array<K>(): StaticArray<K> {
-    const byteLength = this.decoBuffer.consume<u32>();
-    const res = new StaticArray<K>(byteLength);
-    this.decoBuffer.consume_copy(changetype<usize>(res), byteLength);
-    return res;
   }
 
   // We override decode_number, for which we don't need these
