@@ -12,10 +12,11 @@
     "test": "asp",
     "test:borsh": "asp -f bencode",
     "test:json": "asp -f jencode",
-    "build": "yarn workspace @serial-as/transform build"
+    "build": "yarn workspace @serial-as/transform build",
+    "publish": "lerna publish"
   },
   "peerDependencies": {
-    "assemblyscript": "^0.18.31"
+    "assemblyscript": "^0.19.2"
   },
   "devDependencies": {
     "@as-pect/cli": "^6.1.1",
@@ -24,6 +25,7 @@
     "asbuild": "^0.2.0",
     "assemblyscript": "^0.19.2",
     "jest": "^25.1.0",
+    "lerna": "^4.0.0",
     "prettier": "^2.0.4",
     "rimraf": "^3.0.2",
     "ts-jest": "^25.2.1",
