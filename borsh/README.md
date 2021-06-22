@@ -7,6 +7,7 @@
 ```ts
 import { Borsh } from '@serial-as/borsh'
 
+@serializable
 class Pair{
   x: i32 = 0,
   y: i32 = 0

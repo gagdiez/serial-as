@@ -8,6 +8,7 @@
 ```ts
 import JSON from "serial-as"
 
+@serializable
 class Pair{
   x: i32 = 0,
   y: i32 = 0
