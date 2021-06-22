@@ -124,8 +124,8 @@ export class JSONBuffDeserializer extends Deserializer<Uint8Array>{
     }
 
     let ret:string = String.UTF8.decodeUnsafe(this.ptr_buffer + start, this.offset - start);
-    ret = ret.replace('\\"', '"')
-    ret = ret.replace("\\'", "'")
+    ret = ret.replaceAll('\\"', '"')
+    ret = ret.replaceAll("\\'", "'")
     this.offset += 1
     return ret
   }
