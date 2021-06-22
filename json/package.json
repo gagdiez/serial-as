@@ -4,7 +4,11 @@
   "description": "JSON Serializer for Assemblyscript",
   "main": "index.js",
   "types": "assembly/index.ts",
-  "repository": "https://github.com/gagdiez/serial-as",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/gagdiez/serial-as.git",
+    "directory": "json"
+  },
   "author": "Guillermo Gallardo and Willem Wyndham",
   "license": "MIT",
   "private": false,

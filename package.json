@@ -4,7 +4,11 @@
   "description": "A serializer template for the assemblyscript language",
   "main": "dist",
   "types": "dist",
-  "repository": "https://github.com/gagdiez/serial-as",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/gagdiez/serial-as.git",
+    "directory": ""
+  },
   "author": "Guillermo Gallardo & Willem Wyndham",
   "license": "MIT",
   "private": true,

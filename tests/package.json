@@ -6,5 +6,10 @@
   "types": "assembly/index.ts",
   "author": "Guillermo Gallardo and Willem Wyndham",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/gagdiez/serial-as.git",
+    "directory": "test"
+  },
   "private": true
 }

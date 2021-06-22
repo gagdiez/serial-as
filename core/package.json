@@ -6,7 +6,11 @@
   "types": "assembly/index.ts",
   "author": "Guillermo Gallardo and Willem Wyndham",
   "license": "MIT",
-  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/gagdiez/serial-as.git",
+    "directory": "core"
+  },
   "dependencies": {
     "as-bignum": "^0.2.17",
     "@serial-as/transform": "1.0.0"
