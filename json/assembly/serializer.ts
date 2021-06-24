@@ -2,6 +2,11 @@ import { Serializer } from "@serial-as/core"
 import { u128 } from "as-bignum";
 import * as base64 from "as-base64";
 
+function isNull<T>(t: T): boolean {
+  if (!isNullable<T>()) return false;
+  return changetype<usize>(t) == 0;
+}
+
 export class JSONSerializer extends Serializer<string>{
 
   public starting_object: bool = true
@@ -67,7 +72,7 @@ export class JSONSerializer extends Serializer<string>{
 
   // Null --
   encode_nullable<T>(t: T): void {
-    if (t == null) {
+    if (isNull(t)) {
       this.inner_encode.push("null");
     } else {
       // @ts-ignore

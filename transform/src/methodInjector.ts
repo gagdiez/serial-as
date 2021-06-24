@@ -1,5 +1,5 @@
-import { TypeNode, ClassDeclaration, FieldDeclaration, MethodDeclaration } from "visitor-as/as";
-import { SimpleParser, BaseVisitor, registerDecorator } from "visitor-as";
+import { TypeNode, ClassDeclaration, FieldDeclaration, NodeKind, DeclarationStatement } from "visitor-as/as";
+import { SimpleParser, BaseVisitor } from "visitor-as";
 import { toString, isMethodNamed, getName } from 'visitor-as/dist/utils';
 
 
@@ -13,9 +13,11 @@ function getTypeName(type: TypeNode): string {
 }
 
 
+function isField(node: DeclarationStatement): boolean {
+  return node.kind == NodeKind.FIELDDECLARATION;
+}
 
 export class MethodInjector extends BaseVisitor {
-  currentClass?: ClassDeclaration;
   encodeStmts: string[];
   decodeStmts: string[];
 
@@ -27,43 +29,41 @@ export class MethodInjector extends BaseVisitor {
     
     const _type = getTypeName(node.type);
     
-    this.encodeStmts.push(`
-      encoder.encode_field<${_type}>("${name}", this.${name})
-    `);
-    this.decodeStmts.push(`
-      this.${name} = decoder.decode_field<${_type}>("${name}")
-    `);
+    this.encodeStmts.push(`encoder.encode_field<${_type}>("${name}", this.${name})`);
+    this.decodeStmts.push(`this.${name} = decoder.decode_field<${_type}>("${name}")`);
   }
 
   visitClassDeclaration(node: ClassDeclaration): void {
-    if (!node.members || node.members.some(isMethodNamed("encode"))) {
+    const fields = node.members.filter(isField);
+
+    if (!fields) {
       return;
     }
-    
-    this.currentClass = node;
-    const class_name:string = getName(node)
 
     this.encodeStmts = [];
     this.decodeStmts = [];
-    this.visit(node.members);
+    super.visit(fields);
 
     const encodeMethod = `
     encode<__T>(encoder: __T): void {
-      ${node.extendsType != null? "super.encode<__T>(encoder);" : ""}
+      ${node.extendsType != null ? "super.encode<__T>(encoder);" : ""}
       ${this.encodeStmts.join(";\n\t")};
     }
     `
     const decodeMethod = `
     decode<__T>(decoder: __T): void {
-      ${node.extendsType != null? "super.decode(decoder);" : ""}
+      ${node.extendsType != null ? "super.decode(decoder);" : ""}
       ${this.decodeStmts.join(";\n\t")};
     }
     `
-    const encodeMember = SimpleParser.parseClassMember(encodeMethod, node);
-    node.members.push(encodeMember);
-    
-    const decodeMember = SimpleParser.parseClassMember(decodeMethod, node);
-    node.members.push(decodeMember);
+    if (!node.members.some(isMethodNamed("encode"))) { 
+      const encodeMember = SimpleParser.parseClassMember(encodeMethod, node);
+      node.members.push(encodeMember);
+    }
+    if (!node.members.some(isMethodNamed("decode"))) { 
+      const decodeMember = SimpleParser.parseClassMember(decodeMethod, node);
+      node.members.push(decodeMember);
+    }
   }
 
   static visit(node: ClassDeclaration): void {
