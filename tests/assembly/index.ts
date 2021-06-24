@@ -190,3 +190,13 @@ export class BigObj {
     }
   }
 }
+@serializable
+export class HasConstructorArgs {
+  constructor(private U32: u32, private str: string){}
+
+  get string(): string {
+    return this.str;
+  }
+
+  get u32(): u32 { return this.U32; }
+}

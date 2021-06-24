@@ -17,6 +17,7 @@ import {
   MapNullValues,
   BigObj,
   init_arrays,
+  HasConstructorArgs,
 } from "@serial-as/tests";
 
 
@@ -312,5 +313,18 @@ describe("JSONSerializer Serializing Objects", () => {
 
     check_encode<BigObj>(bigObj, expected)
     check_decode<BigObj>(expected, bigObj)
-  })
+  });
+
+  it("should handle objects with constructors", () => {
+    const num: u32 = 42;
+    const str = "hello world";
+    const obj = new HasConstructorArgs(num, str);
+  
+    // computed using rust
+    let expected: string = `{"U32":${num},"str":"${str}"}`;
+  
+    check_encode<HasConstructorArgs>(obj, expected);
+    check_decode<HasConstructorArgs>(expected, obj);
+  
+  });
 });

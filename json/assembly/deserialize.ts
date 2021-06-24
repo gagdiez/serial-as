@@ -1,4 +1,4 @@
-import { Deserializer } from "@serial-as/core";
+import { Deserializer, allocObj } from "@serial-as/core";
 import { u128 } from "as-bignum";
 import * as base64 from "as-base64";
 
@@ -246,7 +246,7 @@ export class JSONDeserializer extends Deserializer<string>{
   decode_object<C extends object>(): C {
     // {object}
     this.first = true
-    let object: C = instantiate<C>()
+    let object: C = allocObj<C>()
     object.decode(this)
     return object
   }
@@ -263,8 +263,8 @@ export class JSONDeserializer extends Deserializer<string>{
   }
 
   decode_long<T extends number>(): T {
-    let number: string = this.decode<string>()
-    return <T>(parseInt(number))
+    let num: string = this.decode<string>()
+    return <T>(isSigned<T>() ? I64.parseInt(num) : U64.parseInt(num));
   }
 
   decode_u128(): u128 {
