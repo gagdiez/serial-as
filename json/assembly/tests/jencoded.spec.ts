@@ -1,6 +1,7 @@
 import { u128 } from "as-bignum";
 import * as base64 from "as-base64";
-import { JSON } from '@serial-as/json'
+import { JSON } from '..';
+
 import {
   Numbers,
   init_numbers,

@@ -1,0 +1,240 @@
+import { JSONSerializer, JSONDeserializer } from "../obj";
+import { u128 } from "as-bignum";
+
+function roundTrip<T>(t:T): void { 
+  const encoded = JSONSerializer.encode(t);
+  const newT = (new JSONDeserializer(encoded)).decode<T>();
+  expect(newT).toStrictEqual(newT);
+
+}
+
+describe("JSONSerializer Serializing Types - Two", () => {
+  it("should encode/decode numbers", () => {
+    roundTrip<u8>(100)
+    roundTrip<u16>(101)
+    roundTrip<u32>(102)
+    roundTrip<u64>(103)
+    roundTrip<i8>(-100)
+    roundTrip<i16>(-101)
+    roundTrip<i32>(-102)
+    roundTrip<i64>(-103)
+  });
+
+  it("should encode/decode floats", () => {
+    roundTrip<f64>(7.23)
+    roundTrip<f64>(10e2)
+    roundTrip<f64>(10E2)
+
+    roundTrip<f64>(123456e-5)
+
+    roundTrip<f64>(123456E-5)
+    
+    roundTrip<f64>(0.0)
+    roundTrip<f64>(7.23)
+  });
+
+    it("should encode/decode u128", () => {
+    let N: u128 = u128.from("100")
+    roundTrip(N);
+  });
+
+  it("should encode/decode just bools", () => {
+    const nums: bool = true;
+    roundTrip(nums)
+  });
+
+  it("should encode/decode just strings", () => {
+    let str: string = '"h"i"';
+
+    roundTrip(str);
+  });
+
+  it("should encode/decode just arrays", () => {
+    const nums: bool[] = [true, false];
+
+    roundTrip(nums);
+  });
+
+  it("should encode/decode just map", () => {
+    const map: Map<i32, string> = new Map()
+    map.set(1, "hi")
+
+    roundTrip(map);
+  });
+
+
+})
+
+
+// describe("JSONSerializer Serializing Objects", () => {
+//   it("should encode/decode numbers", () => {
+//     const nums: Numbers = new Numbers()
+//     init_numbers(nums)
+//     const expected: string = '{"u8":1,"u16":2,"u32":3,"u64":"4","u128":"5","i8":-1,"i16":-2,"i32":-3,"i64":"-4","f32":6.0,"f64":7.1}'
+
+//     check_encode<Numbers>(nums, expected)
+//     check_decode<Numbers>(expected, nums)
+//   });
+
+//   it("should encode/decode strings", () => {
+//     const str: aString = { str: "h\"i" }
+//     const expected: string = '{"str":"h\\"i"}'
+
+//     check_encode<aString>(str, expected)
+//     check_decode<aString>(expected, str)
+//   });
+
+//   it("should encode/decode booleans", () => {
+//     const bool: aBoolean = new aBoolean()
+//     const expected: string = '{"bool":true}'
+
+//     check_encode<aBoolean>(bool, expected)
+//     check_decode<aBoolean>(expected, bool)
+//   });
+
+//   it("should encode/decode Arrays", () => {
+//     const arrays: Arrays = new Arrays()
+//     init_arrays(arrays)
+
+//     const expected: string = '{"u8Arr":[1,2],"u16Arr":[3,4],"u32Arr":[5,6],"u64Arr":["7","8"],"u128Arr":["9","10"],"i8Arr":[-1,-2],"i16Arr":[-3,-4],"i32Arr":[-5,-6],"i64Arr":["-7","-8"],"f32Arr":[1.0,2.0],"f64Arr":[3.1,4.2],"arrI32":[0,1],"arrArr":[[]],"arrUint8":[],"arrObj":[{"s1":0,"s2":1},{"s1":2,"s2":3}],"statI32":[0,1],"buff":[1,0]}'
+//     check_encode<Arrays>(arrays, expected)
+//     check_decode<Arrays>(expected, arrays)
+//   });
+
+//   it("should encode ArrayViews", () => {
+//     const arrays: ArrayViews = new ArrayViews()
+
+//     const expected: string = '{"uint8array":"AAA=","uint16array":[0,0],"uint32array":[0,0],"uint64array":["0","0"],"int8array":[0,0],"int16array":[0,0],"int32array":[0,0],"int64array":["0","0"]}'
+//     check_encode<ArrayViews>(arrays, expected)
+//     check_decode<ArrayViews>(expected, arrays)
+//   });
+
+//   it("should encode/decode empty Sets and Maps", () => {
+//     const map_set: MapSet = new MapSet()
+//     const expected: string = '{"map":{},"set":{}}'
+
+//     check_encode<MapSet>(map_set, expected)
+//     check_decode<MapSet>(expected, map_set)
+//   });
+
+//   it("should encode/decode non-empty Sets and Maps", () => {
+//     const map_set: MapSet = new MapSet()
+//     map_set.map.set('hi', 1)
+//     map_set.set.add(256)
+//     map_set.set.add(4)
+
+//     const expected: string = '{"map":{"hi":1},"set":{256,4}}'
+
+//     check_encode<MapSet>(map_set, expected)
+//     check_decode<MapSet>(expected, map_set)
+//   });
+
+//   it("should encode nullable", () => {
+//     const nullables: Nullables = new Nullables()
+//     const expected: string = '{"u32Arr_null":null,"arr_null":null,"u64_arr":null,"map_null":null,"set_null":null,"obj_null":null}'
+
+//     check_encode<Nullables>(nullables, expected)
+//     check_decode<Nullables>(expected, nullables)
+//   });
+
+//   it("should encode defined nullable", () => {
+//     let nullables: Nullables = new Nullables()
+//     nullables.u32Arr_null = [1]
+//     const expected: string = '{"u32Arr_null":[1],"arr_null":null,"u64_arr":null,"map_null":null,"set_null":null,"obj_null":null}'
+
+//     check_encode<Nullables>(nullables, expected)
+//     check_decode<Nullables>(expected, nullables)
+//   });
+
+//   it("should encode/decode simple Mixtures", () => {
+//     const mix: MixtureOne = new MixtureOne()
+//     const expected: string = '{\"number\":2,\"str\":\"testing\",\"arr\":[0,1],\"arpa\":[{\"s1\":0,\"s2\":1},{\"s1\":2,\"s2\":3}],\"f32_zero\":0.0}'
+
+//     check_encode<MixtureOne>(mix, expected)
+//     check_decode<MixtureOne>(expected, mix)
+//   });
+
+//   it("should encode/decode complex Mixtures", () => {
+//     const mix: MixtureTwo = new MixtureTwo();
+//     initMixtureTwo(mix);
+
+//     const expected: string = '{"foo":321,"bar":123,"u64Val":"4294967297","u64_zero":"0","i64Val":"-64","flag":true,"baz":"foo","uint8array":"aGVsbG8sIHdvcmxkIQ==","arr":[["Hello"],["World"]],"u32Arr":[42,11],"i32Arr":[],"u128Val":"128","uint8arrays":["aGVsbG8sIHdvcmxkIQ==","aGVsbG8sIHdvcmxkIQ=="],"u64Arr":["10000000000","100000000000"]}'
+
+//     check_encode<MixtureTwo>(mix, expected)
+//     check_decode<MixtureTwo>(expected, mix)
+//   });
+
+//   it("should decode Mixtures with spaces", () => {
+//     const mix: MixtureTwo = new MixtureTwo();
+//     initMixtureTwo(mix);
+
+//     const encoded_spaces: string = '{ "foo": 321, "bar":123, "u64Val" : "4294967297","u64_zero":     "0","i64Val": "-64", "flag":    true , "baz":"foo","uint8array":"aGVsbG8sIHdvcmxkIQ==","arr":[["Hello"],["World"]],"u32Arr":[42,11],"i32Arr":[],"u128Val":"128","uint8arrays":["aGVsbG8sIHdvcmxkIQ==","aGVsbG8sIHdvcmxkIQ=="],"u64Arr":["10000000000","100000000000"]}'
+
+//     check_decode<MixtureTwo>(encoded_spaces, mix)
+//   });
+
+//   it("should encode/decode nested JSONSerializer", () => {
+//     const nested: Nested = new Nested();
+//     initMixtureTwo(nested.f);
+
+//     const expected: string = '{"f":{"foo":321,"bar":123,"u64Val":"4294967297","u64_zero":"0","i64Val":"-64","flag":true,"baz":"foo","uint8array":"aGVsbG8sIHdvcmxkIQ==","arr":[["Hello"],["World"]],"u32Arr":[42,11],"i32Arr":[],"u128Val":"128","uint8arrays":["aGVsbG8sIHdvcmxkIQ==","aGVsbG8sIHdvcmxkIQ=="],"u64Arr":["10000000000","100000000000"]}}'
+
+//     check_encode<Nested>(nested, expected)
+//     check_decode<Nested>(expected, nested)
+//   });
+
+//   it("should encode/decode JSONSerializer with inheritence", () => {
+//     const ext: Extends = new Extends();
+//     initMixtureTwo(ext);
+
+//     const expected: string = '{"foo":321,"bar":123,"u64Val":"4294967297","u64_zero":"0","i64Val":"-64","flag":true,"baz":"foo","uint8array":"aGVsbG8sIHdvcmxkIQ==","arr":[["Hello"],["World"]],"u32Arr":[42,11],"i32Arr":[],"u128Val":"128","uint8arrays":["aGVsbG8sIHdvcmxkIQ==","aGVsbG8sIHdvcmxkIQ=="],"u64Arr":["10000000000","100000000000"],"x":[true]}'
+
+//     check_encode<Extends>(ext, expected)
+//     check_decode<Extends>(expected, ext)
+//   });
+
+//   it("should encode/decode Maps with null values", () => {
+//     const map: MapNullValues = new MapNullValues();
+//     map.inner.set(1, null)
+
+//     const expected: string = '{"inner":{1:null}}'
+
+//     check_encode<MapNullValues>(map, expected)
+//     check_decode<MapNullValues>(expected, map)
+//   });
+
+
+//   it("should encode/decode Maps with non-null values", () => {
+//     const map: MapNullValues = new MapNullValues();
+//     map.inner.set(1, "h\"i")
+
+//     const expected: string = '{"inner":{1:"h\\\"i"}}'
+
+//     check_encode<MapNullValues>(map, expected)
+//     check_decode<MapNullValues>(expected, map)
+//   });
+
+
+//   it("should handle big objects", () => {
+//     const bigObj = new BigObj();
+
+//     // computed using rust
+//     let expected: string = '{"big_num":"340282366920938463463374607431768211455","typed_arr":"AAIEBggKDA4QEhQWGBocHiAiJCYoKiwuMDI0Njg6PD5AQkRGSEpMTlBSVFZYWlxeYGJkZmhqbG5wcnR2eHp8foCChIaIioyOkJKUlpianJ6goqSmqKqsrrCytLa4ury+wMLExsjKzM7Q0tTW2Nrc3uDi5Obo6uzu8PL09vj6/P4AAgQGCAoMDhASFBYYGhweICIkJigqLC4wMjQ2ODo8PkBCREZISkxOUFJUVlhaXF5gYmRmaGpsbnBydHZ4enx+gIKEhoiKjI6QkpSWmJqcnqCipKaoqqyusLK0tri6vL7AwsTGyMrMztDS1NbY2tze4OLk5ujq7O7w8vT2+Pr8/gACBAYICgwOEBIUFhgaHB4gIiQmKCosLjAyNDY4Ojw+QEJERkhKTE5QUlRWWFpcXmBiZGZoamxucHJ0dnh6fH6AgoSGiIqMjpCSlJaYmpyeoKKkpqiqrK6wsrS2uLq8vsDCxMbIyszO0NLU1tja3N7g4uTm6Ors7vDy9Pb4+vz+AAIEBggKDA4QEhQWGBocHiAiJCYoKiwuMDI0Njg6PD5AQkRGSEpMTlBSVFZYWlxeYGJkZmhqbG5wcnR2eHp8foCChIaIioyOkJKUlpianJ6goqSmqKqsrrCytLa4ury+wMLExsjKzM7Q0tTW2Nrc3uDi5Obo6uzu8PL09vj6/P4AAgQGCAoMDhASFBYYGhweICIkJigqLC4wMjQ2ODo8PkBCREZISkxOUFJUVlhaXF5gYmRmaGpsbnBydHZ4enx+gIKEhoiKjI6QkpSWmJqcnqCipKaoqqyusLK0tri6vL7AwsTGyMrMztDS1NbY2tze4OLk5ujq7O7w8vT2+Pr8/gACBAYICgwOEBIUFhgaHB4gIiQmKCosLjAyNDY4Ojw+QEJERkhKTE5QUlRWWFpcXmBiZGZoamxucHJ0dnh6fH6AgoSGiIqMjpCSlJaYmpyeoKKkpqiqrK6wsrS2uLq8vsDCxMbIyszO0NLU1tja3N7g4uTm6Ors7vDy9Pb4+vz+AAIEBggKDA4QEhQWGBocHiAiJCYoKiwuMDI0Njg6PD5AQkRGSEpMTlBSVFZYWlxeYGJkZmhqbG5wcnR2eHp8foCChIaIioyOkJKUlpianJ6goqSmqKqsrrCytLa4ury+wMLExsjKzM7Q0tTW2Nrc3uDi5Obo6uzu8PL09vj6/P4AAgQGCAoMDhASFBYYGhweICIkJigqLC4wMjQ2ODo8PkBCREZISkxOUFJUVlhaXF5gYmRmaGpsbnBydHZ4enx+gIKEhoiKjI6QkpSWmJqcnqCipKaoqqyusLK0tri6vL7AwsTGyMrMzg=="}'
+
+//     check_encode<BigObj>(bigObj, expected)
+//     check_decode<BigObj>(expected, bigObj)
+//   });
+
+//   it("should handle objects with constructors", () => {
+//     const num: u32 = 42;
+//     const str = "hello world";
+//     const obj = new HasConstructorArgs(num, str);
+  
+//     // computed using rust
+//     let expected: string = `{"U32":${num},"str":"${str}"}`;
+  
+//     check_encode<HasConstructorArgs>(obj, expected);
+//     check_decode<HasConstructorArgs>(expected, obj);
+  
+//   });
+// });
