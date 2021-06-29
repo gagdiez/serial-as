@@ -1,12 +1,12 @@
-import { Deserializer, allocObj } from "@serial-as/core";
+import { Deserializer, allocObj, WRAP } from "@serial-as/core";
 import { u128 } from "as-bignum";
 import * as base64 from "as-base64";
 import { JSON } from "assemblyscript-json";
 
-export class JSONDeserializer extends Deserializer<JSON.Value>{
+export class ValueDeserializer extends Deserializer<JSON.Value>{
   valStack: JSON.Value[] = [];
 
-  constructor(val: JSON.Value){
+  constructor(val: JSON.Value) {
     super(val);
     this.pushVal(val);
   }
@@ -88,8 +88,8 @@ export class JSONDeserializer extends Deserializer<JSON.Value>{
       let u8arr = this.decode_string();
       return changetype<A>(base64.decode(u8arr))
     }
-    
-    return this.decode_array_to_type<A>()
+    // @ts-ignore
+    return WRAP<A, valueof<A>>(this.decode_arraybuffer_view<Uint8Array>().buffer);
   }
 
   decode_static_array<T>():StaticArray<T>{
@@ -97,7 +97,7 @@ export class JSONDeserializer extends Deserializer<JSON.Value>{
   }
 
   decode_arraybuffer(): ArrayBuffer{
-    return this.decode_array_to_type<Uint8Array>().buffer
+    return this.decode_arraybuffer_view<Uint8Array>().buffer
   }
 
   // Null --
@@ -110,15 +110,11 @@ export class JSONDeserializer extends Deserializer<JSON.Value>{
 
   // Set --
   decode_set<T>(): Set<T> {
-    const obj = this.currentObj;
+    const arr = this.decode_array<T[]>();
     const ret_set = new Set<T>();
-    for (let i = 0; i < obj.keys.length; i++) {
-      const val = obj.get(obj.keys[i]) as JSON.Value;
-      this.pushVal(val);
-      ret_set.add(this.decode<T>());
-      this.popVal();
+    for (let i = 0; i < arr.length; i++) {
+      ret_set.add(arr[i]);
     }
-    
     return ret_set
   }
 
@@ -128,10 +124,11 @@ export class JSONDeserializer extends Deserializer<JSON.Value>{
     const ret_map = new Map<K, V>();
     for (let i = 0; i < obj.keys.length; i++) {
       const name = obj.keys[i];
+      const key = ValueDeserializer.decode<K>(name);
       const val = obj.get(name) as JSON.Value;
       this.pushVal(val);
       // @ts-ignore
-      ret_map.set(name, this.decode<V>());
+      ret_map.set(key, this.decode<V>());
       this.popVal();
     }
     
@@ -146,8 +143,8 @@ export class JSONDeserializer extends Deserializer<JSON.Value>{
   }
 
   decode_int<T extends number>(): T {
-    assert(this.currentVal.isNum, `Expected JSON.Num but found ${this.currentVal.toString()}`);
-    return <T>(<JSON.Num>this.currentVal).valueOf();
+    assert(this.currentVal.isInteger, `Expected JSON.Integer but found ${this.currentVal.toString()}`);
+    return <T>(<JSON.Integer>this.currentVal).valueOf();
   }
 
   decode_long<T extends number>(): T {
@@ -166,8 +163,8 @@ export class JSONDeserializer extends Deserializer<JSON.Value>{
   }
 
   // We override decode_number, for which we don't need these
-  decode_u8(): u8 { return this.decode_int<u8>() }
-  decode_i8(): i8 { return this.decode_int<i8>() }
+  decode_u8(): u8 {   return this.decode_int<u8>() }
+  decode_i8(): i8 {   return this.decode_int<i8>() }
   decode_u16(): u16 { return this.decode_int<u16>() }
   decode_i16(): i16 { return this.decode_int<i16>() }
   decode_u32(): u32 { return this.decode_int<u32>() }
@@ -177,8 +174,18 @@ export class JSONDeserializer extends Deserializer<JSON.Value>{
   decode_f32(): f32 { return this.decode_float<f32>() }
   decode_f64(): f64 { return this.decode_float<f64>() }
 
-  static decode<T>(s: string): T {
-    const decoder = new JSONDeserializer(JSON.parse(s));
+  static decode<T, From = string>(s: From): T {
+    let val: JSON.Value = JSON.Value.Null();
+    if (s instanceof JSON.Value) {
+      val = s;
+    } else if (isString<From>(s)) {
+      val = JSON.parse(s);
+      if (isString<T>()) { 
+        // @ts-ignore
+        return (<JSON.Str>val).valueOf();
+      }
+    }
+    const decoder = new ValueDeserializer(val);
     return decoder.decode<T>();
   }
 }

@@ -147,11 +147,13 @@ export class JSONDeserializer extends Deserializer<string>{
   }
 
   decode_array_to_type<A>():A{
+    // @ts-ignore
     let decoded:Array<valueof<A>> = this.decode_array<Array<valueof<A>>>()
 
     let ret:A = instantiate<A>(decoded.length)
 
     for(let i:i32 = 0; i < decoded.length; i++){
+      // @ts-ignore
       ret[i] = decoded[i]
     }
 

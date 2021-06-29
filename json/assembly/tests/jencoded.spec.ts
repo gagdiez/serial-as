@@ -20,6 +20,7 @@ import {
   init_arrays,
   HasConstructorArgs,
 } from "@serial-as/tests";
+import { initMixtureTwo } from "./utils";
 
 
 function check_encode<T>(object: T, expected: string): void {
@@ -35,21 +36,7 @@ function check_decode<T>(encoded: string, original: T): void {
   expect(deco).toStrictEqual(original)
 }
 
-function initMixtureTwo(f: MixtureTwo): MixtureTwo {
-  f.u32Arr = [42, 11];
-  f.foo = 321;
-  f.bar = 123;
-  f.flag = true;
-  f.baz = "foo";
-  f.uint8array = base64.decode("aGVsbG8sIHdvcmxkIQ==");
-  f.u128Val = new u128(128);
-  f.arr = [["Hello"], ["World"]];
-  f.uint8arrays = new Array<Uint8Array>(2);
-  f.uint8arrays[0] = base64.decode("aGVsbG8sIHdvcmxkIQ==");
-  f.uint8arrays[1] = base64.decode("aGVsbG8sIHdvcmxkIQ==");
-  f.u64Arr = [10000000000, 100000000000];
-  return f;
-}
+
 
 
 function check_single_number<T extends number>(N: T): void {

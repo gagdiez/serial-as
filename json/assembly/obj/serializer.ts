@@ -8,7 +8,7 @@ function isNull<T>(t: T): boolean {
   return changetype<usize>(t) == 0;
 }
 
-export class JSONSerializer extends Serializer<JSON.Value> {
+export class ValueSerializer extends Serializer<JSON.Value> {
   valueStack: JSON.Value[] = [];
   public starting_object: bool = true;
   public inner_encode: string[] = [];
@@ -46,13 +46,12 @@ export class JSONSerializer extends Serializer<JSON.Value> {
 
   // Array --
   encode_array<K extends ArrayLike<any>>(value: K): void {
-    const arr = this.peek() as JSON.Arr;
+    const arr = JSON.Value.Array();
     for (let i = 0; i < value.length; i++) {
       // @ts-ignore
       arr.push(this.encodeAndPop<valueof<K>>(value[i]));
     }
-
-    
+    this.push(arr);
   } 
 
   encode_arraybuffer(value:ArrayBuffer): void {
@@ -109,7 +108,7 @@ export class JSONSerializer extends Serializer<JSON.Value> {
   }
 
   encode_small_int<N extends number>(value: N): void { 
-    this.push(JSON.Value.Number(value));
+    this.push(JSON.Value.Integer(value));
   }
 
   encode_u8(value: u8): void { this.encode_small_int(value); }
@@ -125,7 +124,7 @@ export class JSONSerializer extends Serializer<JSON.Value> {
   encode_f64(value: f64): void { this.push(JSON.Value.Float(value)); }
 
   static encode<T>(value: T): JSON.Value {
-    const ser = new JSONSerializer();
+    const ser = new ValueSerializer();
     ser.encode(value);
     return ser.get_encoded_object();
   }
