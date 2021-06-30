@@ -30,7 +30,9 @@ export class MethodInjector extends BaseVisitor {
     const _type = getTypeName(node.type);
     
     this.encodeStmts.push(`encoder.encode_field<${_type}>("${name}", this.${name})`);
-    this.decodeStmts.push(`this.${name} = decoder.decode_field<${_type}>("${name}")`);
+    
+    let defaultValue: string = node.initializer ? `, ${toString(node.initializer)}`: "";
+    this.decodeStmts.push(`this.${name} = decoder.decode_field<${_type}>("${name}"${defaultValue})`);
   }
 
   visitClassDeclaration(node: ClassDeclaration): void {

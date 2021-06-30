@@ -1,11 +1,7 @@
-import { Serializer } from "@serial-as/core"
+import { Serializer, isNull } from "@serial-as/core"
 import { u128 } from "as-bignum";
 import * as base64 from "as-base64";
 
-function isNull<T>(t: T): boolean {
-  if (!isNullable<T>()) return false;
-  return changetype<usize>(t) == 0;
-}
 
 export class JSONSerializer extends Serializer<string>{
 
@@ -126,4 +122,10 @@ export class JSONSerializer extends Serializer<string>{
   encode_u128(value: u128): void { this.inner_encode.push(`"${value.toString()}"`) }
   encode_f32(value: f32): void { this.inner_encode.push(value.toString()) }
   encode_f64(value: f64): void { this.inner_encode.push(value.toString()) }
+
+  static encode<T>(t: T): string {
+    const s = new JSONSerializer();
+    s.encode<T>(t);
+    return s.get_encoded_object()
+  }
 }

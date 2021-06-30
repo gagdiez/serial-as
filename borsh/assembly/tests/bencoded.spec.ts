@@ -3,22 +3,22 @@ import { BigObj, MapSet, MixtureOne, Numbers, aString, aBoolean, Arrays, ArrayVi
 import { u128 } from 'as-bignum';
 
 
-@serializable
-export class FooBar {
-  foo: i32 = 0;
-  bar: u32 = 1;
-  u64Val: u64 = 4294967297;
-  i64Val: i64 = -64;
-  flag: bool;
-  baz: string = "";
-  uint8array: Uint8Array = new Uint8Array(2);
-  arr: Array<Array<string>> = [];
-  u32Arr: u32[] = [];
-  i32Arr: i32[] = [];
-  u128Val: u128 = u128.Zero;
-  uint8arrays: Array<Uint8Array> = [];
-  u64Arr: u64[] = [];
-}
+// @serializable
+// class FooBar {
+//   foo: i32 = 0;
+//   bar: u32 = 1;
+//   u64Val: u64 = 4294967297;
+//   i64Val: i64 = -64;
+//   flag: bool;
+//   baz: string = "";
+//   uint8array: Uint8Array = new Uint8Array(2);
+//   arr: Array<Array<string>> = [];
+//   u32Arr: u32[] = [];
+//   i32Arr: i32[] = [];
+//   u128Val: u128 = u128.Zero;
+//   uint8arrays: Array<Uint8Array> = [];
+//   u64Arr: u64[] = [];
+// }
 
 function initMixtureTwo(f: MixtureTwo): void {
   f.foo = 321;

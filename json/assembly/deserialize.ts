@@ -53,7 +53,7 @@ export class JSONDeserializer extends Deserializer<string>{
     return res
   }
 
-  decode_field<T>(name: string): T {
+  _decode_field<T>(name: string, _defaultValue: T): T {
     // "name":value,
 
     this.skip_spaces()

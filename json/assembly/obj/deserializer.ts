@@ -33,9 +33,10 @@ export class ValueDeserializer extends Deserializer<JSON.Value>{
     return (<JSON.Arr>this.currentVal);
   }
 
-  decode_field<T>(name: string): T {
+  _decode_field<T>(name: string, defaultValue: T): T {
     // "name":value,
     const obj = this.currentObj;
+    if (!obj.has(name)) { return defaultValue; }
     this.pushVal(obj.get(name)!);
     const res = this.decode<T>();
     this.popVal();
@@ -124,7 +125,8 @@ export class ValueDeserializer extends Deserializer<JSON.Value>{
     const ret_map = new Map<K, V>();
     for (let i = 0; i < obj.keys.length; i++) {
       const name = obj.keys[i];
-      const key = ValueDeserializer.decode<K>(name);
+      const encodedName = isString<K>() ? `"${name}"` : name;
+      const key = ValueDeserializer.decode<K>(encodedName);
       const val = obj.get(name) as JSON.Value;
       this.pushVal(val);
       // @ts-ignore

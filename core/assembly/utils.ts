@@ -49,3 +49,19 @@ export function WRAP<TArray extends ArrayBufferView, T>(
   store<usize>(changetype<usize>(out), changetype<usize>(buffer) + <usize>byteOffset, offsetof<TArray>("dataStart"));
   return out;
 }
+
+//@ts-ignore
+@inline
+@global
+export function defaultValue<T>(): T {
+  //@ts-ignore
+  if (isInteger<T>() || isFloat<T>()) return <T>0;
+  //@ts-ignore
+  if (isString<T>()) return "";
+  return changetype<T>(0);
+}
+
+export function isNull<T>(t: T): boolean {
+  if (!isNullable<T>()) return false;
+  return changetype<usize>(t) == 0;
+}

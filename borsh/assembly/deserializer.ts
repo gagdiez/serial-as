@@ -1,4 +1,4 @@
-import { Deserializer, isNumber } from "@serial-as/core";
+import { defaultValue, Deserializer } from "@serial-as/core";
 import { u128 } from "as-bignum";
 import { DecodeBuffer } from "./buffer";
 
@@ -10,7 +10,7 @@ export class BorshDeserializer extends Deserializer<ArrayBuffer>{
     this.decoBuffer = new DecodeBuffer(encoded_object)
   }
 
-  decode_field<T>(name: string): T {
+  decode_field<T>(_name: string, _defaultValue: T = defaultValue<T>()): T {
     return this.decode<T>()
   }
 
@@ -53,6 +53,7 @@ export class BorshDeserializer extends Deserializer<ArrayBuffer>{
   decode_arraybuffer_view<A extends ArrayBufferView>(): A {
     const length = this.decoBuffer.consume<u32>();
     let res:A = instantiate<A>(length)
+    // @ts-ignore
     this.decoBuffer.consume_copy(res.dataStart, sizeof<valueof<A>>()*length)
     return res
   }
