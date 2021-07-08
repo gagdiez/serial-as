@@ -1,19 +1,19 @@
-import { defaultValue, Deserializer } from "@serial-as/core";
+import { Deserializer } from "@serial-as/core";
 import { u128 } from "as-bignum";
 import { DecodeBuffer } from "./buffer";
 
 export class BorshDeserializer extends Deserializer<ArrayBuffer>{
   private decoBuffer: DecodeBuffer;
-
+  
   constructor(encoded_object: ArrayBuffer) {
     super(encoded_object)
     this.decoBuffer = new DecodeBuffer(encoded_object)
   }
-
-  decode_field<T>(_name: string, _defaultValue: T = defaultValue<T>()): T {
+  
+  _decode_field<T>(_name: string, _defaultValue: T): T {
     return this.decode<T>()
   }
-
+  
   // Bool --
   decode_bool(): bool {
     // little endian
@@ -117,12 +117,6 @@ export class BorshDeserializer extends Deserializer<ArrayBuffer>{
     return this.decoBuffer.consume<T>()
   }
 
-  decode_u128(): u128 {
-    const lo = this.decoBuffer.consume<u64>();
-    const hi = this.decoBuffer.consume<u64>();
-    return new u128(lo, hi);
-  }
-
   // We override decode_number, for which we don't need these
   decode_u8(): u8 { return 0 }
   decode_i8(): i8 { return 0 }
@@ -134,4 +128,8 @@ export class BorshDeserializer extends Deserializer<ArrayBuffer>{
   decode_i64(): i64 { return 0 }
   decode_f32(): f32 { return 0 }
   decode_f64(): f64 { return 0 }
+
+  static decode<T>(a: ArrayBuffer): T {
+    return (new BorshDeserializer(a)).decode<T>();
+  }
 }

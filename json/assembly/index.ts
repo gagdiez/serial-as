@@ -1,27 +1,24 @@
-import { JSONSerializer } from './serializer';
-import { JSONDeserializer } from './deserialize';
-import { ValueDeserializer, ValueSerializer } from './obj'
+// import { JSONSerializer } from './serializer';
+// import { JSONDeserializer } from './deserialize';
+import { Serial } from '@serial-as/core';
+import { ValueDeserializer, ValueSerializer } from './value'
+import { JSON } from "assemblyscript-json";
 
-export {JSONSerializer, JSONDeserializer}
+// TODO figure out complier issue that prevented these exports.
+// export {JSONSerializer, JSONDeserializer}
 
-export class JSON {
 
-  static encode<O>(object: O): string {
-    let encoder: JSONSerializer = new JSONSerializer();
-    encoder.encode(object)
-    return encoder.get_encoded_object();
+  /**
+   * 
+   * @param s string or JSON.Value
+   * @returns 
+   */
+export function parse<T, From = string>(s: From): T {
+    return ValueDeserializer.decode<T, From>(s);
   }
 
-  static decode<O>(t: string): O {
-    const decoder: JSONDeserializer = new JSONDeserializer(t)
-    return decoder.decode<O>()
+export function stringify<T>(s: T): string {
+    return ValueSerializer.encode(s).stringify();
   }
 
-  static parse<T>(s: string): T {
-    return ValueDeserializer.decode<T>(s);
-  }
-
-  static stringify<T>(s: T): string {
-    return ValueSerializer.encode(s).toString();
-  }
-}
+export class JSONValueSerializer extends Serial <JSON.Value, ValueSerializer, ValueDeserializer> {}

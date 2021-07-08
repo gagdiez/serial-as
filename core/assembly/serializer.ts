@@ -40,7 +40,6 @@ export abstract class Serializer<R>{
   abstract encode_i32(value: i32): void
   abstract encode_u64(value: u64): void
   abstract encode_i64(value: i64): void
-  abstract encode_u128(value: u128): void
   abstract encode_f32(value: f32): void
   abstract encode_f64(value: f64): void
 
@@ -83,9 +82,6 @@ export abstract class Serializer<R>{
 
     // @ts-ignore
     if (isDefined(value.encode)){ this.encode_object(value); return }
-    
-    // @ts-ignore
-    if(value instanceof u128){ this.encode_u128(value); return }
 
     // @ts-ignore
     if (value instanceof ArrayBuffer) { this.encode_arraybuffer(value); return; }

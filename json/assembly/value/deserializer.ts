@@ -1,5 +1,5 @@
 import { Deserializer, allocObj, WRAP } from "@serial-as/core";
-import { u128 } from "as-bignum";
+import { u128, u128Safe } from "as-bignum";
 import * as base64 from "as-base64";
 import { JSON } from "assemblyscript-json";
 
@@ -24,12 +24,12 @@ export class ValueDeserializer extends Deserializer<JSON.Value>{
   }
 
   get currentObj(): JSON.Obj {
-    assert(this.currentVal.isObj, `Expected JSON.Obj but found ${this.currentVal.toString()}`);
+    assert(this.currentVal.isObj, `Expected JSON.Obj but found ${this.currentVal.stringify()}`);
     return <JSON.Obj> this.currentVal;
   }
 
   get currentArr(): JSON.Arr {
-    assert(this.currentVal.isArr, `Expected JSON.Arr but found ${this.currentVal.toString()}`);
+    assert(this.currentVal.isArr, `Expected JSON.Arr but found ${this.currentVal.stringify()}`);
     return (<JSON.Arr>this.currentVal);
   }
 
@@ -45,13 +45,13 @@ export class ValueDeserializer extends Deserializer<JSON.Value>{
 
   // Bool --
   decode_bool(): bool {
-    assert(this.currentVal.isBool, `Expected JSON.Bool but found ${this.currentVal.toString()}`);
+    assert(this.currentVal.isBool, `Expected JSON.Bool but found ${this.currentVal.stringify()}`);
     return (<JSON.Bool>this.currentVal).valueOf();
   }
 
   // String --
   decode_string(): string {
-    assert(this.currentVal.isString, `Expected JSON.Str but found ${this.currentVal.toString()}`);
+    assert(this.currentVal.isString, `Expected JSON.Str but found ${this.currentVal.stringify()}`);
     return (<JSON.Str>this.currentVal).valueOf();
   }
 
@@ -68,7 +68,8 @@ export class ValueDeserializer extends Deserializer<JSON.Value>{
     return ret
   }
 
-  decode_array_to_type<A>():A{
+  decode_array_to_type<A>(): A {
+    // @ts-ignore
     let decoded:Array<valueof<A>> = this.decode_array<Array<valueof<A>>>()
 
     let ret:A = instantiate<A>(decoded.length)
@@ -122,9 +123,10 @@ export class ValueDeserializer extends Deserializer<JSON.Value>{
   // Map --
   decode_map<K, V>(): Map<K, V> {
     const obj = this.currentObj;
+    const keys = obj.keys;
     const ret_map = new Map<K, V>();
-    for (let i = 0; i < obj.keys.length; i++) {
-      const name = obj.keys[i];
+    for (let i = 0; i < keys.length; i++) {
+      const name = keys[i];
       const encodedName = isString<K>() ? `"${name}"` : name;
       const key = ValueDeserializer.decode<K>(encodedName);
       const val = obj.get(name) as JSON.Value;
@@ -139,13 +141,20 @@ export class ValueDeserializer extends Deserializer<JSON.Value>{
 
   // Object --
   decode_object<C extends object>(): C {
-    let object: C = allocObj<C>();
-    object.decode(this);
+    let object: C;
+    object = allocObj<C>();
+    if (object instanceof u128 || object instanceof u128Safe) {
+      const obj = u128.from(this.decode_string());
+      object.lo = obj.lo;
+      object.hi = obj.hi;
+    } else {
+      object.decode(this);
+    }
     return object;
   }
 
   decode_int<T extends number>(): T {
-    assert(this.currentVal.isInteger, `Expected JSON.Integer but found ${this.currentVal.toString()}`);
+    assert(this.currentVal.isInteger, `Expected JSON.Integer but found ${this.currentVal.stringify()}`);
     return <T>(<JSON.Integer>this.currentVal).valueOf();
   }
 
@@ -154,13 +163,8 @@ export class ValueDeserializer extends Deserializer<JSON.Value>{
     return <T>(isSigned<T>() ? I64.parseInt(num) : U64.parseInt(num));
   }
 
-  decode_u128(): u128 {
-    let number: string = this.decode<string>()
-    return u128.from(number)
-  }
-
   decode_float<T extends number>(): T {
-    assert(this.currentVal.isFloat, `Expected JSON.Float but found ${this.currentVal.toString()}`);
+    assert(this.currentVal.isFloat, `Expected JSON.Float but found ${this.currentVal.stringify()}`);
     return <T>(<JSON.Float>this.currentVal).valueOf();
   }
 
@@ -176,17 +180,21 @@ export class ValueDeserializer extends Deserializer<JSON.Value>{
   decode_f32(): f32 { return this.decode_float<f32>() }
   decode_f64(): f64 { return this.decode_float<f64>() }
 
+  /**
+   * 
+   * @param s string or JSON.Value
+   * @returns T
+   */
   static decode<T, From = string>(s: From): T {
     let val: JSON.Value = JSON.Value.Null();
     if (s instanceof JSON.Value) {
       val = s;
-    } else if (isString<From>(s)) {
+    } else if (isString<From>()) {
       val = JSON.parse(s);
-      if (isString<T>()) { 
-        // @ts-ignore
-        return (<JSON.Str>val).valueOf();
-      }
+    } else {
+      ERROR("ValueDeserializer can only decode `string` and `JSON` Values.")
     }
+
     const decoder = new ValueDeserializer(val);
     return decoder.decode<T>();
   }

@@ -1,4 +1,4 @@
-import { ValueSerializer, ValueDeserializer } from "../obj";
+import { ValueSerializer, ValueDeserializer } from "../value";
 import { u128 } from "as-bignum";
 import {
   Numbers,
@@ -23,8 +23,25 @@ import { initMixtureTwo } from "./utils";
 function roundTrip<T>(t:T): void { 
   const encoded = ValueSerializer.encode(t);
   const newT = (new ValueDeserializer(encoded)).decode<T>();
-  expect(newT).toStrictEqual(newT);
+  expect(newT).toStrictEqual(t);
+  const str = encoded.stringify();
+  expect<T>(ValueDeserializer.decode<T>(str)).toStrictEqual(t, str);
 }
+
+function check_encode<T>(object: T, expected: string): void {
+  // Checks that encoding an object returns the expected encoding
+  let res: string = ValueSerializer.encode(object).stringify();
+
+  expect(res).toBe(expected)
+}
+
+function check_decode<T>(encoded: string, original: T): void {
+  // Checks that an encoding returns the expected object
+  let deco: T = ValueDeserializer.decode<T>(encoded) as T;
+  expect(deco).toStrictEqual(original)
+}
+
+
 
 describe("JSONSerializer Serializing Types - Two", () => {
   it("should encode/decode numbers", () => {
@@ -122,6 +139,12 @@ describe("JSONSerializer Serializing Objects", () => {
     roundTrip(map_set);
   });
 
+  it("should handle sets with different types", () => {
+    const strSet = new Set<string>();
+    strSet.add("hello");
+    roundTrip(strSet);
+  })
+
   it("should encode nullable", () => {
     const nullables: Nullables = new Nullables()
     roundTrip(nullables);
@@ -184,5 +207,15 @@ describe("JSONSerializer Serializing Objects", () => {
     const str = "hello world";
     const obj = new HasConstructorArgs(num, str);
     roundTrip(obj);
+  });
+
+  it("should handle big objects", () => {
+    const bigObj = new BigObj();
+
+    // computed using rust
+    let expected: string = '{"big_num":"340282366920938463463374607431768211455","typed_arr":"AAIEBggKDA4QEhQWGBocHiAiJCYoKiwuMDI0Njg6PD5AQkRGSEpMTlBSVFZYWlxeYGJkZmhqbG5wcnR2eHp8foCChIaIioyOkJKUlpianJ6goqSmqKqsrrCytLa4ury+wMLExsjKzM7Q0tTW2Nrc3uDi5Obo6uzu8PL09vj6/P4AAgQGCAoMDhASFBYYGhweICIkJigqLC4wMjQ2ODo8PkBCREZISkxOUFJUVlhaXF5gYmRmaGpsbnBydHZ4enx+gIKEhoiKjI6QkpSWmJqcnqCipKaoqqyusLK0tri6vL7AwsTGyMrMztDS1NbY2tze4OLk5ujq7O7w8vT2+Pr8/gACBAYICgwOEBIUFhgaHB4gIiQmKCosLjAyNDY4Ojw+QEJERkhKTE5QUlRWWFpcXmBiZGZoamxucHJ0dnh6fH6AgoSGiIqMjpCSlJaYmpyeoKKkpqiqrK6wsrS2uLq8vsDCxMbIyszO0NLU1tja3N7g4uTm6Ors7vDy9Pb4+vz+AAIEBggKDA4QEhQWGBocHiAiJCYoKiwuMDI0Njg6PD5AQkRGSEpMTlBSVFZYWlxeYGJkZmhqbG5wcnR2eHp8foCChIaIioyOkJKUlpianJ6goqSmqKqsrrCytLa4ury+wMLExsjKzM7Q0tTW2Nrc3uDi5Obo6uzu8PL09vj6/P4AAgQGCAoMDhASFBYYGhweICIkJigqLC4wMjQ2ODo8PkBCREZISkxOUFJUVlhaXF5gYmRmaGpsbnBydHZ4enx+gIKEhoiKjI6QkpSWmJqcnqCipKaoqqyusLK0tri6vL7AwsTGyMrMztDS1NbY2tze4OLk5ujq7O7w8vT2+Pr8/gACBAYICgwOEBIUFhgaHB4gIiQmKCosLjAyNDY4Ojw+QEJERkhKTE5QUlRWWFpcXmBiZGZoamxucHJ0dnh6fH6AgoSGiIqMjpCSlJaYmpyeoKKkpqiqrK6wsrS2uLq8vsDCxMbIyszO0NLU1tja3N7g4uTm6Ors7vDy9Pb4+vz+AAIEBggKDA4QEhQWGBocHiAiJCYoKiwuMDI0Njg6PD5AQkRGSEpMTlBSVFZYWlxeYGJkZmhqbG5wcnR2eHp8foCChIaIioyOkJKUlpianJ6goqSmqKqsrrCytLa4ury+wMLExsjKzM7Q0tTW2Nrc3uDi5Obo6uzu8PL09vj6/P4AAgQGCAoMDhASFBYYGhweICIkJigqLC4wMjQ2ODo8PkBCREZISkxOUFJUVlhaXF5gYmRmaGpsbnBydHZ4enx+gIKEhoiKjI6QkpSWmJqcnqCipKaoqqyusLK0tri6vL7AwsTGyMrMzg=="}'
+
+    check_encode<BigObj>(bigObj, expected)
+    check_decode<BigObj>(expected, bigObj)
   });
 });

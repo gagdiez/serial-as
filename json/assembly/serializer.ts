@@ -1,5 +1,5 @@
 import { Serializer, isNull } from "@serial-as/core"
-import { u128 } from "as-bignum";
+import { u128, u128Safe } from "as-bignum";
 import * as base64 from "as-base64";
 
 
@@ -57,7 +57,8 @@ export class JSONSerializer extends Serializer<string>{
   encode_arraybuffer_view<T extends ArrayBufferView>(value:T): void {
     if (value instanceof Uint8Array) {
       this.inner_encode.push(`"${base64.encode(value)}"`)
-    }else{
+    } else {
+      // @ts-ignore
       this.encode_array<T>(value);
     }    
   }
@@ -107,7 +108,11 @@ export class JSONSerializer extends Serializer<string>{
 
   // Object --
   encode_object<C extends object>(value: C): void {
-    this.starting_object = true
+    if (value instanceof u128 || value instanceof u128Safe) {
+      this.encode_string(value.toString());
+      return;
+    }
+    this.starting_object = true;
     value.encode(this);
   }
 

@@ -1,5 +1,5 @@
 import { Deserializer, allocObj } from "@serial-as/core";
-import { u128 } from "as-bignum";
+import { u128, u128Safe } from "as-bignum";
 import * as base64 from "as-base64";
 
 export class JSONDeserializer extends Deserializer<string>{
@@ -248,9 +248,16 @@ export class JSONDeserializer extends Deserializer<string>{
   decode_object<C extends object>(): C {
     // {object}
     this.first = true
-    let object: C = allocObj<C>()
-    object.decode(this)
-    return object
+    let object: C;
+    object = allocObj<C>();
+    if (object instanceof u128 || object instanceof u128Safe) {
+      const obj = u128.from(this.decode_string());
+      object.lo = obj.lo;
+      object.hi = obj.hi;
+    } else {
+      object.decode(this);
+    }
+    return object;
   }
 
   decode_int<T extends number>(): T {
@@ -296,4 +303,9 @@ export class JSONDeserializer extends Deserializer<string>{
   decode_i64(): i64 { return this.decode_long<i64>() }
   decode_f32(): f32 { return this.decode_float<f32>() }
   decode_f64(): f64 { return this.decode_float<f64>() }
+
+  static decode<T>(s: string): T {
+    const decoder: JSONDeserializer = new JSONDeserializer(s)
+    return decoder.decode<T>()
+  }
 }

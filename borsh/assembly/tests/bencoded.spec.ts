@@ -1,4 +1,4 @@
-import { Borsh } from '@serial-as/borsh'
+import { BorshDeserializer, BorshSerializer } from '@serial-as/borsh'
 import { BigObj, MapSet, MixtureOne, Numbers, aString, aBoolean, Arrays, ArrayViews, Nullables, MixtureTwo, Nested, Extends, MapNullValues, init_numbers, init_arrays } from '@serial-as/tests';
 import { u128 } from 'as-bignum';
 
@@ -47,7 +47,7 @@ function u8toArrayBuffer(arr: u8[]): ArrayBuffer {
 function check_encode<T>(object: T, expected: ArrayBuffer): void {
   // Checks that encoding an object returns the expected encoding
   //const borsh:Borsh = new Borsh()
-  let res: ArrayBuffer = Borsh.encode(object)
+  let res: ArrayBuffer = BorshSerializer.encode(object)
 
   expect(res).toStrictEqual(expected)
 }
@@ -55,7 +55,7 @@ function check_encode<T>(object: T, expected: ArrayBuffer): void {
 function check_decode<T>(encoded: ArrayBuffer, original: T): void {
   // Checks that an encoding returns the expected object
   //const borsh:Borsh = new Borsh()
-  let deco: T = Borsh.decode<T>(encoded)
+  let deco: T = BorshDeserializer.decode<T>(encoded)
   expect(deco).toStrictEqual(original)
 }
 

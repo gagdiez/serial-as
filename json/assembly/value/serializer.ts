@@ -1,5 +1,5 @@
 import { Serializer } from "@serial-as/core"
-import { u128 } from "as-bignum";
+import { u128, u128Safe } from "as-bignum";
 import * as base64 from "as-base64";
 import { JSON } from "assemblyscript-json";
 
@@ -103,6 +103,10 @@ export class ValueSerializer extends Serializer<JSON.Value> {
 
   // Object --
   encode_object<C extends object>(value: C): void {
+    if (value instanceof u128 || value instanceof u128Safe) {
+      this.encode_string(value.toString());
+      return;
+    }
     this.push(JSON.Value.Object());
     value.encode(this);
   }
@@ -119,7 +123,6 @@ export class ValueSerializer extends Serializer<JSON.Value> {
   encode_i32(value: i32): void { this.encode_small_int(value); }
   encode_u64(value: u64): void { this.encode_string(value.toString()); }
   encode_i64(value: i64): void { this.encode_string(value.toString()); }
-  encode_u128(value: u128): void { this.encode_string(value.toString()); }
   encode_f32(value: f32): void { this.push(JSON.Value.Float(value)); }
   encode_f64(value: f64): void { this.push(JSON.Value.Float(value)); }
 

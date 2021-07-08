@@ -1,6 +1,5 @@
 import { Serializer, isNumber } from "@serial-as/core";
 import { EncodeBuffer } from "./buffer";
-import { u128 } from "as-bignum";
 
 export class BorshSerializer extends Serializer<ArrayBuffer> {
   public buffer: EncodeBuffer = new EncodeBuffer();
@@ -49,6 +48,7 @@ export class BorshSerializer extends Serializer<ArrayBuffer> {
 
     //for el in x; repr(el as K)
     for (let i = 0; i < value.length; i++) {
+      // @ts-ignore
       this.encode<valueof<T>>(value[i]);
     }
   }
@@ -129,12 +129,6 @@ export class BorshSerializer extends Serializer<ArrayBuffer> {
     this.buffer.store<T>(value);
   }
 
-  encode_u128(value: u128): void {
-    // little_endian(x)
-    this.buffer.store<u64>(value.lo);
-    this.buffer.store<u64>(value.hi);
-  }
-
   // We override encode_number, for which we don't need these
   encode_u8(value: u8): void { }
   encode_i8(value: i8): void { }
@@ -156,4 +150,10 @@ export class BorshSerializer extends Serializer<ArrayBuffer> {
   encode_i32array(value: Int32Array): void { }
   encode_u64array(value: Uint64Array): void { }
   encode_i64array(value: Int64Array): void { }
+
+  static encode<T>(a: T): ArrayBuffer {
+    const encoder = new BorshSerializer();
+    encoder.encode<T>(a);
+    return encoder.get_encoded_object();
+  }
 }
