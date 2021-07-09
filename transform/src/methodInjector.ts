@@ -1,18 +1,7 @@
 import { TypeNode, ClassDeclaration, Source, FieldDeclaration, NodeKind, DeclarationStatement, CommonFlags } from "visitor-as/as";
 import { SimpleParser, BaseVisitor } from "visitor-as";
 import { toString, isMethodNamed, getName } from 'visitor-as/dist/utils';
-import {isStdlib} from "./utils";
-
-
-function getTypeName(type: TypeNode): string {
-  let _type = getName(type);
-  const OR_NULL = /\|.*null/;
-  if (type.isNullable && !OR_NULL.test(_type)) {
-    _type = `${_type} | null`;
-  }
-  return _type
-}
-
+import { isStdlib } from "./utils";
 
 function isField(node: DeclarationStatement): boolean {
   return node.kind == NodeKind.FIELDDECLARATION;
@@ -33,7 +22,7 @@ export class MethodInjector extends BaseVisitor {
       throw new Error(`Field ${name} is missing a type declaration  for ${toString(this.currentClass)}`);
     }
     
-    const _type = getTypeName(node.type);
+    const _type = getName(node.type);
     
     this.encodeStmts.push(`encoder.encode_field<${_type}>("${name}", this.${name})`);
     
@@ -42,7 +31,6 @@ export class MethodInjector extends BaseVisitor {
   }
 
   visitClassDeclaration(node: ClassDeclaration): void {
-    console.log(`${getName(node)}`);
     if (isStdlib(node)) { return; }
 
     const fields = node.members.filter(isInstanceField);

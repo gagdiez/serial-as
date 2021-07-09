@@ -1846,10 +1846,10 @@ asn1@~0.2.3:
   dependencies:
     safer-buffer "~2.1.0"
 
-assemblyscript-json@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/assemblyscript-json/-/assemblyscript-json-1.0.0.tgz#2211f53987f377ef90dd5425b14e09bd1fdea74a"
-  integrity sha512-Cv96RESaVbCJn6jqVPXJlrClb3ZoLwcoSNFPDpHMXxi7NqLBeUGhV6zitSjLIgPHXVocIuYYH+SnykzEtErrBg==
+assemblyscript-json@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/assemblyscript-json/-/assemblyscript-json-1.1.0.tgz#49d38bc21f1ac36f2887528a35de6cf7d59c17be"
+  integrity sha512-UbE8ts8csTWQgd5TnSPN7MRV9NveuHv1bVnKmDLoo/tzjqxkmsZb3lu59Uk8H7SGoqdkDSEE049alx/nHnSdFw==
 
 assemblyscript@^0.18.31:
   version "0.18.32"
@@ -1859,10 +1859,10 @@ assemblyscript@^0.18.31:
     binaryen "100.0.0-nightly.20210413"
     long "^4.0.0"
 
-assemblyscript@^0.19.2:
-  version "0.19.3"
-  resolved "https://registry.yarnpkg.com/assemblyscript/-/assemblyscript-0.19.3.tgz#4600db7a7f46bb0f6bb8a1342791264033605282"
-  integrity sha512-IfRqQ7nYDY/UzbGnRrFwKnClR1ITha6nhHGqr/3Jzwof9BdgfqANhpqTmRcKJ5o02WAmghkjQwfJqzDfnDd1VA==
+assemblyscript@^0.19.5:
+  version "0.19.5"
+  resolved "https://registry.yarnpkg.com/assemblyscript/-/assemblyscript-0.19.5.tgz#12f5976c41f6b866dd0d1aad5275dcd358a5d82f"
+  integrity sha512-mAx7gcwjJI5OSu2RcOlugHFNxKt/rtWn3vyp46cN1+uXb7YSS//rgO044+KKwfxnGvoWj0ClsU0dNt5eWoXF7A==
   dependencies:
     binaryen "101.0.0-nightly.20210604"
     long "^4.0.0"
@@ -7472,6 +7472,14 @@ visitor-as@^0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/visitor-as/-/visitor-as-0.6.0.tgz#b0cca3c918bd9d396545faf08529d2b9ba968a40"
   integrity sha512-4WcnwCLXWjhNkwJj9gSqh46sdIv9CyIvnSuwr61OOfrGCtN2mKcW5KE828OeEr1rYjEy0Z/CIdPBJKJRLsUgDA==
+  dependencies:
+    lodash.clonedeep "^4.5.0"
+    ts-mixer "^5.4.1"
+
+visitor-as@^0.7.0-1:
+  version "0.7.0-1"
+  resolved "https://registry.yarnpkg.com/visitor-as/-/visitor-as-0.7.0-1.tgz#88009d6acca30c1be4d9b93429f1204a63f78874"
+  integrity sha512-0X1t0HbzCGDIC9Q8A27KMEUMrMtmWdS8YoJK4oF9ppo4CKZGKIJPphz5ZzuHuLdEC6eHhj9BYEBseaV5VT2F+A==
   dependencies:
     lodash.clonedeep "^4.5.0"
     ts-mixer "^5.4.1"
