@@ -1,4 +1,5 @@
-import { ValueSerializer, ValueDeserializer } from "../value";
+import { ValueSerializer } from "../serializer"
+import { ValueDeserializer } from "../deserializer";
 import { u128 } from "as-bignum";
 import {
   Numbers,
