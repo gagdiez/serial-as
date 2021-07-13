@@ -15,7 +15,7 @@
   "scripts": {
     "test": "asp",
     "test:borsh": "asp -f bencode",
-    "test:json": "asp -f jencode",
+    "test:json": "asp -f jvalue",
     "build": "yarn workspace @serial-as/transform build",
     "publish": "lerna publish"
   },
@@ -27,7 +27,7 @@
     "@types/jest": "^25.1.4",
     "@types/node": "^13.9.1",
     "asbuild": "^0.2.0",
-    "assemblyscript": "^0.19.2",
+    "assemblyscript": "^0.19.5",
     "jest": "^25.1.0",
     "lerna": "^4.0.0",
     "prettier": "^2.0.4",

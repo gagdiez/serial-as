@@ -1,22 +1,21 @@
-import { ClassDeclaration } from "visitor-as/as";
-import { registerDecorator, Decorator } from "visitor-as";
+import { ClassDeclaration, Parser, CommonFlags } from "visitor-as/as";
+import { registerDecorator, Decorator, ASTTransformVisitor } from "visitor-as";
 
 import {MethodInjector} from "./methodInjector";
+import { getName, isLibrary, not } from "visitor-as/dist/utils";
+import { isStdlib } from "./utils";
 
 
 
-class Encoder extends Decorator {
-  
+class Transformer extends ASTTransformVisitor {
   visitClassDeclaration(node: ClassDeclaration): void {
-    MethodInjector.visit(node);
+      MethodInjector.visit(node);
   }
 
-  get name(): string { return "serializable" }
-
-  get sourceFilter() {
-    return (_:any) => true;
+  afterParse(_: Parser): void { 
+    _.sources.forEach(source => this.visit(source));
   }
- 
+  
 }
 
-export = registerDecorator(new Encoder())
+export = Transformer;

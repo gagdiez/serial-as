@@ -1,4 +1,5 @@
 import { u128 } from "as-bignum";
+import { defaultValue } from "./utils";
 
 @global
 export abstract class Deserializer<I> {
@@ -11,7 +12,11 @@ export abstract class Deserializer<I> {
   }
 
   // Decode Field
-  abstract decode_field<T>(name: string): T
+  abstract _decode_field<T>(name: string, defaultValue: T): T
+
+  decode_field<T>(name: string, _defaultValue: T = defaultValue<T>()): T {
+    return this._decode_field(name, _defaultValue);
+  }
 
   // Boolean
   abstract decode_bool(): bool
@@ -46,7 +51,6 @@ export abstract class Deserializer<I> {
   abstract decode_i32(): i32
   abstract decode_u64(): u64
   abstract decode_i64(): i64
-  abstract decode_u128(): u128
   abstract decode_f32(): f32
   abstract decode_f64(): f64
 
@@ -93,7 +97,7 @@ export abstract class Deserializer<I> {
     let value: T
 
     // @ts-ignore
-    if(value instanceof u128 && !isDefined(value.decode)){ return this.decode_u128(); }  // -> we need to get ride of this
+    if (isDefined(value.decode)) { return this.decode_object<T>(); }
 
     // @ts-ignore
     if (value instanceof ArrayBuffer) { return this.decode_arraybuffer(); }    

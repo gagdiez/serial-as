@@ -6,9 +6,9 @@ export { Serializer, Deserializer }
 
 export class Serial<__R, E extends Serializer<__R>, D extends Deserializer<__R>> {
 
-  encode<O>(object: O): __R {
+  encode<O>(value: O): __R {
     let encoder: E = instantiate<E>();
-    encoder.encode(object)
+    encoder.encode(value)
     return encoder.get_encoded_object();
   }
 

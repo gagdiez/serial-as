@@ -1,24 +1,24 @@
-import { Borsh } from '@serial-as/borsh'
+import { BorshDeserializer, BorshSerializer } from '@serial-as/borsh'
 import { BigObj, MapSet, MixtureOne, Numbers, aString, aBoolean, Arrays, ArrayViews, Nullables, MixtureTwo, Nested, Extends, MapNullValues, init_numbers, init_arrays } from '@serial-as/tests';
 import { u128 } from 'as-bignum';
 
 
-@serializable
-export class FooBar {
-  foo: i32 = 0;
-  bar: u32 = 1;
-  u64Val: u64 = 4294967297;
-  i64Val: i64 = -64;
-  flag: bool;
-  baz: string = "";
-  uint8array: Uint8Array = new Uint8Array(2);
-  arr: Array<Array<string>> = [];
-  u32Arr: u32[] = [];
-  i32Arr: i32[] = [];
-  u128Val: u128 = u128.Zero;
-  uint8arrays: Array<Uint8Array> = [];
-  u64Arr: u64[] = [];
-}
+// @serializable
+// class FooBar {
+//   foo: i32 = 0;
+//   bar: u32 = 1;
+//   u64Val: u64 = 4294967297;
+//   i64Val: i64 = -64;
+//   flag: bool;
+//   baz: string = "";
+//   uint8array: Uint8Array = new Uint8Array(2);
+//   arr: Array<Array<string>> = [];
+//   u32Arr: u32[] = [];
+//   i32Arr: i32[] = [];
+//   u128Val: u128 = u128.Zero;
+//   uint8arrays: Array<Uint8Array> = [];
+//   u64Arr: u64[] = [];
+// }
 
 function initMixtureTwo(f: MixtureTwo): void {
   f.foo = 321;
@@ -47,7 +47,7 @@ function u8toArrayBuffer(arr: u8[]): ArrayBuffer {
 function check_encode<T>(object: T, expected: ArrayBuffer): void {
   // Checks that encoding an object returns the expected encoding
   //const borsh:Borsh = new Borsh()
-  let res: ArrayBuffer = Borsh.encode(object)
+  let res: ArrayBuffer = BorshSerializer.encode(object)
 
   expect(res).toStrictEqual(expected)
 }
@@ -55,7 +55,7 @@ function check_encode<T>(object: T, expected: ArrayBuffer): void {
 function check_decode<T>(encoded: ArrayBuffer, original: T): void {
   // Checks that an encoding returns the expected object
   //const borsh:Borsh = new Borsh()
-  let deco: T = Borsh.decode<T>(encoded)
+  let deco: T = BorshDeserializer.decode<T>(encoded)
   expect(deco).toStrictEqual(original)
 }
 

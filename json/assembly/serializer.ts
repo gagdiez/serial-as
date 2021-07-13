@@ -1,69 +1,71 @@
 import { Serializer } from "@serial-as/core"
-import { u128 } from "as-bignum";
+import { u128, u128Safe } from "as-bignum";
 import * as base64 from "as-base64";
+import { JSON } from "assemblyscript-json";
 
 function isNull<T>(t: T): boolean {
   if (!isNullable<T>()) return false;
   return changetype<usize>(t) == 0;
 }
 
-export class JSONSerializer extends Serializer<string>{
+export class ValueSerializer extends Serializer<JSON.Value> {
+  valueStack: JSON.Value[] = [];
+  public starting_object: bool = true;
+  public inner_encode: string[] = [];
 
-  public starting_object: bool = true
-  public inner_encode: string[] = []
+  peek(): JSON.Value {
+    return this.valueStack[this.valueStack.length - 1];
+  }
 
-  get_encoded_object(): string {
-    return this.inner_encode.join('')
+  push(v: JSON.Value): void { this.valueStack.push(v); }
+
+  encodeAndPop<T>(t: T): JSON.Value {
+    this.encode<T>(t);
+    return this.valueStack.pop();
+  }
+
+  get_encoded_object(): JSON.Value {
+    assert(this.valueStack.length == 1);
+    return this.valueStack.pop();
   }
 
   encode_field<K>(name: string, value: K): void {
-    if (this.starting_object) {
-      this.inner_encode.push("{")
-    } else {
-      this.inner_encode[this.inner_encode.length - 1] = ","
-    }
-
-    this.inner_encode.push(`"${name}":`)
-    this.encode<K>(value)
-    this.inner_encode.push("}")
-    this.starting_object = false
+    const obj = this.peek() as JSON.Obj;
+    obj.set(name, this.encodeAndPop<K>(value));
   }
 
   // Bool --
   encode_bool(value: bool): void {
-    this.inner_encode.push(value.toString())
+    this.push(JSON.Value.Bool(value));
   }
 
   // String --
   encode_string(value: string): void {
-    value = value.replaceAll('"', '\\"')
-    value = value.replaceAll("'", "\\'")
-    this.inner_encode.push(`"${value}"`)
+    this.push(JSON.Value.String(value));
   }
 
   // Array --
   encode_array<K extends ArrayLike<any>>(value: K): void {
-    this.inner_encode.push(`[`)
-
+    const arr = JSON.Value.Array();
     for (let i = 0; i < value.length; i++) {
       // @ts-ignore
-      this.encode<valueof<K>>(value[i])
-      if (i != value.length - 1) { this.inner_encode.push(`,`) }
+      arr.push(this.encodeAndPop<valueof<K>>(value[i]));
     }
-
-    this.inner_encode.push(`]`)
-  }
+    this.push(arr);
+  } 
 
   encode_arraybuffer(value:ArrayBuffer): void {
-    this.encode_array<Uint8Array>(Uint8Array.wrap(value))   
+    this.encode_arraybuffer_view<Uint8Array>(Uint8Array.wrap(value))   
   }
 
   encode_arraybuffer_view<T extends ArrayBufferView>(value:T): void {
+    let arr: Uint8Array;
     if (value instanceof Uint8Array) {
-      this.inner_encode.push(`"${base64.encode(value)}"`)
+      arr = value;
     }else{
-      this.encode_array<T>(value);
+      arr = Uint8Array.wrap(value.buffer);
     }    
+    this.encode_string(base64.encode(arr));
   }
 
   encode_static_array<T>(value:StaticArray<T>): void {
@@ -73,7 +75,7 @@ export class JSONSerializer extends Serializer<string>{
   // Null --
   encode_nullable<T>(t: T): void {
     if (isNull(t)) {
-      this.inner_encode.push("null");
+      this.push(JSON.Value.Null());
     } else {
       // @ts-ignore
       this.encode<NonNullable<T>>(<NonNullable<T>>t);
@@ -83,47 +85,50 @@ export class JSONSerializer extends Serializer<string>{
   // Set --
   encode_set<T>(value: Set<T>): void {
     let values = value.values();
-    this.inner_encode.push(`{`)
-    for (let i = 0; i < values.length; i++) {
-      this.encode<T>(values[i])
-      if (i != values.length - 1) { this.inner_encode.push(`,`) }
-    }
-    this.inner_encode.push(`}`)
+    this.encode_array(values);
   }
 
   // Map --
   encode_map<K, V>(value: Map<K, V>): void {
 
-    this.inner_encode.push(`{`)
-
+    this.push(JSON.Value.Object());
     let keys = value.keys();
-
     for (let i = 0; i < keys.length; i++) {
-      this.encode<K>(keys[i])
-      this.inner_encode.push(':')
-      this.encode<V>(value.get(keys[i]))
-
-      if (i != keys.length - 1) { this.inner_encode.push(`,`) }
+      const key = keys[i];
+      const val = value.get(key);
+      // @ts-ignore
+      this.encode_field<V>(key.toString(), val);
     }
-
-    this.inner_encode.push(`}`)
   }
 
   // Object --
   encode_object<C extends object>(value: C): void {
-    this.starting_object = true
+    if (value instanceof u128 || value instanceof u128Safe) {
+      this.encode_string(value.toString());
+      return;
+    }
+    this.push(JSON.Value.Object());
     value.encode(this);
   }
 
-  encode_u8(value: u8): void { this.inner_encode.push(value.toString()) }
-  encode_i8(value: i8): void { this.inner_encode.push(value.toString()) }
-  encode_u16(value: u16): void { this.inner_encode.push(value.toString()) }
-  encode_i16(value: i16): void { this.inner_encode.push(value.toString()) }
-  encode_u32(value: u32): void { this.inner_encode.push(value.toString()) }
-  encode_i32(value: i32): void { this.inner_encode.push(value.toString()) }
-  encode_u64(value: u64): void { this.inner_encode.push(`"${value.toString()}"`) }
-  encode_i64(value: i64): void { this.inner_encode.push(`"${value.toString()}"`) }
-  encode_u128(value: u128): void { this.inner_encode.push(`"${value.toString()}"`) }
-  encode_f32(value: f32): void { this.inner_encode.push(value.toString()) }
-  encode_f64(value: f64): void { this.inner_encode.push(value.toString()) }
+  encode_small_int<N extends number>(value: N): void { 
+    this.push(JSON.Value.Integer(value));
+  }
+
+  encode_u8(value: u8): void { this.encode_small_int(value); }
+  encode_i8(value: i8): void { this.encode_small_int(value); }
+  encode_u16(value: u16): void { this.encode_small_int(value); }
+  encode_i16(value: i16): void { this.encode_small_int(value); }
+  encode_u32(value: u32): void { this.encode_small_int(value); }
+  encode_i32(value: i32): void { this.encode_small_int(value); }
+  encode_u64(value: u64): void { this.encode_string(value.toString()); }
+  encode_i64(value: i64): void { this.encode_string(value.toString()); }
+  encode_f32(value: f32): void { this.push(JSON.Value.Float(value)); }
+  encode_f64(value: f64): void { this.push(JSON.Value.Float(value)); }
+
+  static encode<T>(value: T): JSON.Value {
+    const ser = new ValueSerializer();
+    ser.encode(value);
+    return ser.get_encoded_object();
+  }
 }
