@@ -1,6 +1,6 @@
 {
   "name": "@serial-as/transform",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Transform to enable serialization in Assemblyscript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

@@ -1,6 +1,6 @@
 {
   "name": "@serial-as/borsh",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Borsh Serializer for Assemblyscript",
   "main": "index.js",
   "types": "assembly/index.ts",
@@ -13,9 +13,9 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "@serial-as/core": "1.0.0"
+    "@serial-as/core": "1.0.2"
   },
   "devDependencies": {
-    "@serial-as/tests": "1.0.0"
+    "@serial-as/tests": "1.0.2"
   }
 }
