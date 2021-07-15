@@ -15,7 +15,8 @@
   "scripts": {
     "test": "asp",
     "test:borsh": "asp -f bencode",
-    "test:json": "asp -f jvalue",
+    "test:json": "asp -f jencoded",
+    "test:jbuffer": "asp -f jbuff",
     "build": "yarn workspace @serial-as/transform build",
     "publish": "lerna publish"
   },
@@ -39,6 +40,7 @@
   "workspaces": [
     "core",
     "json",
+    "json_buffer",
     "borsh",
     "transform",
     "tests"

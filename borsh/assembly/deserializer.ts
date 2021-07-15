@@ -10,7 +10,7 @@ export class BorshDeserializer extends Deserializer<ArrayBuffer>{
     this.decoBuffer = new DecodeBuffer(encoded_object)
   }
   
-  _decode_field<T>(_name: string, _defaultValue: T): T {
+  decode_field<T>(_name: string): T {
     return this.decode<T>()
   }
   
@@ -129,6 +129,7 @@ export class BorshDeserializer extends Deserializer<ArrayBuffer>{
   decode_f32(): f32 { return 0 }
   decode_f64(): f64 { return 0 }
 
+  
   static decode<T>(a: ArrayBuffer): T {
     return (new BorshDeserializer(a)).decode<T>();
   }

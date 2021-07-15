@@ -1,5 +1,5 @@
 {
-  "name": "@serial-as/json",
+  "name": "@serial-as/json_buffer",
   "version": "1.0.2",
   "description": "JSON Serializer for Assemblyscript",
   "main": "index.js",

@@ -1,20 +1,18 @@
-import { Serial } from '@serial-as/core';
-import { ValueSerializer } from './serializer'
-import { ValueDeserializer } from './deserializer'
+import { JSONSerializer } from './serializer';
+import { JSONDeserializer } from './deserializer';
 
-import { JSON } from "assemblyscript-json";
+export {JSONSerializer, JSONDeserializer}
 
+export class JSON {
 
-/*
- * @param s string or JSON.Value
- * @returns 
- */
-export function parse<T, From = string>(s: From): T {
-    return ValueDeserializer.decode<T, From>(s);
+  static encode<O>(object: O): string {
+    let encoder: JSONSerializer = new JSONSerializer();
+    encoder.encode(object)
+    return encoder.get_encoded_object();
   }
 
-export function stringify<T>(s: T): string {
-    return ValueSerializer.encode(s).stringify();
+  static decode<O>(t: string): O {
+    const decoder: JSONDeserializer = new JSONDeserializer(t)
+    return decoder.decode<O>()
   }
-
-export class JSONValueSerializer extends Serial <JSON.Value, ValueSerializer, ValueDeserializer> {}
+}

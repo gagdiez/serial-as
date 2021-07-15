@@ -1,47 +1,59 @@
 import { Deserializer, allocObj } from "@serial-as/core";
-import { u128, u128Safe } from "as-bignum";
 import * as base64 from "as-base64";
+import {u128, u128Safe} from "as-bignum"
 
-export class JSONDeserializer extends Deserializer<string>{
+@lazy const CHAR_0: i32 = 48;
+@lazy const CHAR_9: i32 = 57;
+@lazy const CHAR_t: i32 = 't'.charCodeAt(0);
+@lazy const CHAR_quotation:i32 = '"'.charCodeAt(0)
+@lazy const CHAR_single_quotation:i32 = "'".charCodeAt(0)
+@lazy const CHAR_escape:i32 = '\\'.charCodeAt(0)
+@lazy const CHAR_minus:i32 = '-'.charCodeAt(0)
+@lazy const CHAR_plus:i32 = '+'.charCodeAt(0)
+@lazy const CHAR_point:i32 = '.'.charCodeAt(0)
+@lazy const CHAR_comma:i32 = ','.charCodeAt(0)
+@lazy const CHAR_ckey:i32 = '}'.charCodeAt(0)
+@lazy const CHAR_e:i32 = 'e'.charCodeAt(0)
+@lazy const CHAR_E:i32 = 'E'.charCodeAt(0)
+@lazy const CHAR_cbraket:i32 = ']'.charCodeAt(0)
+
+export class JSONBuffDeserializer extends Deserializer<Uint8Array>{
 
   public offset: u32 = 0
   public first: bool = true
-  public nums: Set<string> = new Set<string>()
-  public floats: Set<string> = new Set<string>()
+  public nums: Set<i32> = new Set<i32>()
+  public floats: Set<i32> = new Set<i32>()
+  public ptr_buffer:usize
 
-  constructor(encoded_object: string) {
+  constructor(encoded_object: Uint8Array) {
     super(encoded_object)
-    this.nums.add("-")
-    this.nums.add("+")
 
-    this.floats.add("-")
-    this.floats.add("+")
-
-    this.floats.add(".")
-    this.floats.add("e")
-    this.floats.add("E")
-
-    for (let i: u8 = 0; i < 10; i++) {
-      this.nums.add(i.toString())
-      this.floats.add(i.toString())
-    }
+    this.ptr_buffer = changetype<usize>(this.encoded_object.buffer) + this.encoded_object.byteOffset
   }
 
   finished(): bool {
     return this.offset == <u32>this.encoded_object.length
   }
 
-  current_char(): string {
-    return this.encoded_object.at(this.offset)
+  current_char(): u8 {
+    return this.encoded_object[this.offset]
   }
 
   escaped_char(): bool {
     if (this.offset == 0) { return false }
-    return this.encoded_object.at(this.offset - 1) == '\\'
+    return this.encoded_object[this.offset - 1] == CHAR_escape
+  }
+
+  is_float(char:i32):bool{
+    return this.is_number(char) || char == CHAR_point || char == CHAR_e || char == CHAR_E || char == CHAR_minus || char == CHAR_plus
+  }
+  
+  is_number(char:i32):bool{
+    return CHAR_0 <= char && char <= CHAR_9
   }
 
   skip_spaces(): void {
-    while (!this.finished() && this.current_char() == " ") {
+    while (!this.finished() && this.current_char() == " ".charCodeAt(0)) {
       this.offset += 1
     }
   }
@@ -88,12 +100,12 @@ export class JSONDeserializer extends Deserializer<string>{
 
   // Bool --
   decode_bool(): bool {
-    if (this.encoded_object.at(this.offset) == "t") {
-      // it is true,
+    if (this.current_char() == CHAR_t) {
+      // it is true
       this.offset += 4
       return true
     }
-    // it is false,
+    // it is false
     this.offset += 5
     return false
   }
@@ -105,13 +117,13 @@ export class JSONDeserializer extends Deserializer<string>{
     let start: u32 = this.offset
 
     while (true) {
-      if ((this.current_char() == '"' || this.current_char() == "'") && !this.escaped_char()) {
+      if ((this.current_char() == CHAR_quotation || this.current_char() == CHAR_single_quotation) && !this.escaped_char()) {
         break
       }
       this.offset += 1
     }
 
-    let ret: string = this.encoded_object.slice(start, this.offset)
+    let ret:string = String.UTF8.decodeUnsafe(this.ptr_buffer + start, this.offset - start);
     ret = ret.replaceAll('\\"', '"')
     ret = ret.replaceAll("\\'", "'")
     this.offset += 1
@@ -122,11 +134,16 @@ export class JSONDeserializer extends Deserializer<string>{
   decode_array<A extends ArrayLike<any>>(): A {
     //[v1,v2,...,v4] or "uint8_encoded_as64"
     let ret: A
+    // @ts-ignore
+    if (ret instanceof Uint8Array) {
+      let u8arr = this.decode_string();
+      return changetype<A>(base64.decode(u8arr))
+    }
 
     this.offset += 1 // skip [
     this.skip_spaces()
 
-    if (this.current_char() == ']') {
+    if (this.current_char() == CHAR_cbraket) {
       //empty array
       this.offset += 1
       return instantiate<A>(0)
@@ -135,8 +152,8 @@ export class JSONDeserializer extends Deserializer<string>{
     // Not empty
     ret = instantiate<A>()
 
-    while (this.current_char() != ']') {
-      if (this.current_char() == ',') { this.offset += 1 }
+    while (this.current_char() != CHAR_cbraket) {
+      if (this.current_char() == CHAR_comma) { this.offset += 1 }
       //@ts-ignore
       ret.push(this.decode<valueof<A>>())
     }
@@ -180,7 +197,7 @@ export class JSONDeserializer extends Deserializer<string>{
 
   // Null --
   decode_nullable<T>(): T | null {
-    if (this.current_char() == "n") {
+    if (this.current_char() == "n".charCodeAt(0)) {
       this.offset += 4  // skip null
       return null
     }
@@ -194,7 +211,7 @@ export class JSONDeserializer extends Deserializer<string>{
 
     this.skip_spaces()
 
-    if (this.current_char() == '}') {
+    if (this.current_char() == CHAR_ckey) {
       //empty set
       this.offset += 1
       return new Set<T>()
@@ -203,8 +220,8 @@ export class JSONDeserializer extends Deserializer<string>{
     // not empty
     let ret_set: Set<T> = new Set<T>()
 
-    while (this.current_char() != '}') {
-      if (this.current_char() == ',') { this.offset += 1 }
+    while (this.current_char() != CHAR_ckey) {
+      if (this.current_char() == CHAR_comma) { this.offset += 1 }
       ret_set.add(this.decode<T>())
     }
 
@@ -220,7 +237,7 @@ export class JSONDeserializer extends Deserializer<string>{
 
     this.skip_spaces()
 
-    if (this.current_char() == '}') {
+    if (this.current_char() == CHAR_ckey) {
       //empty map
       this.offset += 1
       return new Map<K, V>()
@@ -228,8 +245,8 @@ export class JSONDeserializer extends Deserializer<string>{
 
     // non empty
     let ret_map: Map<K, V> = new Map<K, V>()
-    while (this.current_char() != '}') {
-      if (this.current_char() == ',') { this.offset += 1 }
+    while (this.current_char() != CHAR_ckey) {
+      if (this.current_char() == CHAR_comma) { this.offset += 1 }
 
       const key = this.decode<K>()
       this.offset += 1  // skip :
@@ -245,9 +262,9 @@ export class JSONDeserializer extends Deserializer<string>{
   // Object --
   decode_object<C extends object>(): C {
     // {object}
-
     let object: C;
     object = allocObj<C>();
+    
     if (object instanceof u128 || object instanceof u128Safe) {
       const obj = u128.from(this.decode_string());
       object.lo = obj.lo;
@@ -256,24 +273,36 @@ export class JSONDeserializer extends Deserializer<string>{
       this.first = true
       object.decode(this);
     }
-
-    return object
+    return object;
   }
 
   decode_int<T extends number>(): T {
+    let value:T = 0
+    let sign:T = 1
 
-    let start: u32 = this.offset
-    // faster than performing regex?
-    while (!this.finished() && this.nums.has(this.current_char())) {
+    if(this.current_char() == CHAR_minus){
+      sign = <T>-1
+    }
+    
+    if(this.current_char() == CHAR_minus || this.current_char() == CHAR_plus){
+      this.offset += 1 
+    }
+
+    // not much worst than comparing?
+    while (!this.finished() && this.is_number(this.current_char())) {
+      value *= 10
+      value += <T>(this.current_char() - CHAR_0)
       this.offset += 1
     }
 
-    return <T>parseInt(this.encoded_object.slice(start, this.offset))
+    return value * sign
   }
 
   decode_long<T extends number>(): T {
-    let number: string = this.decode<string>()
-    return <T>(parseInt(number))
+    this.offset += 1 
+    let number: T = this.decode_int<T>()
+    this.offset += 1
+    return <T>number
   }
 
   decode_u128(): u128 {
@@ -285,11 +314,12 @@ export class JSONDeserializer extends Deserializer<string>{
     let start: u32 = this.offset
 
     // faster than performing regex?
-    while (!this.finished() && this.floats.has(this.current_char())) {
+    while (!this.finished() && this.is_float(this.current_char())) {
       this.offset += 1
     }
 
-    return <T>(parseFloat(this.encoded_object.slice(start, this.offset)))
+    let ret:string = String.UTF8.decodeUnsafe(this.ptr_buffer + start, this.offset - start);
+    return <T>(parseFloat(ret))
   }
 
   // We override decode_number, for which we don't need these
@@ -304,8 +334,7 @@ export class JSONDeserializer extends Deserializer<string>{
   decode_f32(): f32 { return this.decode_float<f32>() }
   decode_f64(): f64 { return this.decode_float<f64>() }
 
-  static decode<T>(s: string): T {
-    const decoder = new JSONDeserializer(s);
-    return decoder.decode<T>();
+  static decode<T>(a: Uint8Array): T {
+    return (new JSONBuffDeserializer(a)).decode<T>();
   }
 }

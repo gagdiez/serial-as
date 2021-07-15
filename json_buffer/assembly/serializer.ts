@@ -1,6 +1,6 @@
 import { Serializer } from "@serial-as/core"
-import { u128, u128Safe } from "as-bignum";
 import * as base64 from "as-base64";
+import { u128, u128Safe } from "as-bignum"
 
 export class JSONSerializer extends Serializer<string>{
 
@@ -122,12 +122,26 @@ export class JSONSerializer extends Serializer<string>{
   encode_i32(value: i32): void { this.inner_encode.push(value.toString()) }
   encode_u64(value: u64): void { this.inner_encode.push(`"${value.toString()}"`) }
   encode_i64(value: i64): void { this.inner_encode.push(`"${value.toString()}"`) }
+  encode_u128(value: u128): void { this.inner_encode.push(`"${value.toString()}"`) }
   encode_f32(value: f32): void { this.inner_encode.push(value.toString()) }
   encode_f64(value: f64): void { this.inner_encode.push(value.toString()) }
 
-  static encode<T>(value: T): String {
-    const ser = new JSONSerializer();
-    ser.encode(value);
-    return ser.get_encoded_object();
+  static encode<T>(a: T): Uint8Array {
+    const encoder = new JSONSerializer();
+    encoder.encode<T>(a);
+    const encoded:string = encoder.get_encoded_object();
+
+    let buffer = String.UTF8.encode(encoded, false);
+    
+    if (buffer.byteLength === 0){
+      return new Uint8Array(0);
+    }
+    return Uint8Array.wrap(buffer);
+  }
+
+  static stringify<T>(a: T): string {
+    const encoder = new JSONSerializer();
+    encoder.encode<T>(a);
+    return encoder.get_encoded_object();
   }
 }
