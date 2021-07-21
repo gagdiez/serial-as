@@ -180,6 +180,11 @@ export class MapNullValues {
 }
 
 @serializable
+export class MapStrNullValues {
+  inner: Map<string, string | null> = new Map();
+}
+
+@serializable
 export class BigObj {
   big_num: u128 = u128.Max;
   typed_arr: Uint8Array = new Uint8Array(1000);

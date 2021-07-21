@@ -1,147 +1,101 @@
-import { Deserializer, allocObj } from "@serial-as/core";
+// TODO: 
+// - check SET
+// - raise errors for Maps with non-key strings
+// - check escaped characters
+// - add more error messages in parser.ts
+
+import { Deserializer, allocObj, defaultValue } from "@serial-as/core";
 import { u128, u128Safe } from "as-bignum";
 import * as base64 from "as-base64";
+import { JParser, Value } from "./parser";
 
+function json_to_dict(json: string): Map<string, string>{
+  return new Map<string, string>()
+}
 export class JSONDeserializer extends Deserializer<string>{
 
-  public offset: u32 = 0
-  public first: bool = true
+  private current_value: Value
+
+  public offset: i32 = 0
   public nums: Set<string> = new Set<string>()
   public floats: Set<string> = new Set<string>()
 
   constructor(encoded_object: string) {
     super(encoded_object)
-    this.nums.add("-")
-    this.nums.add("+")
 
-    this.floats.add("-")
-    this.floats.add("+")
-
-    this.floats.add(".")
-    this.floats.add("e")
-    this.floats.add("E")
-
-    for (let i: u8 = 0; i < 10; i++) {
-      this.nums.add(i.toString())
-      this.floats.add(i.toString())
-    }
+    this.current_value = JParser.parse(encoded_object)
   }
 
   finished(): bool {
-    return this.offset == <u32>this.encoded_object.length
+    return this.offset == <u32>this.current_value.value.length
   }
 
   current_char(): string {
-    return this.encoded_object.at(this.offset)
+    return this.current_value.value.at(this.offset)
   }
 
   escaped_char(): bool {
     if (this.offset == 0) { return false }
-    return this.encoded_object.at(this.offset - 1) == '\\'
-  }
-
-  skip_spaces(): void {
-    while (!this.finished() && this.current_char() == " ") {
-      this.offset += 1
-    }
+    return this.current_value.value.at(this.offset - 1) == '\\'
   }
 
   decode<T>(): T {
-    this.skip_spaces()
     const res: T = super.decode<T>()
-    this.skip_spaces()
     return res
   }
 
   decode_field<T>(name: string): T {
-    // "name":value,
-
-    this.skip_spaces()
-
-    if (this.first) {
-      this.offset += 1
-      this.first = false
+    const fields = this.current_value.fields
+    if( fields == null){
+      return defaultValue<T>()
     }
 
-    this.skip_spaces()
-
-    // pass over "name"
-    this.offset += name.length + 2
-
-    this.skip_spaces()
-
-    // pass over :
-    this.offset += 1
-
-    this.skip_spaces()
-
-    // get value
-    const ret: T = this.decode<T>()
-
-    this.skip_spaces()
-
-    // pass over , or }
-    this.offset += 1
-
+    if(!fields.has(name)){
+      return defaultValue<T>()
+    }
+    
+    const cv = this.current_value
+    this.current_value = fields.get(name)
+    const ret:T = this.decode<T>()
+    this.current_value = cv
     return ret
   }
 
   // Bool --
   decode_bool(): bool {
-    if (this.encoded_object.at(this.offset) == "t") {
-      // it is true,
-      this.offset += 4
+    if (this.current_value.value == "true") {
       return true
     }
-    // it is false,
-    this.offset += 5
+    assert(this.current_value.value == "false",
+           `Wrong boolean ${this.current_value}`)
     return false
   }
 
   // String --
   decode_string(): string {
-    // "a\"string"
-    this.offset += 1
-    let start: u32 = this.offset
-
-    while (true) {
-      if ((this.current_char() == '"' || this.current_char() == "'") && !this.escaped_char()) {
-        break
-      }
-      this.offset += 1
-    }
-
-    let ret: string = this.encoded_object.slice(start, this.offset)
-    ret = ret.replaceAll('\\"', '"')
-    ret = ret.replaceAll("\\'", "'")
-    this.offset += 1
+    let ret: string = this.current_value.value.replaceAll('\\"', '"')
     return ret
   }
 
   // Array --
   decode_array<A extends ArrayLike<any>>(): A {
     //[v1,v2,...,v4] or "uint8_encoded_as64"
-    let ret: A
+    const cv = this.current_value
+    const arr = this.current_value.array
 
-    this.offset += 1 // skip [
-    this.skip_spaces()
-
-    if (this.current_char() == ']') {
-      //empty array
-      this.offset += 1
+    if (arr == null){
       return instantiate<A>(0)
     }
 
-    // Not empty
-    ret = instantiate<A>()
+    let ret: A = instantiate<A>(arr.length)
 
-    while (this.current_char() != ']') {
-      if (this.current_char() == ',') { this.offset += 1 }
+    for(let i=0; i < arr.length; i++){
+      this.current_value = arr[i]
       //@ts-ignore
-      ret.push(this.decode<valueof<A>>())
+      ret[i] = this.decode<valueof<A>>()
     }
 
-    this.offset += 1  // skip: ]
+    this.current_value = cv
 
     return ret
   }
@@ -180,8 +134,7 @@ export class JSONDeserializer extends Deserializer<string>{
 
   // Null --
   decode_nullable<T>(): T | null {
-    if (this.current_char() == "n") {
-      this.offset += 4  // skip null
+    if (this.current_value.value == "null") {
       return null
     }
     return this.decode<NonNullable<T>>()
@@ -189,10 +142,8 @@ export class JSONDeserializer extends Deserializer<string>{
 
   // Set --
   decode_set<T>(): Set<T> {
-    // {val,val,val}
+    /* // {val,val,val}
     this.offset += 1  // skip {
-
-    this.skip_spaces()
 
     if (this.current_char() == '}') {
       //empty set
@@ -210,34 +161,37 @@ export class JSONDeserializer extends Deserializer<string>{
 
     this.offset += 1  // skip }
 
-    return ret_set
+    return ret_set */
+    return new Set<T>()
   }
 
   // Map --
   decode_map<K, V>(): Map<K, V> {
     // {key:val,key:val}
-    this.offset += 1  // skip {
+    // ERROR IF K IS NOT STRING
 
-    this.skip_spaces()
+    const cv = this.current_value
+    const fields = this.current_value.fields
 
-    if (this.current_char() == '}') {
+    if (fields == null) {
       //empty map
-      this.offset += 1
       return new Map<K, V>()
     }
 
     // non empty
+    const keys = fields.keys()
     let ret_map: Map<K, V> = new Map<K, V>()
-    while (this.current_char() != '}') {
-      if (this.current_char() == ',') { this.offset += 1 }
 
-      const key = this.decode<K>()
-      this.offset += 1  // skip :
+    for(let i=0; i < keys.length; i++) {
+      const k = keys[i]
+
+      this.current_value = fields.get(k)
+
       const value = this.decode<V>()
-      ret_map.set(key, value)
+      ret_map.set(<K>k, value)
     }
 
-    this.offset += 1  // skip }
+    this.current_value = cv
 
     return ret_map
   }
@@ -253,7 +207,6 @@ export class JSONDeserializer extends Deserializer<string>{
       object.lo = obj.lo;
       object.hi = obj.hi;
     } else {
-      this.first = true
       object.decode(this);
     }
 
@@ -261,14 +214,7 @@ export class JSONDeserializer extends Deserializer<string>{
   }
 
   decode_int<T extends number>(): T {
-
-    let start: u32 = this.offset
-    // faster than performing regex?
-    while (!this.finished() && this.nums.has(this.current_char())) {
-      this.offset += 1
-    }
-
-    return <T>parseInt(this.encoded_object.slice(start, this.offset))
+    return <T>parseInt(this.current_value.value)
   }
 
   decode_long<T extends number>(): T {
@@ -282,14 +228,7 @@ export class JSONDeserializer extends Deserializer<string>{
   }
 
   decode_float<T extends number>(): T {
-    let start: u32 = this.offset
-
-    // faster than performing regex?
-    while (!this.finished() && this.floats.has(this.current_char())) {
-      this.offset += 1
-    }
-
-    return <T>(parseFloat(this.encoded_object.slice(start, this.offset)))
+    return <T>(parseFloat(this.current_value.value))
   }
 
   // We override decode_number, for which we don't need these
