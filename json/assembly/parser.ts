@@ -49,7 +49,7 @@ export class JParser{
   public jstring: string = ""
   private offset:i32 = 0
   private nums:Set<string> = new Set<string>()
-  private escaped: Set<string> = new Set<string>()
+  private escaped: Map<string, string> = new Map<string, string>()
 
   constructor(jstring: string){
     this.jstring = jstring
@@ -63,9 +63,10 @@ export class JParser{
       this.nums.add(i.toString())
     }
 
-    let escaped = ['"', "\\", "/", "b", "n", "r", "t"]
+    const echar = ['"', "\\", "/", "b", "n", "r", "t"]
+    const escaped = ['\"', "\\", "\/", "\b", "\n", "\r", "\t"]
     for (let i:i32 = 0; i < escaped.length; i++){
-      this.escaped.add(escaped[i])
+      this.escaped.set(echar[i], escaped[i])
     }
   }
 
@@ -210,26 +211,23 @@ export class JParser{
   // STRING ==========================================================
   parse_string(): Value {
     this.expect_to_be(this.current_char(), '"')
-    let ret:string = ''
+    let ret:Array<string> = []
     this.offset += 1 // skip "
-
 
     while (true) {
       const current = this.current_char()
       if (current == '"'){ break }
 
-      assert(current.charCodeAt(0) >= 0x20, `Unexpected control character`);
-
-      if (current == '\\'){ 
-        ret += this.parse_escaped()
+      if (current == '\\'){
+        ret.push(this.parse_escaped())
       }else{
-        ret += current
+        ret.push(current)
         this.offset += 1
       }
     }
     this.expect_to_be(this.current_char(), '"')
     this.offset += 1 // skip "
-    return new Value(ret)
+    return new Value(ret.join(''))
   }
 
   parse_escaped(): string {
@@ -240,12 +238,12 @@ export class JParser{
     if (current == "u") {
       this.offset += 1 // skip u
       const hex = this.parse_4hex()      
-      return "\\" + "u" + hex
+      return hex
     }
 
     if(this.escaped.has(current)){
       this.offset += 1
-      return `\\${current}`
+      return this.escaped.get(current)
     }
     
     // ERROR(`Unexpected escaped character: ${current}`);
@@ -255,7 +253,7 @@ export class JParser{
   parse_4hex(): string {
     assert(this.jstring.length > this.offset + 4, "Abrupt end of HEX")
 
-    let ret = ""
+    let D: Array<i32> = new Array<i32>(4)
 
     for(let i=0; i<4; i++){
       let current = this.current_char()
@@ -270,11 +268,10 @@ export class JParser{
       }
 
       assert(digit >= 0 && digit < 16, "Unexpected \\u digit");
-      
-      ret += current
+      D[i] = digit
       this.offset += 1
     }
-
-    return ret
+    let charCode = D[0]*0x1000 + D[1]*0x100 + D[2]*0x10 + D[3];
+    return String.fromCodePoint(charCode)
   }
 }

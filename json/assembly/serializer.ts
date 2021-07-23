@@ -6,6 +6,19 @@ export class JSONSerializer extends Serializer<string>{
 
   public starting_object: bool = true
   public inner_encode: string[] = []
+  public escaped: Set<string> = new Set<string>()
+  public e2char: Map<string, string> = new Map<string, string>()
+
+  constructor(){
+    super()
+    const escaped = ['"', "\\", "\/", "\b", "\n", "\r", "\t"]
+    const echar = ['"', "\\", "/", "b", "n", "r", "t"]
+
+    for(let i=0; i < escaped.length; i++){
+      this.escaped.add(escaped[i])
+      this.e2char.set(escaped[i], echar[i])
+    }
+  }
 
   get_encoded_object(): string {
     return this.inner_encode.join('')
@@ -31,9 +44,20 @@ export class JSONSerializer extends Serializer<string>{
 
   // String --
   encode_string(value: string): void {
-    value = value.replaceAll('"', '\\"')
-    value = value.replaceAll("'", "\\'")
-    this.inner_encode.push(`"${value}"`)
+
+    let ret: Array<string> = []
+
+    for(let i = 0; i < value.length; i++){
+      let char:string = value.at(i)
+      if(this.escaped.has(char)){
+        ret.push('\\')
+        ret.push(this.e2char.get(char))
+      }else{
+        ret.push(char)
+      } 
+    }
+ 
+    this.inner_encode.push(`"${ret.join('')}"`)
   }
 
   // Array --
@@ -78,12 +102,12 @@ export class JSONSerializer extends Serializer<string>{
   // Set --
   encode_set<T>(value: Set<T>): void {
     let values = value.values();
-    this.inner_encode.push(`{`)
+    this.inner_encode.push(`[`)
     for (let i = 0; i < values.length; i++) {
       this.encode<T>(values[i])
       if (i != values.length - 1) { this.inner_encode.push(`,`) }
     }
-    this.inner_encode.push(`}`)
+    this.inner_encode.push(`]`)
   }
 
   // Map --

@@ -1,7 +1,5 @@
 // TODO: 
-// - check SET
 // - raise errors for Maps with non-key strings
-// - check escaped characters
 // - add more error messages in parser.ts
 
 import { Deserializer, allocObj, defaultValue } from "@serial-as/core";
@@ -9,9 +7,7 @@ import { u128, u128Safe } from "as-bignum";
 import * as base64 from "as-base64";
 import { JParser, Value } from "./parser";
 
-function json_to_dict(json: string): Map<string, string>{
-  return new Map<string, string>()
-}
+
 export class JSONDeserializer extends Deserializer<string>{
 
   private current_value: Value
@@ -142,27 +138,24 @@ export class JSONDeserializer extends Deserializer<string>{
 
   // Set --
   decode_set<T>(): Set<T> {
-    /* // {val,val,val}
-    this.offset += 1  // skip {
+    //[v1,v2,...,v4]
+    const cv = this.current_value
+    const arr = this.current_value.array
 
-    if (this.current_char() == '}') {
-      //empty set
-      this.offset += 1
-      return new Set<T>()
+    let ret: Set<T> = new Set<T>()
+
+    if (arr == null){
+      return ret
     }
 
-    // not empty
-    let ret_set: Set<T> = new Set<T>()
-
-    while (this.current_char() != '}') {
-      if (this.current_char() == ',') { this.offset += 1 }
-      ret_set.add(this.decode<T>())
+    for(let i=0; i < arr.length; i++){
+      this.current_value = arr[i]
+      ret.add(this.decode<T>())
     }
 
-    this.offset += 1  // skip }
+    this.current_value = cv
 
-    return ret_set */
-    return new Set<T>()
+    return ret
   }
 
   // Map --

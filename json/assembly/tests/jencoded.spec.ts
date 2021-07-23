@@ -65,6 +65,22 @@ function check_single_number<T extends number>(N: T): void {
 
 
 describe("JSONSerializer Serializing Types", () => {
+  it("should encode/decode special chars", () => {
+    let str: string = '\b';
+    let expected: string = '"\\b"';
+
+    check_encode(str, expected)
+    check_decode(expected, str)
+
+    str = "\u0000";
+    expected = '"\\u0000"';
+    check_decode(expected, str)
+
+    str = "ᄑ"
+    expected = '"\\u1111"'
+    check_decode<string>(expected, str)
+  });
+
   it("should encode/decode numbers", () => {
     check_single_number<u8>(100)
     check_single_number<u16>(101)
@@ -197,10 +213,10 @@ describe("JSONSerializer Serializing Objects", () => {
     check_encode<ArrayViews>(arrays, expected)
     check_decode<ArrayViews>(expected, arrays)
   });
-/*
+
   it("should encode/decode empty Sets and Maps", () => {
     const map_set: MapSet = new MapSet()
-    const expected: string = '{"map":{},"set":{}}'
+    const expected: string = '{"map":{},"set":[]}'
 
     check_encode<MapSet>(map_set, expected)
     check_decode<MapSet>(expected, map_set)
@@ -212,11 +228,11 @@ describe("JSONSerializer Serializing Objects", () => {
     map_set.set.add(256)
     map_set.set.add(4)
 
-    const expected: string = '{"map":{"hi":1},"set":{256,4}}'
+    const expected: string = '{"map":{"hi":1},"set":[256,4]}'
 
     check_encode<MapSet>(map_set, expected)
     check_decode<MapSet>(expected, map_set)
-  });*/
+  });
 
   it("should encode nullable", () => {
     const nullables: Nullables = new Nullables()

@@ -59,7 +59,13 @@ function check_single_number<T extends number>(N: T): void {
 
 
 describe("JSONSerializer Serializing Types", () => {
-  it("should encode/decode numbers", () => {
+  it("should decode unicode", () => {
+    let str: string = "\u0000";
+    let expected: string = '"\\u0000"';
+    check_decode(expected, str)
+  });
+
+   it("should encode/decode numbers", () => {
     check_single_number<u8>(100)
     check_single_number<u16>(101)
     check_single_number<u32>(102)
@@ -117,15 +123,25 @@ describe("JSONSerializer Serializing Types", () => {
 
     check_decode(expected, nums)
   });
-/*
-  it("should encode/decode just map", () => {
-    const map: Map<i32, string> = new Map()
-    map.set(1, "hi")
 
-    const expected: string = '{1:"hi"}'
+  it("should encode/decode just map", () => {
+    const map: Map<string, string> = new Map()
+    map.set("1", "hi")
+
+    const expected: string = '{"1":"hi"}'
 
     check_decode(expected, map)
-  }); */
+  });
+
+  it("should encode/decode just set", () => {
+    const set: Set<i32> = new Set<i32>()
+    set.add(1)
+    set.add(2)
+
+    const expected: string = '[1,2]'
+
+    check_decode(expected, set)
+  });
 
   it("should handle spaces", () => {
     const nums: bool[] = [true, false];
@@ -187,17 +203,17 @@ describe("JSONSerializer Serializing Objects", () => {
 
     check_decode<MapSet>(expected, map_set)
   });
-/*
+
   it("should encode/decode non-empty Sets and Maps", () => {
     const map_set: MapSet = new MapSet()
     map_set.map.set('hi', 1)
     map_set.set.add(256)
     map_set.set.add(4)
 
-    const expected: string = '{"map":{"hi":1},"set":{256,4}}'
+    const expected: string = '{"map":{"hi":1},"set":[256,4]}'
 
     check_decode<MapSet>(expected, map_set)
-  }); */
+  });
 
   it("should encode nullable", () => {
     const nullables: Nullables = new Nullables()
