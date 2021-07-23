@@ -1,7 +1,6 @@
-const CHAR_0 = "0".codePointAt(0)
-const CHAR_A = "A".codePointAt(0)
-const CHAR_A_LOWER = "a".codePointAt(0)
-
+// TODO: 
+// - raise errors for Maps with non-key strings
+// - add more error messages in parser.ts
 
 export class Value{
   public fields: Map<string, Value> | null
@@ -124,7 +123,7 @@ export class JParser{
       this.skip_spaces()
       return ret
     }else{
-      //ERROR("Expected boolean, null, string, array, object or number")
+      assert(false, "Expected boolean, null, string, array, object or number")
     }
 
     return ret
@@ -246,12 +245,16 @@ export class JParser{
       return this.escaped.get(current)
     }
     
-    // ERROR(`Unexpected escaped character: ${current}`);
-    return "";
+    assert(false, "Unexpected escaped character")
+    return ""
   }
 
   parse_4hex(): string {
     assert(this.jstring.length > this.offset + 4, "Abrupt end of HEX")
+
+    const CHAR_0 = "0".codePointAt(0)
+    const CHAR_A = "A".codePointAt(0)
+    const CHAR_A_LOWER = "a".codePointAt(0)
 
     let D: Array<i32> = new Array<i32>(4)
 

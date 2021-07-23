@@ -133,8 +133,8 @@ describe("JSONSerializer Serializing Types", () => {
     check_encode(str, expected)
     check_decode(expected, str)
 
-    str = '\\u041f\\u043e\\u043b\\u0442\\u043e\\u0440\\u0430 \\u0417\\u0435\\u043c\\u043b\\u0435\\u043a\\u043e\\u043f\\u0430'
-    expected = '"\\u041f\\u043e\\u043b\\u0442\\u043e\\u0440\\u0430 \\u0417\\u0435\\u043c\\u043b\\u0435\\u043a\\u043e\\u043f\\u0430"'
+    str = '\u041f\u043e\u043b\u0442\u043e\u0440\u0430 \u0417\u0435\u043c\u043b\u0435\u043a\u043e\u043f\u0430'
+    expected = '"Полтора Землекопа"'
     check_encode(str, expected)
     check_decode(expected, str)
   });

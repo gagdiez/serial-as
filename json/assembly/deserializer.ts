@@ -1,7 +1,3 @@
-// TODO: 
-// - raise errors for Maps with non-key strings
-// - add more error messages in parser.ts
-
 import { Deserializer, allocObj, defaultValue } from "@serial-as/core";
 import { u128, u128Safe } from "as-bignum";
 import * as base64 from "as-base64";

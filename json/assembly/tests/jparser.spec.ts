@@ -60,9 +60,13 @@ function check_single_number<T extends number>(N: T): void {
 
 describe("JSONSerializer Serializing Types", () => {
   it("should decode unicode", () => {
-    let str: string = "\u0000";
-    let expected: string = '"\\u0000"';
-    check_decode(expected, str)
+    let encoded: string = '"\\u0000"';
+    let expected: string = "\u0000";
+    check_decode(encoded, expected)
+
+    encoded = '"\\u041f\\u043e\\u043b\\u0442\\u043e\\u0440\\u0430 \\u0417\\u0435\\u043c\\u043b\\u0435\\u043a\\u043e\\u043f\\u0430"';
+    expected = 'Полтора Землекопа';
+    check_decode(encoded, expected)
   });
 
    it("should encode/decode numbers", () => {
