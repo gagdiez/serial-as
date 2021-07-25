@@ -205,7 +205,7 @@ describe("JSONSerializer Serializing Types", () => {
 
 
 describe("JSONSerializer Serializing Objects", () => {
-/*   it("should encode/decode numbers", () => {
+   it("should encode/decode numbers", () => {
     const nums: Numbers = new Numbers()
     init_numbers(nums)
     const expected: string = '{"u8":1,"u16":2,"u32":3,"u64":"4","u128":"5","i8":-1,"i16":-2,"i32":-3,"i64":"-4","f32":6.0,"f64":7.1}'
@@ -377,5 +377,5 @@ describe("JSONSerializer Serializing Objects", () => {
     const expected: string = '{"arpa":[{"s2":1},{"s1":2,"s2":3}],"str":"testing","arr":[0,1],"number":2}'
 
     check_decode<MixtureOne>(expected, mix)
-  }); */
+  });
 });
