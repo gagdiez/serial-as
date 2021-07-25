@@ -42,6 +42,11 @@ export class Value{
   }
 }
 
+const WS1 = " "
+const WS2 = '\u0020'
+const WS3 = '\u000A'
+const WS4 = '\u000D'
+const WS5 = '\u0009'
 
 export class JParser{
 
@@ -82,10 +87,18 @@ export class JParser{
     return this.jstring.at(this.offset - 1) == '\\'
   }
 
+  is_white_space(char:string): boolean {
+    return char == WS1 || char == WS2 || char == WS3 || char == WS4 || char == WS5
+  }
+
   skip_spaces(): void {
-    // TODO: ADD OTHERS
-    while (!this.finished() && this.current_char() == " ") {
-      this.offset += 1
+    while (!this.finished()){
+      let current = this.current_char()
+      if(this.is_white_space(current)) {
+        this.offset += 1
+      }else{
+        return
+      }  
     }
   }
 

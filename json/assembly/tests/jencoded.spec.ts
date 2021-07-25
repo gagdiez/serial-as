@@ -156,10 +156,10 @@ describe("JSONSerializer Serializing Types", () => {
     map.set("1", 'hel\"lo')
     check_decode(map_encoded, map)
 
-    check_decode<u8>(" 123 ", 123)
+    check_decode<u8>("\u0020 123  \u000A", 123)
     check_decode<u16>(" 123 ", 123)
     check_decode<u32>(" 123 ", 123)
-    check_decode<i8>(" -123 ", -123)
+    check_decode<i8>("\u000D -123 \u0009 ", -123)
   });
 
   // Tests from https://github.com/near/assemblyscript-json/blob/main/assembly/__tests__/string_escape.spec.ts
