@@ -65,8 +65,7 @@ export class JSONDeserializer extends Deserializer<string>{
 
   // String --
   decode_string(): string {
-    let ret: string = this.current_value.value.replaceAll('\\"', '"')
-    return ret
+    return this.current_value.value
   }
 
   // Array --

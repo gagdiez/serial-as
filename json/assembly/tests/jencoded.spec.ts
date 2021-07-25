@@ -189,6 +189,7 @@ describe("JSONSerializer Serializing Types", () => {
 
     for(let i=0; i<strings.length; i++){
       check_encode(strings[i], expected[i])
+      check_decode(expected[i], strings[i])
     }
   });
 
@@ -199,6 +200,7 @@ describe("JSONSerializer Serializing Types", () => {
 
     for(let i=0; i<strings.length; i++){
       check_encode(strings[i], expected[i])
+      check_decode(expected[i], strings[i])
     }
   });
 })

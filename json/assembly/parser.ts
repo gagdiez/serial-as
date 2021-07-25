@@ -62,8 +62,8 @@ export class JParser{
       this.nums.add(i.toString())
     }
 
-    const echar = ['"', "\\", "/", "b", "n", "r", "t"]
-    const escaped = ['\"', "\\", "\/", "\b", "\n", "\r", "\t"]
+    const echar = ['"', "\\", "/", "b", "f", "n", "r", "t"]
+    const escaped = ['\"', "\\", "\/", "\b", "\f", "\n", "\r", "\t"]
     for (let i:i32 = 0; i < escaped.length; i++){
       this.escaped.set(echar[i], escaped[i])
     }
@@ -207,7 +207,7 @@ export class JParser{
     return new Value('', res)
   }
 
-  // STRING ==========================================================
+  // STRING ======================================
   parse_string(): Value {
     this.expect_to_be(this.current_char(), '"')
     let ret:Array<string> = []
@@ -226,6 +226,7 @@ export class JParser{
     }
     this.expect_to_be(this.current_char(), '"')
     this.offset += 1 // skip "
+
     return new Value(ret.join(''))
   }
 
@@ -245,7 +246,7 @@ export class JParser{
       return this.escaped.get(current)
     }
     
-    assert(false, "Unexpected escaped character")
+    assert(false, `Unexpected escaped character ${current}`)
     return ""
   }
 
