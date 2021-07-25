@@ -11,8 +11,8 @@ export class JSONSerializer extends Serializer<string>{
 
   constructor(){
     super()
-    const escaped = ['"', "\\", "\/", "\b", "\n", "\r", "\t"]
-    const echar = ['"', "\\", "/", "b", "n", "r", "t"]
+    const escaped = ['"', "\\", "\b", "\n", "\r", "\t", '\f', '\v']
+    const echar = ['\\"', "\\\\", "\\b", "\\n", "\\r", "\\t", "\\f", "\\u000b"]
 
     for(let i=0; i < escaped.length; i++){
       this.escaped.add(escaped[i])
@@ -50,7 +50,6 @@ export class JSONSerializer extends Serializer<string>{
     for(let i = 0; i < value.length; i++){
       let char:string = value.at(i)
       if(this.escaped.has(char)){
-        ret.push('\\')
         ret.push(this.e2char.get(char))
       }else{
         ret.push(char)

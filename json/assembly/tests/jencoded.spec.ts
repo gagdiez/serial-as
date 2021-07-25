@@ -1,29 +1,15 @@
 import { u128 } from "as-bignum";
 import * as base64 from "as-base64";
 import { JSON } from '@serial-as/json'
-import {
-  Numbers,
-  init_numbers,
-  aString,
-  MapSet,
-  aBoolean,
-  Arrays,
-  ArrayViews,
-  Nullables,
-  MixtureOne,
-  MixtureTwo,
-  Nested,
-  Extends,
-  MapStrNullValues,
-  BigObj,
-  init_arrays,
-} from "@serial-as/tests";
+import { Numbers, init_numbers, aString, MapSet, aBoolean,
+         Arrays, ArrayViews, Nullables, MixtureOne,
+         MixtureTwo, Nested, Extends, MapStrNullValues,
+         BigObj, init_arrays } from "@serial-as/tests";
 
 
 function check_encode<T>(object: T, expected: string): void {
   // Checks that encoding an object returns the expected encoding
   let res: string = JSON.encode(object);
-
   expect(res).toBe(expected)
 }
 
@@ -51,7 +37,6 @@ function initMixtureTwo(f: MixtureTwo): MixtureTwo {
 
 
 function check_single_number<T extends number>(N: T): void {
-
   let expected: string = N.toString();
 
   // @ts-ignore
@@ -63,23 +48,7 @@ function check_single_number<T extends number>(N: T): void {
   check_decode<T>(expected, N)
 }
 
-
 describe("JSONSerializer Serializing Types", () => {
-  it("should encode/decode special chars", () => {
-    let str: string = '\b';
-    let expected: string = '"\\b"';
-
-    check_encode(str, expected)
-    check_decode(expected, str)
-
-    str = "\u0000";
-    expected = '"\\u0000"';
-    check_decode(expected, str)
-
-    str = "ᄑ"
-    expected = '"\\u1111"'
-    check_decode<string>(expected, str)
-  });
 
   it("should encode/decode numbers", () => {
     check_single_number<u8>(100)
@@ -90,8 +59,6 @@ describe("JSONSerializer Serializing Types", () => {
     check_single_number<i16>(-101)
     check_single_number<i32>(-102)
     check_single_number<i64>(-103)
-
-    check_decode<u8>(" 123 ", 123)
   });
 
   it("should encode/decode floats", () => {
@@ -99,7 +66,6 @@ describe("JSONSerializer Serializing Types", () => {
     check_single_number<f64>(10e2)
     check_single_number<f64>(10E2)
 
-  
     check_encode<f64>(10E2, "1000.0")
     check_decode<f64>("10E2", 10E2)
 
@@ -114,26 +80,52 @@ describe("JSONSerializer Serializing Types", () => {
   })
 
   it("should encode/decode u128", () => {
-    let N: u128 = u128.from("100")
-    let expected: string = '"100"'
+    const N: u128 = u128.from("100")
+    const expected: string = '"100"'
     check_encode(N, expected)
     check_decode(expected, N)
   });
 
   it("should encode/decode just bools", () => {
-    const nums: bool = true;
-    const expected: string = 'true';
+    let boolean: bool = true;
+    let expected: string = 'true';
+    
+    check_encode(boolean, expected)
+    check_decode(expected, boolean)
 
-    check_encode(nums, expected)
-    check_decode(expected, nums)
+    boolean = false;
+    expected = 'false';
+    
+    check_encode(boolean, expected)
+    check_decode(expected, boolean)
   });
 
   it("should encode/decode just strings", () => {
-    let str: string = '"h"i"';
-    let expected: string = '"\\"h\\"i\\""';
+    const str: string = '"h"i" this is a \\/ string';
+    const expected: string = "\"\\\"h\\\"i\\\" this is a \\\\/ string\"";
 
     check_encode(str, expected)
     check_decode(expected, str)
+  });
+
+  it("should encode/decode special chars", () => {
+    let str: string = "\u0008";
+    let expected: string = '"\\b"';
+
+    check_encode(str, expected)
+    check_decode(expected, str)
+
+    str = '"\\u0000"';
+    expected = "\u0000";
+    check_decode(str, expected)
+
+    str = '"\\u1111"'
+    expected = "ᄑ"
+    check_decode<string>(str, expected)
+
+    str = '"\\u041f\\u043e\\u043b\\u0442\\u043e\\u0440\\u0430 \\u0417\\u0435\\u043c\\u043b\\u0435\\u043a\\u043e\\u043f\\u0430"';
+    expected = 'Полтора Землекопа';
+    check_decode(str, expected)
   });
 
   it("should encode/decode just arrays", () => {
@@ -157,22 +149,63 @@ describe("JSONSerializer Serializing Types", () => {
   it("should handle spaces", () => {
     const nums: bool[] = [true, false];
     const arr_encoded: string = ' [ true , false ] '
-
     check_decode(arr_encoded, nums)
 
     const map_encoded: string = ' { "1" : "hel\\"lo" } '
-
     let map: Map<string, string> = new Map()
     map.set("1", 'hel\"lo')
-
     check_decode(map_encoded, map)
+
+    check_decode<u8>(" 123 ", 123)
+    check_decode<u16>(" 123 ", 123)
+    check_decode<u32>(" 123 ", 123)
+    check_decode<i8>(" -123 ", -123)
   });
 
+  // Tests from https://github.com/near/assemblyscript-json/blob/main/assembly/__tests__/string_escape.spec.ts
+  // made by @kpeters-cbsi and @willemneal
+  it('Does not escape characters unneccessarily', () => {
+    const strings = [
+      'sphinx of black quartz, judge my vow',
+      '{}',
+      '[]',
+      '/',
+      '|',
+      '/|||/|||[{]}<>,.',
+      'ஂ ஃ அ ஆ இ ஈ உ ஊ எ ஏ ஐ ஒ ஓ ஔ க ங ச ஜ ஞ ட ண த ந ன ப ம ய ர ற ல ள',
+      'ᄀ ᄁ ᄂ ᄃ ᄄ ᄅ ᄆ ᄇ ᄈ ᄉ ᄊ ᄋ ᄌ ᄍ ᄎ ᄏ ᄐ ᄑ ᄒ ᄓ ᄔ ᄕ ᄖ ᄗ ᄘ ᄙ ᄚ ᄛ ',
+      '℀ ℁ ℂ ℃ ℄ ℅ ℆ ℇ ℈ ℉ ℊ ℋ ℌ ℍ ℎ ℏ ℐ ℑ ℒ ℓ ℔ ℕ № ℗ ℘ ℙ ℚ ℛ ℜ ℝ ℞ ℟ ℠ ℡ ™ ℣ ℤ ℥ Ω ℧ ℨ ℩ K Å ℬ ℭ ℮ ℯ ℰ ℱ Ⅎ ℳ ℴ ℵ ℶ ℷ ℸ ',
+      '☀ ☁ ☂ ☃ ☄ ★ ☆ ☇ ☈ ☉ ☊ ☋ ☌ ☍ ☎ ☏ ☐ ☑ ☒ ☓ ☚ ☛ ☜ ☝ ☞ ☟ ☠ ☡ ☢ ☣ ☤ ☥ ☦ ☧ ☨ ☩ ☪ ☫ ☬ ☭ ☮ ☯ ☰ ☱ ☲ ☳ ☴ ☵ ☶ ☷ ☸ ☹ ☺ ☻ ☼ ☽ ☾ ☿ ♀ ♁ ♂ ♃ ♄ ♅ ♆ ♇ ♈ ♉ ♊ ♋ ♌ ♍ ♎ ♏ ♐ ♑ ♒ ♓',
+    ];
+    strings.forEach(
+      str => { check_encode(str, `"${str}"`) }
+    );
+  });
+
+  it('Escapes quotes and backslashes', () => {
+    // computed using JSON.stringify in Firefox
+    const strings = ['"', '\\', '"\\"', '\\"\\"'];
+    const expected = ["\"\\\"\"", "\"\\\\\"", "\"\\\"\\\\\\\"\"", "\"\\\\\\\"\\\\\\\"\""]
+
+    for(let i=0; i<strings.length; i++){
+      check_encode(strings[i], expected[i])
+    }
+  });
+
+  it('Escapes control characters', () => {
+    // computed using JSON.stringify in Firefox
+    const strings = ['\n', '\r', '\r\n', '\b', '\f', '\t', '\v', '\b\f\t\v\r'];
+    const expected = ["\"\\n\"","\"\\r\"","\"\\r\\n\"","\"\\b\"","\"\\f\"","\"\\t\"","\"\\u000b\"","\"\\b\\f\\t\\u000b\\r\""]
+
+    for(let i=0; i<strings.length; i++){
+      check_encode(strings[i], expected[i])
+    }
+  });
 })
 
 
 describe("JSONSerializer Serializing Objects", () => {
-  it("should encode/decode numbers", () => {
+/*   it("should encode/decode numbers", () => {
     const nums: Numbers = new Numbers()
     init_numbers(nums)
     const expected: string = '{"u8":1,"u16":2,"u32":3,"u64":"4","u128":"5","i8":-1,"i16":-2,"i32":-3,"i64":"-4","f32":6.0,"f64":7.1}'
@@ -245,7 +278,9 @@ describe("JSONSerializer Serializing Objects", () => {
   it("should encode defined nullable", () => {
     let nullables: Nullables = new Nullables()
     nullables.u32Arr_null = [1]
-    const expected: string = '{"u32Arr_null":[1],"arr_null":null,"u64_arr":null,"map_null":null,"set_null":null,"obj_null":null}'
+    nullables.set_null = new Set<string>();
+    (<Set<string>>nullables.set_null).add('1')
+    const expected: string = '{"u32Arr_null":[1],"arr_null":null,"u64_arr":null,"map_null":null,"set_null":["1"],"obj_null":null}'
 
     check_encode<Nullables>(nullables, expected)
     check_decode<Nullables>(expected, nullables)
@@ -342,5 +377,5 @@ describe("JSONSerializer Serializing Objects", () => {
     const expected: string = '{"arpa":[{"s2":1},{"s1":2,"s2":3}],"str":"testing","arr":[0,1],"number":2}'
 
     check_decode<MixtureOne>(expected, mix)
-  });
+  }); */
 });
