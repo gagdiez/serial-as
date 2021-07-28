@@ -1,6 +1,6 @@
 {
   "name": "@serial-as/borsh",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "Borsh Serializer for Assemblyscript",
   "main": "index.js",
   "types": "assembly/index.ts",

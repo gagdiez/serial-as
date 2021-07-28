@@ -1,6 +1,6 @@
 {
   "name": "serial-as",
-  "version": "1.0.1-0",
+  "version": "1.0.2-0",
   "description": "A serializer template for the assemblyscript language",
   "main": "dist",
   "types": "dist",
