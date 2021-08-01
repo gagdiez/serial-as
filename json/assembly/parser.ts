@@ -226,7 +226,7 @@ export class JParser{
     let ret:Array<string> = []
     this.offset += 1 // skip "
 
-    while (true) {
+    while (!this.finished()) {
       const current = this.current_char()
       if (current == '"'){ break }
 
