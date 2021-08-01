@@ -8,13 +8,8 @@ export class JSONDeserializer extends Deserializer<string>{
 
   private current_value: Value
 
-  public offset: i32 = 0
-  public nums: Set<string> = new Set<string>()
-  public floats: Set<string> = new Set<string>()
-
   constructor(encoded_object: string) {
     super(encoded_object)
-
     this.current_value = JParser.parse(encoded_object)
   }
 
