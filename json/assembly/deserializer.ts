@@ -18,19 +18,6 @@ export class JSONDeserializer extends Deserializer<string>{
     this.current_value = JParser.parse(encoded_object)
   }
 
-  finished(): bool {
-    return this.offset == <u32>this.current_value.value.length
-  }
-
-  current_char(): string {
-    return this.current_value.value.at(this.offset)
-  }
-
-  escaped_char(): bool {
-    if (this.offset == 0) { return false }
-    return this.current_value.value.at(this.offset - 1) == '\\'
-  }
-
   decode<T>(): T {
     const res: T = super.decode<T>()
     return res
