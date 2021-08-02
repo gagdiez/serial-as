@@ -2,23 +2,27 @@ import { Serializer } from "@serial-as/core"
 import { u128, u128Safe } from "as-bignum";
 import * as base64 from "as-base64";
 
+
+function escape_char(char: string): string {
+  const charCode = char.charCodeAt(0);
+  switch (charCode) {
+    case 0x22: return '\\"';
+    case 0x5C: return "\\\\";
+    case 0x08: return "\\b";
+    case 0x0A: return "\\n";
+    case 0x0D: return "\\r";
+    case 0x09: return "\\t";
+    case 0x0C: return "\\f";
+    case 0x0B: return "\\u000b";
+    default: return char;
+  }
+}
+
+
 export class JSONSerializer extends Serializer<string>{
 
   public starting_object: bool = true
   public inner_encode: string[] = []
-  public escaped: Set<string> = new Set<string>()
-  public e2char: Map<string, string> = new Map<string, string>()
-
-  constructor(){
-    super()
-    const escaped = ['"', "\\", "\b", "\n", "\r", "\t", '\f', '\v']
-    const echar = ['\\"', "\\\\", "\\b", "\\n", "\\r", "\\t", "\\f", "\\u000b"]
-
-    for(let i=0; i < escaped.length; i++){
-      this.escaped.add(escaped[i])
-      this.e2char.set(escaped[i], echar[i])
-    }
-  }
 
   get_encoded_object(): string {
     return this.inner_encode.join('')
@@ -45,15 +49,10 @@ export class JSONSerializer extends Serializer<string>{
   // String --
   encode_string(value: string): void {
 
-    let ret: Array<string> = []
+    let ret: Array<string> = new Array<string>(value.length)
 
     for(let i = 0; i < value.length; i++){
-      let char:string = value.at(i)
-      if(this.escaped.has(char)){
-        ret.push(this.e2char.get(char))
-      }else{
-        ret.push(char)
-      } 
+      ret[i] = escape_char(value.at(i))
     }
  
     this.inner_encode.push(`"${ret.join('')}"`)
