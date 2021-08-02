@@ -2,6 +2,40 @@
 // - raise errors for Maps with non-key strings
 // - add more error messages in parser.ts
 
+@lazy const WS1 = " "
+@lazy const WS2 = '\u0020'
+@lazy const WS3 = '\u000A'
+@lazy const WS4 = '\u000D'
+@lazy const WS5 = '\u0009'
+
+@lazy const CHAR_minus:i32 = '-'.charCodeAt(0)
+@lazy const CHAR_0: i32 = 48;
+@lazy const CHAR_9: i32 = 57;
+@lazy const CHAR_e:i32 = 'e'.charCodeAt(0)
+@lazy const CHAR_E:i32 = 'E'.charCodeAt(0)
+@lazy const CHAR_point:i32 = '.'.charCodeAt(0)
+
+function escaped_char(char: string): string {
+  let charCode = char.charCodeAt(0)
+  switch (charCode) {
+    case '"'.charCodeAt(0): return '\"';
+    case "\\".charCodeAt(0): return "\\";
+    case "b".charCodeAt(0): return "\b";
+    case "f".charCodeAt(0): return "\f";
+    case "n".charCodeAt(0): return "\n";
+    case "r".charCodeAt(0): return "\r";
+    case "t".charCodeAt(0): return "\t";
+    default: return char;
+  }
+}
+
+function is_number(char: string): bool{
+  let charcode = char.charCodeAt(0)
+  return (CHAR_0 <= charcode && charcode <= CHAR_9) ||
+         charcode == CHAR_point || charcode == CHAR_minus ||
+         charcode == CHAR_e || charcode == CHAR_E
+}
+
 export class Value{
   public fields: Map<string, Value> | null
   public value: string
@@ -42,12 +76,6 @@ export class Value{
   }
 }
 
-const WS1 = " "
-const WS2 = '\u0020'
-const WS3 = '\u000A'
-const WS4 = '\u000D'
-const WS5 = '\u0009'
-
 export class JParser{
 
   public jstring: string = ""
@@ -58,20 +86,6 @@ export class JParser{
   constructor(jstring: string){
     this.jstring = jstring
     this.offset = 0
-
-    this.nums.add("-")
-    this.nums.add(".")
-    this.nums.add("e")
-    this.nums.add("E")
-    for (let i: u8 = 0; i < 10; i++) {
-      this.nums.add(i.toString())
-    }
-
-    const echar = ['"', "\\", "/", "b", "f", "n", "r", "t"]
-    const escaped = ['\"', "\\", "\/", "\b", "\f", "\n", "\r", "\t"]
-    for (let i:i32 = 0; i < escaped.length; i++){
-      this.escaped.set(echar[i], escaped[i])
-    }
   }
 
   finished(): bool {
@@ -130,7 +144,10 @@ export class JParser{
 
     if(current_char == '{'){ ret = this.parse_object(); P = true }
 
-    if(this.nums.has(current_char)){ ret = this.parse_number(); P = true }
+    let charcode = current_char.charCodeAt(0)
+    if((CHAR_0 <= charcode && charcode <= CHAR_9) || charcode == CHAR_minus){
+       ret = this.parse_number(); P = true
+    }
     
     if(P){
       this.skip_spaces()
@@ -155,7 +172,7 @@ export class JParser{
 
   parse_number(): Value{
     const start = this.offset
-    while(!this.finished() && this.nums.has(this.current_char())){
+    while(!this.finished() && is_number(this.current_char())){
       this.offset += 1
     }
     return new Value(this.jstring.slice(start, this.offset))
@@ -254,13 +271,8 @@ export class JParser{
       return hex
     }
 
-    if(this.escaped.has(current)){
-      this.offset += 1
-      return this.escaped.get(current)
-    }
-    
-    assert(false, `Unexpected escaped character ${current}`)
-    return ""
+    this.offset += 1
+    return escaped_char(current)
   }
 
   parse_4hex(): string {
