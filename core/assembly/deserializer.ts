@@ -1,5 +1,4 @@
 import { u128 } from "as-bignum";
-import { defaultValue } from "./utils";
 
 @global
 export abstract class Deserializer<I> {
@@ -12,10 +11,10 @@ export abstract class Deserializer<I> {
   }
 
   // Decode Field
-  abstract _decode_field<T>(name: string, defaultValue: T): T
+  abstract _decode_field<T>(name: string): T
 
-  decode_field<T>(name: string, _defaultValue: T = defaultValue<T>()): T {
-    return this._decode_field(name, _defaultValue);
+  decode_field<T>(name: string): T {
+    return this._decode_field<T>(name);
   }
 
   // Boolean
