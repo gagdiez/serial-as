@@ -1,0 +1,23 @@
+{
+  "name": "@serial-as/msgpack",
+  "version": "1.0.2",
+  "description": "MsgPack Serializer for Assemblyscript",
+  "main": "index.js",
+  "types": "assembly/index.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/gagdiez/serial-as.git",
+    "directory": "json"
+  },
+  "author": "Guillermo Gallardo, Willem Wyndham & Jordan Ellis",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "@serial-as/core": "1.0.2",
+    "as-base64": "^0.2.0",
+    "assemblyscript-json": "^1.1.0"
+  },
+  "devDependencies": {
+    "@serial-as/tests": "1.0.2"
+  }
+}

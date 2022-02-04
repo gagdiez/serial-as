@@ -1,0 +1,3 @@
+{
+  "extends": "@serial-as/core/asconfig.json"
+}
