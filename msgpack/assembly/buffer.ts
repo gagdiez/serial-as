@@ -12,7 +12,7 @@ export class EncodeBuffer {
 
   store<T>(value: T): void {
     this.resize_if_necessary(sizeof<T>())
-    store<T>(this.start + this.offset, value)
+    store<T>(this.start + this.offset, bswap(value))
     this.offset += sizeof<T>()
   }
 

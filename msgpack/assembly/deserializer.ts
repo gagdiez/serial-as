@@ -1,158 +1,138 @@
-import { Deserializer, allocObj } from "@serial-as/core";
-import { DecodeBuffer } from "./buffer";
-import {
-  Format,
-  isFloat32,
-  isFloat64,
-  isFixedInt,
-  isNegativeFixedInt,
-  isFixedMap,
-  isFixedArray,
-  isFixedString,
-} from "./format";
+import { Deserializer, allocObj, WRAP } from "@serial-as/core";
+import { u128, u128Safe } from "as-bignum";
+import { Value, MsgParser } from "./parser";
 
-export class BorshDeserializer extends Deserializer<ArrayBuffer>{
-  private decoBuffer: DecodeBuffer;
+export class MsgPackDeserializer extends Deserializer<ArrayBuffer>{
   
+  private current_value: Value
+
   constructor(encoded_object: ArrayBuffer) {
     super(encoded_object)
-    this.decoBuffer = new DecodeBuffer(encoded_object)
-  }
-  
-  _decode_field<T>(_name: string, _defaultValue: T): T {
-    return this.decode<T>()
-  }
-  
-  // Bool --
-  decode_bool(): bool {
-    // little endian
-    return this.decoBuffer.consume<bool>()
+    this.current_value = MsgParser.parse(encoded_object)
   }
 
-  decode_bool_msg(): bool {
-    const value = this.decoBuffer.consume<u8>();
-    if (value == Format.TRUE) {
-      return true;
-    } else if (value == Format.FALSE) {
-      return false;
+  decode<T>(): T {
+    const res: T = super.decode<T>()
+    return res
+  }
+
+  _decode_field<T>(name: string, defaultValue: T): T {
+    const fields = this.current_value.fields
+    if( fields == null){
+      return defaultValue
     }
-    throw new TypeError(
-      this._context.printWithContext(
-        "Property must be of type 'bool'. " + this._getErrorMessage(value)
-      )
-    );
+
+    if(!fields.has(name)){
+      return defaultValue
+    }
+    
+    const cv = this.current_value
+    this.current_value = fields.get(name)
+    const ret:T = this.decode<T>()
+    this.current_value = cv
+    return ret
+  }
+
+  // Bool --
+  decode_bool(): bool {
+    //if (this.current_value.value == "true") {
+    //  return true
+    //}
+    //assert(this.current_value.value == "false",
+    //       `Wrong boolean ${this.current_value}`)
+    //return false
+    return false
   }
 
   // String --
   decode_string(): string {
-    const encoded_string = this.decode_arraybuffer();
-    const decoded_string: string = String.UTF8.decode(encoded_string)
-
-    // repr(decoded as Vec<u8>) 
-    return decoded_string
+    return ""
   }
 
   // Array --
   decode_array<A extends ArrayLike<any>>(): A {
-    // TODO: HANDLE NULL
-    const length: u32 = this.decoBuffer.consume<u32>()
-
-    let ret_array: A = instantiate<A>(length)
-
-    //for el in x; repr(el as K)
-    for (let i: u32 = 0; i < length; i++) {
-      // @ts-ignore
-      ret_array[i] = this.decode<valueof<A>>()
-    }
-
-    return ret_array
+    //[v1,v2,...,v4] or "uint8_encoded_as64"
+    return instantiate<A>(0)
   }
 
-  decode_arraybuffer(): ArrayBuffer {
-    const length: u32 = this.decoBuffer.consume<u32>()
-    return this.decoBuffer.consume_slice(length);
+  decode_array_to_type<A>():A{
+    return instantiate<A>(0)
   }
 
-  decode_arraybuffer_view<A extends ArrayBufferView>(): A {
-    const length = this.decoBuffer.consume<u32>();
-    let res:A = instantiate<A>(length)
-    // @ts-ignore
-    this.decoBuffer.consume_copy(res.dataStart, sizeof<valueof<A>>()*length)
-    return res
+  decode_arraybuffer_view<A extends ArrayBufferView>(): A {   
+    return this.decode_array_to_type<A>()
   }
 
-  decode_static_array<T>(): StaticArray<T> {
-    const length = this.decoBuffer.consume<u32>();
-    const res = new StaticArray<T>(length);
-    this.decoBuffer.consume_copy(changetype<usize>(res), sizeof<T>()*length);
-    return res;
+  decode_static_array<T>():StaticArray<T>{
+    return this.decode_array_to_type<StaticArray<T>>()
+  }
+
+  decode_arraybuffer(): ArrayBuffer{
+    return this.decode_array_to_type<Uint8Array>().buffer
   }
 
   // Null --
   decode_nullable<T>(): T | null {
-    let option = this.decoBuffer.consume<u8>();
-    if (option) {
-      return this.decode<NonNullable<T>>()
-    }
-    return null;
+    return null
   }
 
   // Set --
   decode_set<T>(): Set<T> {
-    const length: u32 = this.decoBuffer.consume<u32>()
-
-    let ret_set: Set<T> = new Set<T>()
-
-    //for el in x.sorted(); repr(el as S)
-    for (let i: u32 = 0; i < length; i++) {
-      ret_set.add(this.decode<T>())
-    }
-
-    return ret_set
+    let ret: Set<T> = new Set<T>()
+    return ret
   }
 
   // Map --
   decode_map<K, V>(): Map<K, V> {
-    // TODO: HANDLE NULL
-    const length: u32 = this.decoBuffer.consume<u32>()
-
-    let ret_map: Map<K, V> = new Map<K, V>()
-
-    // repr(k as K)
-    // repr(v as V)
-    for (let i: u32 = 0; i < length; i++) {
-      const key = this.decode<K>()
-      const value = this.decode<V>()
-      ret_map.set(key, value)
-    }
-    return ret_map
+    return new Map<K, V>()
   }
 
   // Object --
   decode_object<C extends object>(): C {
-    let object: C = allocObj<C>()
-    object.decode(this)
+    // {object}
+
+    let object: C;
+    object = allocObj<C>();
+    if (object instanceof u128 || object instanceof u128Safe) {
+      const obj = u128.from(this.decode_string());
+      object.lo = obj.lo;
+      object.hi = obj.hi;
+    } else {
+      object.decode(this);
+    }
+
     return object
   }
 
-  decode_number<T>(): T {
-    // little_endian(x)
-    return this.decoBuffer.consume<T>()
+  decode_int<T extends number>(): T {
+    return <T>0
+  }
+
+  decode_long<T extends number>(): T {
+    return <T>0
+  }
+
+  decode_u128(): u128 {
+    return u128.from(0)
+  }
+
+  decode_float<T extends number>(): T {
+    return <T>(parseFloat("0"))
   }
 
   // We override decode_number, for which we don't need these
-  decode_u8(): u8 { return 0 }
-  decode_i8(): i8 { return 0 }
-  decode_u16(): u16 { return 0 }
-  decode_i16(): i16 { return 0 }
-  decode_u32(): u32 { return 0 }
-  decode_i32(): i32 { return 0 }
-  decode_u64(): u64 { return 0 }
-  decode_i64(): i64 { return 0 }
-  decode_f32(): f32 { return 0 }
-  decode_f64(): f64 { return 0 }
+  decode_u8(): u8 { return this.decode_int<u8>() }
+  decode_i8(): i8 { return this.decode_int<i8>() }
+  decode_u16(): u16 { return this.decode_int<u16>() }
+  decode_i16(): i16 { return this.decode_int<i16>() }
+  decode_u32(): u32 { return this.decode_int<u32>() }
+  decode_i32(): i32 { return this.decode_int<i32>() }
+  decode_u64(): u64 { return this.decode_long<u64>() }
+  decode_i64(): i64 { return this.decode_long<i64>() }
+  decode_f32(): f32 { return this.decode_float<f32>() }
+  decode_f64(): f64 { return this.decode_float<f64>() }
 
   static decode<T>(a: ArrayBuffer): T {
-    return (new BorshDeserializer(a)).decode<T>();
+    return (new MsgPackDeserializer(a)).decode<T>();
   }
 }
