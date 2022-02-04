@@ -33,7 +33,7 @@ export class ValueDeserializer extends Deserializer<JSON.Value>{
     return (<JSON.Arr>this.currentVal);
   }
 
-  _decode_field<T>(name: string): T {
+  decode_field<T>(name: string): T {
     // "name":value,
     const obj = this.currentObj;
     if (!obj.has(name)) { return defaultValue<T>(); }

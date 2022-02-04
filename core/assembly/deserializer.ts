@@ -11,11 +11,7 @@ export abstract class Deserializer<I> {
   }
 
   // Decode Field
-  abstract _decode_field<T>(name: string): T
-
-  decode_field<T>(name: string): T {
-    return this._decode_field<T>(name);
-  }
+  abstract decode_field<T>(name: string): T
 
   // Boolean
   abstract decode_bool(): bool

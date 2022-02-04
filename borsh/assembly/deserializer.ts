@@ -9,7 +9,7 @@ export class BorshDeserializer extends Deserializer<ArrayBuffer>{
     this.decoBuffer = new DecodeBuffer(encoded_object)
   }
   
-  _decode_field<T>(_name: string): T {
+  decode_field<T>(_name: string): T {
     return this.decode<T>()
   }
   
