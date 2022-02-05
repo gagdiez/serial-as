@@ -131,4 +131,8 @@ export class MsgPackDeserializer extends Deserializer<ArrayBuffer>{
   decode_i64(): i64 { return this.decode_long<i64>() }
   decode_f32(): f32 { return this.decode_float<f32>() }
   decode_f64(): f64 { return this.decode_float<f64>() }
+
+  static decode<T>(a: ArrayBuffer): T {
+    return (new MsgPackDeserializer(a)).decode<T>();
+  }
 }
