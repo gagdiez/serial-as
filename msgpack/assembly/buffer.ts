@@ -12,7 +12,17 @@ export class EncodeBuffer {
 
   store<T>(value: T): void {
     this.resize_if_necessary(sizeof<T>())
-    store<T>(this.start + this.offset, bswap(value))
+    if(!isFloat<T>(value)){
+      store<T>(this.start + this.offset, bswap(value))
+    }else{
+      if (value instanceof f32){
+        store<u32>(this.start + this.offset, bswap<u32>(reinterpret<u32>(value)))
+      }else{
+        store<u64>(this.start + this.offset, bswap<u64>(reinterpret<u64>(value)))
+      }
+      
+    }
+        
     this.offset += sizeof<T>()
   }
 
