@@ -161,9 +161,10 @@ export class MsgPackSerializer extends Serializer<ArrayBuffer> {
   }
 
   encode_i32(value: i32): void { 
-    if (value >= 0 && value < 1 << 7) {
+
+    if (value >= 0 && value <= 128) {
       this.buffer.store<u8>(<u8>value);
-    } else if (value < 0 && value >= -(1 << 5)) {
+    } else if (value < 0 && value >= -32) {
       this.buffer.store<u8>((<u8>value) | (<u8>Format.NEGATIVE_FIXINT));
     } else if (value <= <i32>i8.MAX_VALUE && value >= <i32>i8.MIN_VALUE) {
       this.buffer.store<u8>(<u8>Format.INT8);

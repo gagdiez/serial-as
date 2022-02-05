@@ -58,16 +58,47 @@ function check_single_number<T = number>(N: T): void {
 
 describe("MsgPack Serializing Types", () => {
   it("should encode/decode numbers", () => {
-    
     let expected: ArrayBuffer = u8toArrayBuffer([1])
     check_encode(<u8>1, expected)
 
-    expected = u8toArrayBuffer([0xcc, 0x80])
+    expected = u8toArrayBuffer([0xe0])
+    check_encode(<i8>-32, expected)
+
+    expected = u8toArrayBuffer([33])
+    check_encode(<i8>33, expected)
+
+    expected = u8toArrayBuffer([33])
+    check_encode(<u8>33, expected)
+
+    expected = u8toArrayBuffer([0xd0, 0xdf])
+    check_encode(<i8>-33, expected)
+
+    expected = u8toArrayBuffer([127])
+    check_encode<i8>(127, expected)
+
+    expected = u8toArrayBuffer([204, 128])
     check_encode(<u8>128, expected)
 
-    // This fails, don't know why
-    // expected = u8toArrayBuffer([0xd1, 0xff, 0x80])
-    // check_encode(-128, expected)
+    expected = u8toArrayBuffer([0xff])
+    check_encode<i8>(-1, expected)
+
+    expected = u8toArrayBuffer([0xd0, 0x81])
+    check_encode(-127, expected)
+    
+    expected = u8toArrayBuffer([0xd0, 0x80])
+    check_encode(-128, expected)
+
+    expected = u8toArrayBuffer([0xd1, 0xff, 0x7f])
+    check_encode(-129, expected)
+
+    expected = u8toArrayBuffer([209, 128, 0])
+    check_encode(-32768, expected)
+
+    expected = u8toArrayBuffer([210, 255, 255, 127, 255])
+    check_encode(-32769, expected)
+
+    expected = u8toArrayBuffer([211, 255, 255, 255, 255, 127, 255, 255, 255])
+    check_encode<i64>(-2147483649, expected)
 
     //check_decode(expected, num)
 
@@ -81,8 +112,14 @@ describe("MsgPack Serializing Types", () => {
     roundTrip<i64>(-103) */
   });
 
-/*   it("should encode/decode floats", () => {
-    roundTrip<f64>(7.23)
+  it("should encode/decode floats", () => {
+    let expected: ArrayBuffer = u8toArrayBuffer([203, 64, 28, 235, 133, 30, 184, 81, 236])
+    check_encode<f64>(7.23, expected)
+
+    expected = u8toArrayBuffer([202, 64, 231, 92, 41])
+    check_encode(<f32>7.23, expected)
+
+    /*roundTrip<f64>(7.23)
     roundTrip<f64>(10e2)
     roundTrip<f64>(10E2)
 
@@ -91,37 +128,54 @@ describe("MsgPack Serializing Types", () => {
     roundTrip<f64>(123456E-5)
     
     roundTrip<f64>(0.0)
-    roundTrip<f64>(7.23)
+    roundTrip<f64>(7.23)*/
   });
 
-    it("should encode/decode u128", () => {
+  /*it("should encode/decode u128", () => {
     let N: u128 = u128.from("100")
     roundTrip(N);
-  });
+  });*/
 
   it("should encode/decode just bools", () => {
-    const nums: bool = true;
-    roundTrip(nums)
+    let expected: ArrayBuffer = u8toArrayBuffer([0xc3])
+    check_encode(true, expected)
+
+    expected = u8toArrayBuffer([0xc2])
+    check_encode(false, expected)
+
+    //roundTrip(nums)
   });
 
   it("should encode/decode just strings", () => {
-    let str: string = '"h"i"';
+    let str: string = "h\"i";
+    let expected: ArrayBuffer = u8toArrayBuffer([0xa3, 0x68, 0x22, 0x69])
+    check_encode(str, expected)
 
-    roundTrip(str);
+    str = "\\u041f\\u043e\\u043b\\u0442\\u043e\\u0440\\u0430 \\u0417\\u0435\\u043c\\u043b\\u0435\\u043a\\u043e\\u043f\\u0430"
+    expected = u8toArrayBuffer([0xd9, 0x61, 0x5c, 0x75, 0x30, 0x34, 0x31, 0x66, 0x5c, 0x75, 0x30, 0x34, 0x33, 0x65, 0x5c, 0x75, 0x30, 0x34, 0x33, 0x62, 0x5c, 0x75, 0x30, 0x34, 0x34, 0x32, 0x5c, 0x75, 0x30, 0x34, 0x33, 0x65, 0x5c, 0x75, 0x30, 0x34, 0x34, 0x30, 0x5c, 0x75, 0x30, 0x34, 0x33, 0x30, 0x20, 0x5c, 0x75, 0x30, 0x34, 0x31, 0x37, 0x5c, 0x75, 0x30, 0x34, 0x33, 0x35, 0x5c, 0x75, 0x30, 0x34, 0x33, 0x63, 0x5c, 0x75, 0x30, 0x34, 0x33, 0x62, 0x5c, 0x75, 0x30, 0x34, 0x33, 0x35, 0x5c, 0x75, 0x30, 0x34, 0x33, 0x61, 0x5c, 0x75, 0x30, 0x34, 0x33, 0x65, 0x5c, 0x75, 0x30, 0x34, 0x33, 0x66, 0x5c, 0x75, 0x30, 0x34, 0x33, 0x30])
+
+    str = "\"h\"i\" this is a \\/ string"
+    expected = u8toArrayBuffer([0xb9, 0x22, 0x68, 0x22, 0x69, 0x22, 0x20, 0x74, 0x68, 0x69, 0x73, 0x20, 0x69, 0x73, 0x20, 0x61, 0x20, 0x5c, 0x2f, 0x20, 0x73, 0x74, 0x72, 0x69, 0x6e, 0x67])
+    //roundTrip(str);
   });
 
   it("should encode/decode just arrays", () => {
-    const nums: bool[] = [true, false];
+    let nums: bool[] = [true, false];
+    let expected: ArrayBuffer = u8toArrayBuffer([0x92, 0xc3, 0xc2])
+    check_encode(nums, expected)
 
-    roundTrip(nums);
+    // roundTrip(nums);
   });
 
   it("should encode/decode just map", () => {
     const map: Map<i32, string> = new Map()
     map.set(1, "hi")
 
-    roundTrip(map);
-  }); */
+    let expected: ArrayBuffer = u8toArrayBuffer([0x81, 1, 0xa2, 0x68, 0x69])
+    check_encode(map, expected)
+
+    //roundTrip(map);
+  });
 })
 
 /* describe("JSONSerializer Serializing Objects", () => {
