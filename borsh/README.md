@@ -26,7 +26,7 @@ let decoded: Pair = BorshDeserializer.decode<Pair>(serialized)
 
 ## Limitations
 
-Assemblyscript does not have Enums, nor allows to predefine the lenght of an array. Because of this, Borsh-as has the following limitations:
+Assemblyscript does not have Enums, nor allows to predefine the length of an array. Because of this, Borsh-as has the following limitations:
 
 - Does **not** deserialize Enums.
 - Does **not** deserialize fixed-size arrays.
