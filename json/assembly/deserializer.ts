@@ -164,7 +164,7 @@ export class ValueDeserializer extends Deserializer<JSON.Value>{
   }
 
   decode_float<T extends number>(): T {
-    assert(this.currentVal.isFloat, `Expected JSON.Float but found ${this.currentVal.stringify()}`);
+    assert(this.currentVal.isFloat || this.currentVal.isInteger, `Expected JSON.Float but found ${this.currentVal.stringify()}`);
     return <T>(<JSON.Float>this.currentVal).valueOf();
   }
 
