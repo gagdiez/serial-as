@@ -20,6 +20,7 @@ import {
   HasConstructorArgs,
 } from "@serial-as/tests";
 import { initMixtureTwo } from "./utils";
+import { Point } from "../../../tests/assembly";
 
 function roundTrip<T>(t:T): void { 
   const encoded = ValueSerializer.encode(t);
@@ -57,6 +58,9 @@ describe("JSONSerializer Serializing Types - Two", () => {
   });
 
   it("should encode/decode floats", () => {
+    roundTrip<f64>(1)
+    roundTrip<f64>(-2)
+
     roundTrip<f64>(7.23)
     roundTrip<f64>(10e2)
     roundTrip<f64>(10E2)
@@ -69,7 +73,11 @@ describe("JSONSerializer Serializing Types - Two", () => {
     roundTrip<f64>(7.23)
   });
 
-    it("should encode/decode u128", () => {
+  it("should decode int as float", () => {
+    check_decode<Point>('{ "x": 3.4, "y": 3 }', { x: 3.4, y: 3.0 })
+  });
+
+  it("should encode/decode u128", () => {
     let N: u128 = u128.from("100")
     roundTrip(N);
   });

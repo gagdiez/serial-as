@@ -28,6 +28,12 @@ export class Numbers {
   public f64: f64 = 0;
 }
 
+@serializable
+export class Point {
+  public x: f64;
+  public y: f64;
+}
+
 export function init_numbers(N:Numbers):void{
   N.u8 = 1;
   N.u16 = 2;
