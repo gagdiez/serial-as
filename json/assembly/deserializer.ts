@@ -1,4 +1,4 @@
-import { Deserializer, allocObj, WRAP } from "@serial-as/core";
+import { Deserializer, allocObj, WRAP, defaultValue } from "@serial-as/core";
 import { u128, u128Safe } from "as-bignum";
 import * as base64 from "as-base64";
 import { JSON } from "assemblyscript-json";
@@ -33,10 +33,10 @@ export class ValueDeserializer extends Deserializer<JSON.Value>{
     return (<JSON.Arr>this.currentVal);
   }
 
-  _decode_field<T>(name: string, defaultValue: T): T {
+  decode_field<T>(name: string): T {
     // "name":value,
     const obj = this.currentObj;
-    if (!obj.has(name)) { return defaultValue; }
+    if (!obj.has(name)) { return defaultValue<T>(); }
     this.pushVal(obj.get(name)!);
     const res = this.decode<T>();
     this.popVal();
