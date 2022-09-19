@@ -17,8 +17,7 @@
     "exportRuntime": true,
     "use": ["RTRACE=1"],
     "debug": true,
-    "exportTable": true,
-    "transform": ["transform/dist/index.js"]
+    "exportTable": true
   },
   "extends": "./asconfig.json",
   "entries": ["./node_modules/@as-pect/assembly/assembly/index.ts"]
