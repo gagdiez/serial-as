@@ -1,7 +1,6 @@
-import { ClassDeclaration, Parser } from "assemblyscript/dist/assemblyscript";
+import { ClassDeclaration, Parser } from "assemblyscript/dist/assemblyscript.js";
 import { ASTTransformVisitor } from "visitor-as";
-declare class Transformer extends ASTTransformVisitor {
+export default class Transformer extends ASTTransformVisitor {
     visitClassDeclaration(node: ClassDeclaration): void;
     afterParse(_: Parser): void;
 }
-export default Transformer;

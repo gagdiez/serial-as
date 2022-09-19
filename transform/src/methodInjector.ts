@@ -1,7 +1,7 @@
-import { TypeNode, ClassDeclaration, Source, FieldDeclaration, NodeKind, DeclarationStatement, CommonFlags } from "assemblyscript/dist/assemblyscript";
+import { TypeNode, ClassDeclaration, Source, FieldDeclaration, NodeKind, DeclarationStatement, CommonFlags } from "assemblyscript/dist/assemblyscript.js";
 import { SimpleParser, BaseVisitor } from "visitor-as";
-import { toString, isMethodNamed, getName } from 'visitor-as/dist/utils';
-import { isStdlib } from "./utils";
+import { toString, isMethodNamed, getName } from 'visitor-as/dist/utils.js';
+import { isStdlib } from "./utils.js";
 
 function isField(node: DeclarationStatement): boolean {
   return node.kind == NodeKind.FIELDDECLARATION;

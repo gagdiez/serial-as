@@ -1,6 +1,6 @@
 {
   "options": {
     "runtime": "stub",
-    "transform": ["./transform/dist/index.js"]
+    "transform": ["./transform"]
   }
 }

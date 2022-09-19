@@ -1,6 +1,6 @@
 import { ValueSerializer } from "../serializer"
 import { ValueDeserializer } from "../deserializer";
-import { u128 } from "as-bignum";
+import { u128 } from "as-bignum/assembly";
 import {
   Numbers,
   init_numbers,
@@ -18,7 +18,7 @@ import {
   MapNullValues,
   BigObj,
   HasConstructorArgs,
-} from "@serial-as/tests";
+} from "@serial-as/tests/assembly";
 import { initMixtureTwo } from "./utils";
 
 function roundTrip<T>(t:T): void { 

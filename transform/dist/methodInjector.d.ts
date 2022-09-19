@@ -1,4 +1,4 @@
-import { ClassDeclaration, Source, FieldDeclaration } from "assemblyscript/dist/assemblyscript";
+import { ClassDeclaration, Source, FieldDeclaration } from "assemblyscript/dist/assemblyscript.js";
 import { BaseVisitor } from "visitor-as";
 export declare class MethodInjector extends BaseVisitor {
     encodeStmts: string[];
