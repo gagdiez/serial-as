@@ -1,4 +1,4 @@
-import { Serializer, isNumber } from "@serial-as/core";
+import { Serializer, isNumber } from "@serial-as/core/assembly";
 import { EncodeBuffer } from "./buffer";
 
 export class BorshSerializer extends Serializer<ArrayBuffer> {

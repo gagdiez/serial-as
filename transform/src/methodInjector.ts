@@ -1,4 +1,4 @@
-import { TypeNode, ClassDeclaration, Source, FieldDeclaration, NodeKind, DeclarationStatement, CommonFlags } from "visitor-as/as";
+import { TypeNode, ClassDeclaration, Source, FieldDeclaration, NodeKind, DeclarationStatement, CommonFlags } from "assemblyscript/dist/assemblyscript";
 import { SimpleParser, BaseVisitor } from "visitor-as";
 import { toString, isMethodNamed, getName } from 'visitor-as/dist/utils';
 import { isStdlib } from "./utils";

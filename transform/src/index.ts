@@ -1,4 +1,4 @@
-import { ClassDeclaration, Parser, CommonFlags } from "visitor-as/as";
+import { ClassDeclaration, Parser, CommonFlags } from "assemblyscript/dist/assemblyscript";
 import { registerDecorator, Decorator, ASTTransformVisitor } from "visitor-as";
 
 import {MethodInjector} from "./methodInjector";
@@ -18,4 +18,4 @@ class Transformer extends ASTTransformVisitor {
   
 }
 
-export = Transformer;
+export default Transformer;

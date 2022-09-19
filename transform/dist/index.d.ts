@@ -1,7 +1,7 @@
-import { ClassDeclaration, Parser } from "visitor-as/as";
+import { ClassDeclaration, Parser } from "assemblyscript/dist/assemblyscript";
 import { ASTTransformVisitor } from "visitor-as";
 declare class Transformer extends ASTTransformVisitor {
     visitClassDeclaration(node: ClassDeclaration): void;
     afterParse(_: Parser): void;
 }
-export = Transformer;
+export default Transformer;

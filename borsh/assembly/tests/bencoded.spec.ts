@@ -1,6 +1,6 @@
-import { BorshDeserializer, BorshSerializer } from '@serial-as/borsh'
-import { BigObj, MapSet, MixtureOne, Numbers, aString, aBoolean, Arrays, ArrayViews, Nullables, MixtureTwo, Nested, Extends, MapNullValues, init_numbers, init_arrays } from '@serial-as/tests';
-import { u128 } from 'as-bignum';
+import { BorshDeserializer, BorshSerializer } from '@serial-as/borsh/assembly'
+import { BigObj, MapSet, MixtureOne, Numbers, aString, aBoolean, Arrays, ArrayViews, Nullables, MixtureTwo, Nested, Extends, MapNullValues, init_numbers, init_arrays } from '@serial-as/tests/assembly';
+import { u128 } from 'as-bignum/assembly';
 
 
 // @serializable
