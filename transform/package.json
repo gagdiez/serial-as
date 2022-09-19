@@ -12,7 +12,7 @@
     "directory": "test"
   },
   "dependencies": {
-    "visitor-as": "^0.7.0-1"
+    "visitor-as": "^0.10.2"
   },
   "scripts": {
     "build": "rimraf dist/ && tsc"
