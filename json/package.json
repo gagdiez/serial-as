@@ -1,6 +1,6 @@
 {
   "name": "@serial-as/json",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "JSON Serializer for Assemblyscript",
   "main": "index.js",
   "types": "assembly/index.ts",
@@ -13,11 +13,11 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "@serial-as/core": "1.0.2",
+    "@serial-as/core": "^2.0.0",
     "as-base64": "^0.2.0",
     "assemblyscript-json": "^1.1.0"
   },
   "devDependencies": {
-    "@serial-as/tests": "1.0.2"
+    "@serial-as/tests": "^2.0.0"
   }
 }

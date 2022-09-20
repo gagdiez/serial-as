@@ -1,6 +1,6 @@
 {
   "name": "@serial-as/tests",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "Tets for serializers in Assemblyscript",
   "main": "dist/index.js",
   "types": "assembly/index.ts",
