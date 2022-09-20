@@ -1,4 +1,4 @@
-import { Serializer, isNumber } from "@serial-as/core";
+import { Serializer, isNumber } from "@serial-as/core/assembly";
 import { EncodeBuffer } from "./buffer";
 
 export class BorshSerializer extends Serializer<ArrayBuffer> {
@@ -112,18 +112,11 @@ export class BorshSerializer extends Serializer<ArrayBuffer> {
 
   encode_number<T extends number>(value: T): void {
     if (isFloat<T>()) {
-      // @ts-ignore
-      if (value instanceof f32) {
-        assert(
-          value != f32.NaN,
-          "For portability reasons we do not allow f32s to be encoded as Nan"
-        );
-      } else {
-        assert(
-          value != f64.NaN,
-          "For portability reasons we do not allow f64s to be encoded as Nan"
-        );
-      }
+      assert(
+        // Type information is passed nicely here
+        !isNaN(value),
+        "For portability reasons we do not allow f32s to be encoded as Nan"
+      );
     }
     // little_endian(x)
     this.buffer.store<T>(value);

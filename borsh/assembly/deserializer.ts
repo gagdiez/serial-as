@@ -1,4 +1,4 @@
-import { Deserializer, allocObj } from "@serial-as/core";
+import { Deserializer, allocObj } from "@serial-as/core/assembly";
 import { DecodeBuffer } from "./buffer";
 
 export class BorshDeserializer extends Deserializer<ArrayBuffer>{

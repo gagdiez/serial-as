@@ -1,6 +1,6 @@
-import { MixtureTwo } from "@serial-as/tests";
-import * as base64 from "as-base64";
-import { u128 } from "as-bignum";
+import { MixtureTwo } from "@serial-as/tests/assembly";
+import * as base64 from "as-base64/assembly";
+import { u128 } from "as-bignum/assembly";
 
 export function initMixtureTwo(f: MixtureTwo): MixtureTwo {
   f.u32Arr = [42, 11];

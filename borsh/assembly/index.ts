@@ -1,4 +1,4 @@
-import { Serial } from '@serial-as/core'
+import { Serial } from '@serial-as/core/assembly'
 
 import { BorshSerializer } from './serializer'
 import { BorshDeserializer } from './deserializer'

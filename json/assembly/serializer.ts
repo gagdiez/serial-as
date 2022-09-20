@@ -1,7 +1,7 @@
-import { Serializer } from "@serial-as/core"
-import { u128, u128Safe } from "as-bignum";
-import * as base64 from "as-base64";
-import { JSON } from "assemblyscript-json";
+import { Serializer } from "@serial-as/core/assembly"
+import { u128, u128Safe } from "as-bignum/assembly";
+import * as base64 from "as-base64/assembly";
+import { JSON } from "assemblyscript-json/assembly";
 
 function isNull<T>(t: T): boolean {
   if (!isNullable<T>()) return false;

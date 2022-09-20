@@ -1,1 +1,1 @@
-export  { isStdlib } from "visitor-as/dist/utils";
+export  { isStdlib } from "visitor-as/dist/utils.js";

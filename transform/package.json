@@ -3,6 +3,7 @@
   "version": "1.0.2",
   "description": "Transform to enable serialization in Assemblyscript",
   "main": "dist/index.js",
+  "type": "module",
   "types": "dist/index.d.ts",
   "author": "Guillermo Gallardo and Willem Wyndham",
   "license": "MIT",
@@ -12,7 +13,7 @@
     "directory": "test"
   },
   "dependencies": {
-    "visitor-as": "^0.7.0-1"
+    "visitor-as": "^0.10.2"
   },
   "scripts": {
     "build": "rimraf dist/ && tsc"

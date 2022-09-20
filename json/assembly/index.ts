@@ -1,8 +1,8 @@
-import { Serial } from '@serial-as/core';
+import { Serial } from '@serial-as/core/assembly';
 import { ValueSerializer } from './serializer'
 import { ValueDeserializer } from './deserializer'
 
-import { JSON } from "assemblyscript-json";
+import { JSON } from "assemblyscript-json/assembly";
 
 
 /*

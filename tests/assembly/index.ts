@@ -1,4 +1,4 @@
-import { u128 } from "as-bignum";
+import { u128 } from "as-bignum/assembly";
 
 // Test
 // Numbers
