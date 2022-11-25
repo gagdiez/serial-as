@@ -12,7 +12,7 @@ import { stringify, parse } from '@serial-as/json'
 
 @serializable
 class Pair{
-  x: i32 = 0,
+  x: i32 = 0
   y: i32 = 0
 }
 
