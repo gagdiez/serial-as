@@ -164,9 +164,17 @@ export class ValueDeserializer extends Deserializer<JSON.Value>{
   }
 
   decode_float<T extends number>(): T {
-    assert(this.currentVal.isFloat, `Expected JSON.Float but found ${this.currentVal.stringify()}`);
-    return <T>(<JSON.Float>this.currentVal).valueOf();
+    assert(
+      this.currentVal.isFloat || this.currentVal.isInteger,
+      `Expected JSON.Float || JSON.Integer but found ${this.currentVal.stringify()}`,
+    );
+
+    if (this.currentVal.isFloat) {
+      return <T>(<JSON.Float>this.currentVal).valueOf();
+    }
+    return <T>(<JSON.Integer>this.currentVal).valueOf();
   }
+
 
   // We override decode_number, for which we don't need these
   decode_u8(): u8 {   return this.decode_int<u8>() }
